@@ -893,7 +893,7 @@
           "fail": true
         }
       ],
-      "chapter": "Where it breaks"
+      "chapter": "Map cells in memory"
     },
     {
       "eyebrow": "Fix: map cells in memory",
@@ -1188,8 +1188,7 @@
           }
         ]
       },
-      "labels": [],
-      "chapter": "Fix it"
+      "labels": []
     },
     {
       "eyebrow": "Search near the rider",
@@ -2500,7 +2499,7 @@
           "fail": true
         }
       ],
-      "chapter": "Where it breaks"
+      "chapter": "Reserve first"
     },
     {
       "eyebrow": "Fix: reserve first",
@@ -2863,8 +2862,7 @@
           ],
           "accent": true
         }
-      ],
-      "chapter": "Fix it"
+      ]
     },
     {
       "eyebrow": "Quick check",

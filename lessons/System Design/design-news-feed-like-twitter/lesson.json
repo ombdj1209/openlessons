@@ -603,7 +603,7 @@
           "fail": true
         }
       ],
-      "chapter": "Where it breaks"
+      "chapter": "A ready-made timeline"
     },
     {
       "eyebrow": "Fix: a ready-made timeline",
@@ -819,8 +819,7 @@
             560
           ]
         }
-      ],
-      "chapter": "Fix it"
+      ]
     },
     {
       "eyebrow": "Fan-out on write",
@@ -1763,7 +1762,7 @@
           "fail": true
         }
       ],
-      "chapter": "Where it breaks"
+      "chapter": "Mix push and pull"
     },
     {
       "eyebrow": "Fix: mix push and pull",
@@ -2134,8 +2133,7 @@
           ],
           "accent": true
         }
-      ],
-      "chapter": "Fix it"
+      ]
     },
     {
       "eyebrow": "Quick check",

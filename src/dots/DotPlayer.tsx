@@ -198,7 +198,8 @@ export function DotPlayer({ slug, lesson, next }: { slug: string; lesson: Lesson
             <nav className="dot-chapters" aria-label="Chapters">
               {chapters.map((c, i) => (
                 <button key={c.name} className={`dot-chapter ${i === chapterIdx ? 'on' : ''} ${i < chapterIdx ? 'done' : ''}`}
-                  aria-current={i === chapterIdx ? 'step' : undefined} onClick={() => go(c.start)}>{c.name}</button>
+                  aria-current={i === chapterIdx ? 'step' : undefined} onClick={() => go(c.start)}
+                  ref={i === chapterIdx ? (el) => el?.scrollIntoView({ block: 'nearest', inline: 'nearest' }) : undefined}>{c.name}</button>
               ))}
             </nav>
           )}

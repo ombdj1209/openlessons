@@ -1,0 +1,2394 @@
+{
+  "$schema": "../../../lesson.schema.json",
+  "title": "How DNS finds a website",
+  "question": "How does your browser turn a name like shop.io into an address?",
+  "createdAt": "2026-10-09",
+  "tags": [
+    "networking",
+    "dns",
+    "caching",
+    "web"
+  ],
+  "companies": [],
+  "authors": [
+    "ombdj1209"
+  ],
+  "difficulty": "Easy",
+  "dots": 2400,
+  "spacing": 8,
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "chapter": "Question",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer sets the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "HOW DNS WORKS",
+            "size": 110
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "CONCEPTS · EASY",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "You type shop.io and a page appears. But computers find each other by number (IP addresses), not by name. How does the browser turn a name into an address?",
+        "example": [
+          "shop.io → 203.0.113.7",
+          "Usually answered in a few milliseconds"
+        ],
+        "constraints": [
+          "Hundreds of millions of names, changing all the time",
+          "No single server could hold or answer them all"
+        ],
+        "followUp": "Why can a change to a website’s address take hours to reach everyone?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "The idea",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "DNS is the internet’s *phone book*: it turns a name like shop.io into the number computers actually use.",
+        "points": [
+          "*You give:* a name.",
+          "*You get back:* an IP address, like 203.0.113.7.",
+          "*The catch:* no single book holds every name."
+        ]
+      }
+    },
+    {
+      "eyebrow": "Names vs numbers",
+      "caption": "Your browser wants shop.io, but the network only delivers to *numbers*. Before anything else, it must find shop.io’s address.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.35,
+            "label": "YOUR BROWSER",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              650
+            ],
+            "scale": 0.45,
+            "label": "THE WEBSITE",
+            "id": "site"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                470
+              ],
+              [
+                300,
+                470
+              ],
+              [
+                300,
+                650
+              ],
+              [
+                1045,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_site"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                175,
+                470
+              ],
+              [
+                300,
+                470
+              ],
+              [
+                300,
+                650
+              ],
+              [
+                1045,
+                650
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "shop.io = ?",
+          "at": [
+            620,
+            620
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "The lookup"
+    },
+    {
+      "eyebrow": "Ask a resolver",
+      "caption": "So it asks a *resolver*: a server, run by your internet provider or a public one like 1.1.1.1, that goes and finds the answer for you.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.35,
+            "label": "YOUR BROWSER",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "RESOLVER",
+            "note": "Run by your internet provider, or a public one like 1.1.1.1. It does the asking for you.",
+            "id": "res",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_you"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“where is shop.io?”",
+          "at": [
+            300,
+            395
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Step 1 · the root",
+      "caption": "The resolver starts at the *root servers*. They don’t know shop.io, but they know who runs every ending, so they reply: “ask the .io servers.”",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.35,
+            "label": "YOUR BROWSER",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "RESOLVER",
+            "note": "Run by your internet provider, or a public one like 1.1.1.1. It does the asking for you.",
+            "id": "res"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              820,
+              200
+            ],
+            "scale": 0.45,
+            "label": "ROOT SERVERS",
+            "note": "They know who runs every ending: .com, .org, .io and the rest.",
+            "id": "root",
+            "accent": true
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              200
+            ],
+            "scale": 0.4,
+            "label": ".IO SERVERS",
+            "note": "They know which name server is in charge of each .io name.",
+            "id": "tld"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SHOP.IO NAME SERVER",
+            "note": "The authoritative server: it holds the real record for shop.io.",
+            "id": "auth"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_you"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                778,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_root"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                415
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                1100,
+                152
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tld"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                430
+              ],
+              [
+                1325,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_auth"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                530,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                778,
+                200
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                778,
+                200
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                530,
+                400
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“ask the .io servers”",
+          "at": [
+            820,
+            130
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Step 2 · the .io servers",
+      "caption": "The .io servers don’t know the address either, but they know which *name server* is in charge of shop.io, and point there.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.35,
+            "label": "YOUR BROWSER",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "RESOLVER",
+            "note": "Run by your internet provider, or a public one like 1.1.1.1. It does the asking for you.",
+            "id": "res"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              820,
+              200
+            ],
+            "scale": 0.45,
+            "label": "ROOT SERVERS",
+            "note": "They know who runs every ending: .com, .org, .io and the rest.",
+            "id": "root"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              200
+            ],
+            "scale": 0.4,
+            "label": ".IO SERVERS",
+            "note": "They know which name server is in charge of each .io name.",
+            "id": "tld",
+            "accent": true
+          },
+          {
+            "shape": "server",
+            "at": [
+              1380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SHOP.IO NAME SERVER",
+            "note": "The authoritative server: it holds the real record for shop.io.",
+            "id": "auth"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_you"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                778,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_root"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                415
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                1100,
+                152
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tld"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                430
+              ],
+              [
+                1325,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_auth"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                530,
+                415
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                1100,
+                152
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1100,
+                152
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                530,
+                415
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“ask shop.io’s name server”",
+          "at": [
+            1100,
+            290
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Step 3 · the real answer",
+      "caption": "shop.io’s own name server holds the real record: shop.io → 203.0.113.7. This is the *authoritative* answer.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.35,
+            "label": "YOUR BROWSER",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "RESOLVER",
+            "note": "Run by your internet provider, or a public one like 1.1.1.1. It does the asking for you.",
+            "id": "res"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              820,
+              200
+            ],
+            "scale": 0.45,
+            "label": "ROOT SERVERS",
+            "note": "They know who runs every ending: .com, .org, .io and the rest.",
+            "id": "root"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              200
+            ],
+            "scale": 0.4,
+            "label": ".IO SERVERS",
+            "note": "They know which name server is in charge of each .io name.",
+            "id": "tld"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SHOP.IO NAME SERVER",
+            "note": "The authoritative server: it holds the real record for shop.io.",
+            "id": "auth",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_you"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                778,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_root"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                415
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                1100,
+                152
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tld"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                430
+              ],
+              [
+                1325,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_auth"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                530,
+                430
+              ],
+              [
+                1325,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1325,
+                430
+              ],
+              [
+                530,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "shop.io → 203.0.113.7",
+          "at": [
+            1000,
+            400
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Connect",
+      "caption": "The resolver hands the address back, and the browser finally connects to 203.0.113.7. Three questions first, then the real request.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.35,
+            "label": "YOUR BROWSER",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "RESOLVER",
+            "note": "Run by your internet provider, or a public one like 1.1.1.1. It does the asking for you.",
+            "id": "res"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              820,
+              200
+            ],
+            "scale": 0.45,
+            "label": "ROOT SERVERS",
+            "note": "They know who runs every ending: .com, .org, .io and the rest.",
+            "id": "root"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              200
+            ],
+            "scale": 0.4,
+            "label": ".IO SERVERS",
+            "note": "They know which name server is in charge of each .io name.",
+            "id": "tld"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SHOP.IO NAME SERVER",
+            "note": "The authoritative server: it holds the real record for shop.io.",
+            "id": "auth"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_you"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                778,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_root"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                415
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                1100,
+                152
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tld"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                430
+              ],
+              [
+                1325,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_auth"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              650
+            ],
+            "scale": 0.45,
+            "label": "THE WEBSITE",
+            "id": "site"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                470
+              ],
+              [
+                300,
+                470
+              ],
+              [
+                300,
+                650
+              ],
+              [
+                1045,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_site"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                425,
+                430
+              ],
+              [
+                175,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                175,
+                470
+              ],
+              [
+                300,
+                470
+              ],
+              [
+                300,
+                650
+              ],
+              [
+                1045,
+                650
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "GET / → 203.0.113.7",
+          "at": [
+            620,
+            620
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Which server actually holds the record shop.io → 203.0.113.7?",
+        "options": [
+          "shop.io’s own name server",
+          "The root servers",
+          "Your browser"
+        ],
+        "answer": 0,
+        "explain": "The root and .io servers only *point the way*. The authoritative name server for shop.io is the one that holds the real record."
+      }
+    },
+    {
+      "eyebrow": "Every lookup walks the chain?",
+      "caption": "Billions of lookups a day can’t all walk root → .io → shop.io. The root servers would melt, and every page would wait for three extra round trips.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.35,
+            "label": "YOUR BROWSER",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "RESOLVER",
+            "note": "Run by your internet provider, or a public one like 1.1.1.1. It does the asking for you.",
+            "id": "res"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              820,
+              200
+            ],
+            "scale": 0.45,
+            "label": "ROOT SERVERS",
+            "note": "They know who runs every ending: .com, .org, .io and the rest.",
+            "id": "root",
+            "fail": true
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              200
+            ],
+            "scale": 0.4,
+            "label": ".IO SERVERS",
+            "note": "They know which name server is in charge of each .io name.",
+            "id": "tld"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SHOP.IO NAME SERVER",
+            "note": "The authoritative server: it holds the real record for shop.io.",
+            "id": "auth"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_you"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                778,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_root"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                415
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                1100,
+                152
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tld"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                430
+              ],
+              [
+                1325,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_auth"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              650
+            ],
+            "scale": 0.45,
+            "label": "THE WEBSITE",
+            "id": "site"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                470
+              ],
+              [
+                300,
+                470
+              ],
+              [
+                300,
+                650
+              ],
+              [
+                1045,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_site"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "count": 8,
+            "speed": 0.7
+          },
+          {
+            "path": [
+              [
+                530,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                778,
+                200
+              ]
+            ],
+            "count": 10,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          },
+          {
+            "path": [
+              [
+                530,
+                415
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                1100,
+                152
+              ]
+            ],
+            "count": 4,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "BILLIONS OF LOOKUPS ✕",
+          "at": [
+            820,
+            130
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Caching"
+    },
+    {
+      "eyebrow": "Fix: remember answers",
+      "caption": "So resolvers *cache* answers. The next person who asks for shop.io gets 203.0.113.7 straight from memory, in about a millisecond.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.35,
+            "label": "YOUR BROWSER",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "RESOLVER",
+            "note": "Run by your internet provider, or a public one like 1.1.1.1. It does the asking for you.",
+            "id": "res"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              820,
+              200
+            ],
+            "scale": 0.45,
+            "label": "ROOT SERVERS",
+            "note": "They know who runs every ending: .com, .org, .io and the rest.",
+            "id": "root"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              200
+            ],
+            "scale": 0.4,
+            "label": ".IO SERVERS",
+            "note": "They know which name server is in charge of each .io name.",
+            "id": "tld"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SHOP.IO NAME SERVER",
+            "note": "The authoritative server: it holds the real record for shop.io.",
+            "id": "auth"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_you"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                778,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_root"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                415
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                1100,
+                152
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tld"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                430
+              ],
+              [
+                1325,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_auth"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              650
+            ],
+            "scale": 0.45,
+            "label": "THE WEBSITE",
+            "id": "site"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                470
+              ],
+              [
+                300,
+                470
+              ],
+              [
+                300,
+                650
+              ],
+              [
+                1045,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_site"
+          },
+          {
+            "shape": "map",
+            "at": [
+              480,
+              215
+            ],
+            "scale": 0.8,
+            "entries": [
+              [
+                "shop.io",
+                "203.0.113.7"
+              ]
+            ],
+            "head": [
+              "NAME",
+              "ADDRESS"
+            ],
+            "label": "RESOLVER CACHE",
+            "id": "cache",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                262
+              ]
+            ],
+            "arrow": true,
+            "id": "p_cache"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                262
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                425,
+                430
+              ],
+              [
+                175,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "NO TRIP TO ROOT, .IO OR SHOP.IO",
+          "at": [
+            1000,
+            380
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "How long to remember: TTL",
+      "caption": "Every record carries a *TTL*, its time to live, say one hour. A resolver may reuse the answer that long, then must ask again. Browsers and phones cache too.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.35,
+            "label": "YOUR BROWSER",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "RESOLVER",
+            "note": "Run by your internet provider, or a public one like 1.1.1.1. It does the asking for you.",
+            "id": "res"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              820,
+              200
+            ],
+            "scale": 0.45,
+            "label": "ROOT SERVERS",
+            "note": "They know who runs every ending: .com, .org, .io and the rest.",
+            "id": "root"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              200
+            ],
+            "scale": 0.4,
+            "label": ".IO SERVERS",
+            "note": "They know which name server is in charge of each .io name.",
+            "id": "tld"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SHOP.IO NAME SERVER",
+            "note": "The authoritative server: it holds the real record for shop.io.",
+            "id": "auth"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_you"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                778,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_root"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                415
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                1100,
+                152
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tld"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                430
+              ],
+              [
+                1325,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_auth"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              650
+            ],
+            "scale": 0.45,
+            "label": "THE WEBSITE",
+            "id": "site"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                470
+              ],
+              [
+                300,
+                470
+              ],
+              [
+                300,
+                650
+              ],
+              [
+                1045,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_site"
+          },
+          {
+            "shape": "map",
+            "at": [
+              480,
+              215
+            ],
+            "scale": 0.8,
+            "entries": [
+              [
+                "shop.io",
+                "203.0.113.7"
+              ]
+            ],
+            "head": [
+              "NAME",
+              "ADDRESS"
+            ],
+            "label": "RESOLVER CACHE",
+            "id": "cache",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                262
+              ]
+            ],
+            "arrow": true,
+            "id": "p_cache"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                262
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "TTL 3600 s",
+          "at": [
+            620,
+            215
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Moving house",
+      "caption": "Move shop.io to a new server at 198.51.100.4. Resolvers holding the old answer keep sending people to the *old* address until their TTL runs out.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.35,
+            "label": "YOUR BROWSER",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "RESOLVER",
+            "note": "Run by your internet provider, or a public one like 1.1.1.1. It does the asking for you.",
+            "id": "res"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              820,
+              200
+            ],
+            "scale": 0.45,
+            "label": "ROOT SERVERS",
+            "note": "They know who runs every ending: .com, .org, .io and the rest.",
+            "id": "root"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              200
+            ],
+            "scale": 0.4,
+            "label": ".IO SERVERS",
+            "note": "They know which name server is in charge of each .io name.",
+            "id": "tld"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SHOP.IO NAME SERVER",
+            "note": "The authoritative server: it holds the real record for shop.io.",
+            "id": "auth"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_you"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                778,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_root"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                415
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                1100,
+                152
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tld"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                430
+              ],
+              [
+                1325,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_auth"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              650
+            ],
+            "scale": 0.45,
+            "label": "THE WEBSITE",
+            "id": "site"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                470
+              ],
+              [
+                300,
+                470
+              ],
+              [
+                300,
+                650
+              ],
+              [
+                1045,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_site"
+          },
+          {
+            "shape": "map",
+            "at": [
+              480,
+              215
+            ],
+            "scale": 0.8,
+            "entries": [
+              [
+                "shop.io",
+                "203.0.113.7"
+              ]
+            ],
+            "head": [
+              "NAME",
+              "ADDRESS"
+            ],
+            "label": "RESOLVER CACHE",
+            "id": "cache",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                262
+              ]
+            ],
+            "arrow": true,
+            "id": "p_cache"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                262
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                175,
+                470
+              ],
+              [
+                300,
+                470
+              ],
+              [
+                300,
+                650
+              ],
+              [
+                1045,
+                650
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "STILL 203.0.113.7 FOR UP TO AN HOUR ✕",
+          "at": [
+            620,
+            600
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Changes"
+    },
+    {
+      "eyebrow": "Fix: lower the TTL first",
+      "caption": "Before a move, drop the TTL to, say, 60 seconds and wait for the old hour to pass. Then the switch reaches everyone within a minute.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.35,
+            "label": "YOUR BROWSER",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "RESOLVER",
+            "note": "Run by your internet provider, or a public one like 1.1.1.1. It does the asking for you.",
+            "id": "res"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              820,
+              200
+            ],
+            "scale": 0.45,
+            "label": "ROOT SERVERS",
+            "note": "They know who runs every ending: .com, .org, .io and the rest.",
+            "id": "root"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              200
+            ],
+            "scale": 0.4,
+            "label": ".IO SERVERS",
+            "note": "They know which name server is in charge of each .io name.",
+            "id": "tld"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SHOP.IO NAME SERVER",
+            "note": "The authoritative server: it holds the real record for shop.io.",
+            "id": "auth"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                430
+              ],
+              [
+                425,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_you"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                200
+              ],
+              [
+                778,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_root"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                415
+              ],
+              [
+                640,
+                415
+              ],
+              [
+                640,
+                110
+              ],
+              [
+                1100,
+                110
+              ],
+              [
+                1100,
+                152
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tld"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                530,
+                430
+              ],
+              [
+                1325,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_auth"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1100,
+              650
+            ],
+            "scale": 0.45,
+            "label": "THE WEBSITE",
+            "id": "site"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                175,
+                470
+              ],
+              [
+                300,
+                470
+              ],
+              [
+                300,
+                650
+              ],
+              [
+                1045,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_site"
+          },
+          {
+            "shape": "map",
+            "at": [
+              480,
+              215
+            ],
+            "scale": 0.8,
+            "entries": [
+              [
+                "shop.io",
+                "198.51.100.4"
+              ]
+            ],
+            "head": [
+              "NAME",
+              "ADDRESS"
+            ],
+            "label": "RESOLVER CACHE",
+            "id": "cache",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                262
+              ]
+            ],
+            "arrow": true,
+            "id": "p_cache"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                262
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                175,
+                470
+              ],
+              [
+                300,
+                470
+              ],
+              [
+                300,
+                650
+              ],
+              [
+                1045,
+                650
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "TTL 60 s",
+          "at": [
+            620,
+            215
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "You changed shop.io’s address an hour ago, but some users still reach the old server. Why?",
+        "options": [
+          "Their resolvers cached the old answer and its TTL hasn’t run out",
+          "DNS changes need a server restart",
+          "The root servers are down"
+        ],
+        "answer": 0,
+        "explain": "Caches keep an answer until its *TTL* expires. Lower the TTL well before a move so old answers die quickly."
+      }
+    },
+    {
+      "eyebrow": "Takeaway",
+      "chapter": "Recap",
+      "caption": "The big idea: DNS is a *chain of referrals* (root → ending → the name’s own server), made fast by caching, and kept fresh by TTLs.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      }
+    }
+  ]
+}

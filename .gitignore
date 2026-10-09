@@ -1,4 +1,9 @@
 node_modules
 dist
+coverage
 test-results
 *.mp4
+*.log
+.DS_Store
+.vscode/*
+!.vscode/settings.json

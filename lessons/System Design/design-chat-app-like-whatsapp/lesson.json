@@ -466,7 +466,7 @@
           "fail": true
         }
       ],
-      "chapter": "Where it breaks"
+      "chapter": "Who is where"
     },
     {
       "eyebrow": "Many servers… where is Bob?",
@@ -816,8 +816,7 @@
           }
         ]
       },
-      "labels": [],
-      "chapter": "Fix it"
+      "labels": []
     },
     {
       "eyebrow": "✓ Sent",
@@ -2156,7 +2155,7 @@
           "fail": true
         }
       ],
-      "chapter": "Where it breaks"
+      "chapter": "One id per message"
     },
     {
       "eyebrow": "Fix: one id per message",
@@ -2389,8 +2388,7 @@
           ],
           "accent": true
         }
-      ],
-      "chapter": "Fix it"
+      ]
     },
     {
       "eyebrow": "Groups",

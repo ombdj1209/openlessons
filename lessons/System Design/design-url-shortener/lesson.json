@@ -683,7 +683,7 @@
           "fail": true
         }
       ],
-      "chapter": "Where it breaks"
+      "chapter": "Many servers"
     },
     {
       "eyebrow": "Fix: many servers",
@@ -1007,8 +1007,7 @@
           }
         ]
       },
-      "labels": [],
-      "chapter": "Fix it"
+      "labels": []
     },
     {
       "eyebrow": "Now the database chokes",
@@ -1387,7 +1386,7 @@
           "fail": true
         }
       ],
-      "chapter": "Where it breaks"
+      "chapter": "A cache"
     },
     {
       "eyebrow": "Fix: a cache",
@@ -1818,8 +1817,7 @@
           }
         ]
       },
-      "labels": [],
-      "chapter": "Fix it"
+      "labels": []
     },
     {
       "eyebrow": "A cache miss",
@@ -2478,7 +2476,7 @@
           "fail": true
         }
       ],
-      "chapter": "Where it breaks"
+      "chapter": "ID blocks"
     },
     {
       "eyebrow": "Fix: ID blocks",
@@ -2887,8 +2885,7 @@
             570
           ]
         }
-      ],
-      "chapter": "Fix it"
+      ]
     },
     {
       "eyebrow": "Number → short code",
@@ -3816,7 +3813,7 @@
           "fail": true
         }
       ],
-      "chapter": "Where it breaks"
+      "chapter": "Shards"
     },
     {
       "eyebrow": "Fix: shards",
@@ -4377,8 +4374,7 @@
           ],
           "accent": true
         }
-      ],
-      "chapter": "Fix it"
+      ]
     },
     {
       "eyebrow": "Quick check",
