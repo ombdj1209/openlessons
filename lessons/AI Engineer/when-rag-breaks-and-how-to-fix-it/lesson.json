@@ -1,0 +1,4547 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-09",
+  "request": "add an AI Engineer folder with RAG in detail: how it works, types of RAG and use cases",
+  "companies": [],
+  "dots": 2400,
+  "spacing": 8,
+  "difficulty": "Medium",
+  "title": "When RAG breaks, and how to fix it",
+  "tags": [
+    "ai-engineering",
+    "rag",
+    "llm",
+    "chunking",
+    "hybrid-search",
+    "reranking",
+    "evaluation"
+  ],
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "chapter": "Question",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer sets the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "WHEN RAG BREAKS",
+            "size": 104
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "AI ENGINEERING · MEDIUM",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Your RAG assistant is live and real users are finding problems. Find what breaks, why, and the fix for each one.",
+        "example": [
+          "Another company’s numbers show up in an answer",
+          "“error E-4012” returns nothing useful",
+          "Confident answers that are not in the documents"
+        ],
+        "constraints": [
+          "Answers must stay grounded in your documents",
+          "Fixes should not slow every question much",
+          "You must be able to prove each fix helped"
+        ],
+        "followUp": "How would you prove a fix actually improved things?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Requirements",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Fix a RAG system *one failure at a time*: work out whether *finding* or *writing* failed, apply the matching fix, then measure.",
+        "points": [
+          "*You get:* an assistant that is right most of the time.",
+          "*You do:* find each failure’s cause and fix only that part.",
+          "*The catch:* a fix in one place can hurt another, so measure."
+        ]
+      }
+    },
+    {
+      "eyebrow": "Chunks lose their context",
+      "caption": "A chunk can lose its context. “Revenue grew 3% over the last quarter” doesn’t say *whose* revenue. Ask about ACME, get another company’s chunk.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                54,
+                54
+              ]
+            ],
+            "bad": [
+              21
+            ],
+            "marks": [
+              {
+                "i": 20,
+                "text": "“revenue grew 3%”"
+              },
+              {
+                "i": 21,
+                "text": "“revenue grew 3%”"
+              }
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "identical text: whose revenue?  ✕",
+          "at": [
+            1020,
+            556
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Chunks"
+    },
+    {
+      "eyebrow": "Fix: add context to each chunk",
+      "caption": "Before embedding, have an AI prepend a short note to every chunk: “From ACME’s Q2 report: revenue grew 3%…”. Anthropic calls this *contextual retrieval*.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              470,
+              200
+            ],
+            "scale": 0.5,
+            "values": [
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6"
+            ],
+            "label": "CHUNKS",
+            "note": "Small pieces of the documents: a few paragraphs each, with a little overlap.",
+            "id": "chunks",
+            "accent": true
+          },
+          {
+            "shape": "server",
+            "at": [
+              760,
+              200
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "Turns text into a list of numbers that captures its meaning.",
+            "id": "embA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                620,
+                200
+              ],
+              [
+                715,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_chunksEmb"
+          },
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                54,
+                56
+              ],
+              [
+                26,
+                56
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                54,
+                54
+              ]
+            ],
+            "hi": [
+              20
+            ],
+            "marks": [
+              {
+                "i": 20,
+                "text": "ACME · Q2 · +3%"
+              },
+              {
+                "i": 21,
+                "text": "OtherCo · Q2 · +3%"
+              }
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                620,
+                200
+              ],
+              [
+                715,
+                200
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "+ “From ACME’s Q2 report:”",
+          "at": [
+            470,
+            130
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Exact words get lost",
+      "caption": "Vectors are fuzzy. Search “error E-4012” and they find pages about errors *in general*. An exact code has little “meaning”, so the one page that names it is missed.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                54,
+                54
+              ]
+            ],
+            "bad": [
+              20,
+              21
+            ],
+            "marks": [
+              {
+                "i": 22,
+                "text": "“E-4012” (missed)"
+              }
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“error E-4012”",
+          "at": [
+            990,
+            358
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Search"
+    },
+    {
+      "eyebrow": "Fix: hybrid search",
+      "caption": "Add a classic *keyword index* (BM25) beside the vector index. Keywords catch exact codes and names; vectors catch meaning. Run both, then merge the lists.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                54,
+                54
+              ]
+            ],
+            "dim": [
+              20,
+              21
+            ],
+            "hi": [
+              22
+            ],
+            "marks": [
+              {
+                "i": 22,
+                "text": "“E-4012” ✓"
+              }
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          },
+          {
+            "shape": "table",
+            "at": [
+              1300,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 4,
+            "cols": 3,
+            "label": "KEYWORD INDEX",
+            "note": "A classic search index (BM25) that matches exact words, codes and names.",
+            "id": "kw",
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              1490,
+              380
+            ],
+            "w": 110,
+            "h": 100,
+            "text": "PROMPT",
+            "label": "PROMPT",
+            "note": "Question + the retrieved chunks + the rules for answering.",
+            "id": "prompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                1195,
+                575
+              ],
+              [
+                1195,
+                200
+              ],
+              [
+                1228,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embKw"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vdbPrompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1350,
+                200
+              ],
+              [
+                1490,
+                200
+              ],
+              [
+                1490,
+                326
+              ]
+            ],
+            "arrow": true,
+            "id": "p_kwPrompt"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                1195,
+                575
+              ],
+              [
+                1195,
+                200
+              ],
+              [
+                1228,
+                200
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1350,
+                200
+              ],
+              [
+                1490,
+                200
+              ],
+              [
+                1490,
+                326
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "merge: rank fusion",
+          "at": [
+            1350,
+            285
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Searching “error E-4012” returns pages about errors in general. What is the cheapest fix?",
+        "options": [
+          "Add keyword (BM25) search next to vector search",
+          "Switch to a bigger AI model",
+          "Make every chunk longer"
+        ],
+        "answer": 0,
+        "explain": "The problem is *retrieval*, not the AI. Keyword search matches the exact code, and merging with vector results keeps both strengths."
+      }
+    },
+    {
+      "eyebrow": "Too many, too noisy",
+      "caption": "Retrieve 20 chunks and most are filler. The prompt fills up, the AI gets distracted, and the bill grows. We want only the best few.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                54,
+                54
+              ]
+            ],
+            "r": 120,
+            "hi": [
+              2,
+              20,
+              21
+            ],
+            "bad": [
+              3,
+              4,
+              8,
+              9,
+              12,
+              15,
+              17
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1490,
+              380
+            ],
+            "w": 110,
+            "h": 100,
+            "text": "PROMPT",
+            "label": "PROMPT",
+            "note": "Question + the retrieved chunks + the rules for answering.",
+            "id": "prompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vdbPrompt"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "count": 8,
+            "speed": 0.4,
+            "fail": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "20 CHUNKS, ~3 USEFUL",
+          "at": [
+            1020,
+            556
+          ],
+          "fail": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Fix: rerank",
+      "caption": "Retrieve many cheaply (say 20), then a *reranker* reads the question together with each candidate, scores them, and keeps only the best 3 to 5.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                54,
+                54
+              ]
+            ],
+            "r": 120,
+            "hi": [
+              2,
+              20,
+              21
+            ],
+            "dim": [
+              3,
+              4,
+              8,
+              9,
+              12,
+              15,
+              17
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1290,
+              380
+            ],
+            "w": 140,
+            "h": 100,
+            "text": "RERANK",
+            "label": "RERANKER",
+            "note": "A model that reads the question and each candidate together, and keeps only the best few.",
+            "id": "rerank",
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              1490,
+              380
+            ],
+            "w": 110,
+            "h": 100,
+            "text": "PROMPT",
+            "label": "PROMPT",
+            "note": "Question + the retrieved chunks + the rules for answering.",
+            "id": "prompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1215,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vdbRerank"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1365,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rerankPrompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1290,
+                434
+              ],
+              [
+                1290,
+                520
+              ]
+            ],
+            "arrow": true,
+            "id": "p_drop"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1215,
+                380
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1365,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1290,
+                434
+              ],
+              [
+                1290,
+                520
+              ]
+            ],
+            "count": 4,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "DROPPED",
+          "at": [
+            1290,
+            548
+          ],
+          "fail": true
+        },
+        {
+          "text": "KEEP 3",
+          "at": [
+            1398,
+            438
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "It makes things up",
+      "caption": "Ask about something the documents never mention: “Do we cover pet insurance?” Retrieval still returns its nearest chunks, and the AI may invent an answer from them.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                52,
+                96
+              ]
+            ],
+            "bad": [
+              11,
+              16,
+              18
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1490,
+              380
+            ],
+            "w": 110,
+            "h": 100,
+            "text": "PROMPT",
+            "label": "PROMPT",
+            "note": "Question + the retrieved chunks + the rules for answering.",
+            "id": "prompt"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vdbPrompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1490,
+                434
+              ],
+              [
+                1490,
+                522
+              ]
+            ],
+            "arrow": true,
+            "id": "p_promptLlm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "arrow": true,
+            "id": "p_llmYou"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "count": 3,
+            "speed": 0.3,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“Yes, pets are covered.”  ✕",
+          "at": [
+            700,
+            692
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Answers"
+    },
+    {
+      "eyebrow": "Fix: allowed to say “I don’t know”",
+      "caption": "Tell the AI: answer *only* from the context; if it doesn’t say, reply “I don’t know”. Require a citation for every claim.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                52,
+                96
+              ]
+            ],
+            "dim": [
+              11,
+              16,
+              18
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1490,
+              380
+            ],
+            "w": 110,
+            "h": 100,
+            "text": "PROMPT",
+            "label": "PROMPT",
+            "note": "Question + the retrieved chunks + the rules for answering.",
+            "id": "prompt",
+            "accent": true
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vdbPrompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1490,
+                434
+              ],
+              [
+                1490,
+                522
+              ]
+            ],
+            "arrow": true,
+            "id": "p_promptLlm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "arrow": true,
+            "id": "p_llmYou"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "count": 3,
+            "speed": 0.3
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“I couldn’t find that in the documents.”",
+          "at": [
+            700,
+            692
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "A user asks about something that is not in your documents. What should the assistant do?",
+        "options": [
+          "Say it couldn’t find it in the documents",
+          "Answer from its general knowledge anyway",
+          "Return the nearest chunk as the answer"
+        ],
+        "answer": 0,
+        "explain": "A trustworthy RAG assistant knows the limits of its sources. “I don’t know” beats a confident wrong answer."
+      }
+    },
+    {
+      "eyebrow": "The documents change",
+      "caption": "Refund policy v4 says 14 days, but the index still holds v3. The assistant quotes the old rule with total confidence, and cites a document that no longer exists.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "bad": [
+              0
+            ],
+            "marks": [
+              {
+                "i": 0,
+                "text": "“30 days” (old)"
+              }
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1490,
+              380
+            ],
+            "w": 110,
+            "h": 100,
+            "text": "PROMPT",
+            "label": "PROMPT",
+            "note": "Question + the retrieved chunks + the rules for answering.",
+            "id": "prompt"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vdbPrompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1490,
+                434
+              ],
+              [
+                1490,
+                522
+              ]
+            ],
+            "arrow": true,
+            "id": "p_promptLlm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "arrow": true,
+            "id": "p_llmYou"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              70,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d1"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              140,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "label": "YOUR DOCUMENTS",
+            "note": "Policies, manuals, tickets, wikis: whatever the AI should be able to answer from.",
+            "id": "d2"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              210,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d3"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "count": 3,
+            "speed": 0.3,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“30 days”  ✕  (policy is now 14)",
+          "at": [
+            700,
+            692
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Upkeep"
+    },
+    {
+      "eyebrow": "Fix: re-index only what changed",
+      "caption": "Stamp each chunk with its document and version. When a document changes, re-embed *only that one* and swap its old chunks. Delete chunks of removed documents.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "doc",
+            "at": [
+              70,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d1"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              140,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "label": "YOUR DOCUMENTS",
+            "note": "Policies, manuals, tickets, wikis: whatever the AI should be able to answer from.",
+            "id": "d2",
+            "accent": true
+          },
+          {
+            "shape": "doc",
+            "at": [
+              210,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d3"
+          },
+          {
+            "shape": "array",
+            "at": [
+              470,
+              200
+            ],
+            "scale": 0.5,
+            "values": [
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6"
+            ],
+            "label": "CHUNKS",
+            "note": "Small pieces of the documents: a few paragraphs each, with a little overlap.",
+            "id": "chunks",
+            "accent": true
+          },
+          {
+            "shape": "server",
+            "at": [
+              760,
+              200
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "Turns text into a list of numbers that captures its meaning.",
+            "id": "embA"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                24,
+                28
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "hi": [
+              0
+            ],
+            "marks": [
+              {
+                "i": 0,
+                "text": "“14 days” (new)"
+              }
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                318,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_docsChunks"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                620,
+                200
+              ],
+              [
+                715,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_chunksEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                805,
+                200
+              ],
+              [
+                1020,
+                200
+              ],
+              [
+                1020,
+                266
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                318,
+                200
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                620,
+                200
+              ],
+              [
+                715,
+                200
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                805,
+                200
+              ],
+              [
+                1020,
+                200
+              ],
+              [
+                1020,
+                266
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.6
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "ONE CHANGED DOCUMENT → ONE RE-INDEX",
+          "at": [
+            800,
+            120
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Who may see what",
+      "caption": "A new hire asks about executive pay, and the HR-only chunk comes back. Search has no idea who is asking, so it returns the nearest chunk, allowed or not.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                26,
+                76
+              ]
+            ],
+            "bad": [
+              11
+            ],
+            "marks": [
+              {
+                "i": 11,
+                "text": "CEO pay · HR only"
+              }
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "NEW HIRE’S QUESTION",
+          "at": [
+            1026,
+            432.8
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Fix: filter while searching",
+      "caption": "Tag every chunk with who may read it, and have the search consider *only the chunks this user is allowed to see*. Filter during retrieval, not after.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                26,
+                76
+              ]
+            ],
+            "dim": [
+              10,
+              11,
+              12,
+              13,
+              14
+            ],
+            "marks": [
+              {
+                "i": 11,
+                "text": "hidden from this user"
+              }
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "ONLY CHUNKS THIS USER MAY READ",
+          "at": [
+            1020,
+            556
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Measure retrieval first",
+      "caption": "Measure the two halves *separately*. First retrieval: for test questions with known answers, was the right chunk in the top k? That score is called *recall@k*.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "accent": true,
+            "queries": [
+              [
+                54,
+                54
+              ]
+            ],
+            "hi": [
+              20
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1490,
+              380
+            ],
+            "w": 110,
+            "h": 100,
+            "text": "PROMPT",
+            "label": "PROMPT",
+            "note": "Question + the retrieved chunks + the rules for answering.",
+            "id": "prompt"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vdbPrompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1490,
+                434
+              ],
+              [
+                1490,
+                522
+              ]
+            ],
+            "arrow": true,
+            "id": "p_promptLlm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "arrow": true,
+            "id": "p_llmYou"
+          }
+        ],
+        "flows": []
+      },
+      "labels": [
+        {
+          "text": "RECALL@K: WAS THE RIGHT CHUNK IN THE TOP K?",
+          "at": [
+            1020,
+            556
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Measure",
+      "focus": [
+        "vdbB",
+        "embB",
+        "you"
+      ]
+    },
+    {
+      "eyebrow": "Then measure the answer",
+      "caption": "Then generation: does the answer stick to the retrieved chunks (*faithfulness*), and does it actually answer the question (*relevance*)? Tools like RAGAS automate this.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ],
+              [
+                52,
+                52
+              ],
+              [
+                57,
+                57
+              ],
+              [
+                88,
+                48
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdbB",
+            "queries": [
+              [
+                54,
+                54
+              ]
+            ],
+            "hi": [
+              20
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1490,
+              380
+            ],
+            "w": 110,
+            "h": 100,
+            "text": "PROMPT",
+            "label": "PROMPT",
+            "note": "Question + the retrieved chunks + the rules for answering.",
+            "id": "prompt"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vdbPrompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1490,
+                434
+              ],
+              [
+                1490,
+                522
+              ]
+            ],
+            "arrow": true,
+            "id": "p_promptLlm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "arrow": true,
+            "id": "p_llmYou"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1490,
+                434
+              ],
+              [
+                1490,
+                522
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "FAITHFUL TO THE CHUNKS?   RELEVANT TO THE QUESTION?",
+          "at": [
+            800,
+            692
+          ],
+          "accent": true
+        }
+      ],
+      "focus": [
+        "llm",
+        "prompt"
+      ]
+    },
+    {
+      "eyebrow": "Fixes stack up",
+      "caption": "Fixes stack. In Anthropic’s published test, “right chunk missing from the top 20” fell from 5.7% to 1.9% as context, keywords and reranking were added.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "bars",
+            "at": [
+              800,
+              420
+            ],
+            "values": [
+              5.7,
+              3.7,
+              2.9,
+              1.9
+            ],
+            "h": 250,
+            "marks": [
+              {
+                "i": 0,
+                "text": "plain RAG"
+              },
+              {
+                "i": 1,
+                "text": "+ context"
+              },
+              {
+                "i": 2,
+                "text": "+ keywords"
+              },
+              {
+                "i": 3,
+                "text": "+ rerank"
+              }
+            ],
+            "id": "bars"
+          }
+        ],
+        "flows": []
+      },
+      "labels": [
+        {
+          "text": "% OF QUESTIONS WHERE THE RIGHT CHUNK IS MISSING FROM THE TOP 20  (LOWER IS BETTER)",
+          "at": [
+            800,
+            150
+          ],
+          "accent": true
+        },
+        {
+          "text": "SOURCE: ANTHROPIC, CONTEXTUAL RETRIEVAL",
+          "at": [
+            800,
+            640
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "RAG, long prompt, or fine-tuning",
+      "chapter": "Trade-offs",
+      "caption": "Not every problem needs RAG. Pick by the shape of your data and what you need from the AI:",
+      "dur": 11,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Put it all in the prompt",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "RAG",
+            "id": "alt1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Fine-tuning",
+            "id": "alt2"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF EVERYTHING FITS IN ONE PROMPT",
+          "at": [
+            300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "skip RAG · cache the prompt",
+          "at": [
+            300,
+            548
+          ]
+        },
+        {
+          "text": "IF DATA IS BIG OR CHANGES OFTEN",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "finds facts · cites sources",
+          "at": [
+            800,
+            548
+          ]
+        },
+        {
+          "text": "IF YOU NEED A STYLE, NOT FACTS",
+          "at": [
+            1300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "teaches behaviour · bad at fresh facts",
+          "at": [
+            1300,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "chapter": "Recap",
+      "caption": "The big idea: *each RAG fix targets one failure*: context for lost meaning, keywords for exact terms, reranking for noise, rules for honesty. Measure, then fix.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      }
+    }
+  ]
+}

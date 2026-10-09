@@ -1,0 +1,616 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-08",
+  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "title": "Merge intervals: sort, then sweep",
+  "tags": [
+    "dsa",
+    "arrays",
+    "intervals",
+    "sorting",
+    "interview"
+  ],
+  "companies": [
+    "Amazon",
+    "Microsoft"
+  ],
+  "difficulty": "Medium",
+  "dots": 1300,
+  "steps": [
+    {
+      "eyebrow": "The problem",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer reads you the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "MERGE INTERVALS",
+            "size": 104
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LEETCODE 56 · MEDIUM",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Given an array of *intervals* where intervals[i] = [start_i, end_i], merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.",
+        "example": [
+          "Input:  intervals = [[1,3], [2,6], [8,10], [15,18]]",
+          "Output: [[1,6], [8,10], [15,18]]",
+          "[1,3] and [2,6] overlap, so they merge into [1,6]"
+        ],
+        "constraints": [
+          "1 <= intervals.length <= 10^4",
+          "intervals[i].length == 2",
+          "0 <= start_i <= end_i <= 10^4"
+        ]
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Some ranges overlap. *Glue the overlapping ones together* and return what is left.",
+        "points": [
+          "*You get:* ranges like [1, 3] and [2, 6].",
+          "*You return:* the glued ranges, like [1, 6].",
+          "*The catch:* the ranges can arrive in any order."
+        ]
+      }
+    },
+    {
+      "eyebrow": "The picture",
+      "dur": 8,
+      "caption": "Each range is a bar on a number line. Here they arrive *out of order*, so overlaps are hard to spot.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "intervals",
+            "at": [
+              760,
+              420
+            ],
+            "w": 900,
+            "entries": [
+              [
+                8,
+                10
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                15,
+                18
+              ],
+              [
+                2,
+                6
+              ]
+            ],
+            "note": "Each bar runs from its start to its end on the number line below."
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "Step 1 · sort by start",
+      "chapter": "Solution",
+      "dur": 9,
+      "caption": "Sort by *start*. Now anything that overlaps the current range must come right after it, so one walk left to right is enough.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "intervals",
+            "at": [
+              760,
+              420
+            ],
+            "w": 900,
+            "entries": [
+              [
+                1,
+                3
+              ],
+              [
+                2,
+                6
+              ],
+              [
+                8,
+                10
+              ],
+              [
+                15,
+                18
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "Walk · first range",
+      "dur": 6,
+      "caption": "Take the first range as *current*: [1, 3].",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "intervals",
+            "at": [
+              760,
+              420
+            ],
+            "w": 900,
+            "entries": [
+              [
+                1,
+                3
+              ],
+              [
+                2,
+                6
+              ],
+              [
+                8,
+                10
+              ],
+              [
+                15,
+                18
+              ]
+            ],
+            "hi": [
+              0
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "current: [1, 3]",
+          "at": [
+            760,
+            230
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Overlap",
+      "dur": 9,
+      "caption": "Next is [2, 6]. It starts at 2, before current ends at 3, so they *overlap*. Stretch current to end at 6: [1, 6].",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "intervals",
+            "at": [
+              760,
+              420
+            ],
+            "w": 900,
+            "entries": [
+              [
+                1,
+                3
+              ],
+              [
+                2,
+                6
+              ],
+              [
+                8,
+                10
+              ],
+              [
+                15,
+                18
+              ]
+            ],
+            "hi": [
+              0,
+              1
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "2 ≤ 3 → overlap → current = [1, max(3, 6)] = [1, 6]",
+          "at": [
+            760,
+            230
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "A gap",
+      "dur": 9,
+      "caption": "Next is [8, 10]. It starts at 8, after current ends at 6: a *gap*. Save [1, 6] and make [8, 10] the new current.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "intervals",
+            "at": [
+              760,
+              420
+            ],
+            "w": 900,
+            "entries": [
+              [
+                1,
+                3
+              ],
+              [
+                2,
+                6
+              ],
+              [
+                8,
+                10
+              ],
+              [
+                15,
+                18
+              ]
+            ],
+            "hi": [
+              2
+            ],
+            "dim": [
+              0,
+              1
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "8 > 6 → gap → save [1, 6], current = [8, 10]",
+          "at": [
+            760,
+            230
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Last one",
+      "dur": 8,
+      "caption": "[15, 18] starts after 10: another gap. Save [8, 10], and at the end save [15, 18] too.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "intervals",
+            "at": [
+              760,
+              420
+            ],
+            "w": 900,
+            "entries": [
+              [
+                1,
+                3
+              ],
+              [
+                2,
+                6
+              ],
+              [
+                8,
+                10
+              ],
+              [
+                15,
+                18
+              ]
+            ],
+            "hi": [
+              3
+            ],
+            "dim": [
+              0,
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "15 > 10 → save [8, 10] · end → save [15, 18]",
+          "at": [
+            760,
+            230
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "The answer",
+      "dur": 8,
+      "caption": "Three ranges are left: *[1, 6], [8, 10], [15, 18]*. The sort cost O(n log n); the walk itself was a single pass.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "intervals",
+            "at": [
+              760,
+              420
+            ],
+            "w": 900,
+            "entries": [
+              [
+                1,
+                6
+              ],
+              [
+                8,
+                10
+              ],
+              [
+                15,
+                18
+              ]
+            ],
+            "hi": [
+              0,
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "[[1, 6], [8, 10], [15, 18]]",
+          "at": [
+            760,
+            250
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Current is [1, 5]. The next range is [2, 4]. What is current now?",
+        "options": [
+          "[1, 4]",
+          "[1, 5]",
+          "[2, 5]"
+        ],
+        "answer": 1,
+        "explain": "[2, 4] sits *inside* [1, 5]. Take the max of the two ends, not the new end, or the range would shrink. A classic bug."
+      }
+    },
+    {
+      "eyebrow": "The code",
+      "chapter": "Code",
+      "caption": "Here is the whole solution. The comments match the steps we just walked through.",
+      "dur": 10,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 920,
+            "h": 378
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "def merge(intervals):",
+          "at": [
+            370,
+            276
+          ],
+          "code": true
+        },
+        {
+          "text": "    intervals.sort(key=lambda iv: iv[0])       # by start",
+          "at": [
+            370,
+            312
+          ],
+          "code": true
+        },
+        {
+          "text": "    out = [intervals[0]]",
+          "at": [
+            370,
+            348
+          ],
+          "code": true
+        },
+        {
+          "text": "    for start, end in intervals[1:]:",
+          "at": [
+            370,
+            384
+          ],
+          "code": true
+        },
+        {
+          "text": "        if start <= out[-1][1]:                # overlaps the last one",
+          "at": [
+            370,
+            420
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "            out[-1][1] = max(out[-1][1], end)  # stretch it",
+          "at": [
+            370,
+            456
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "        else:",
+          "at": [
+            370,
+            492
+          ],
+          "code": true
+        },
+        {
+          "text": "            out.append([start, end])           # gap: a new range",
+          "at": [
+            370,
+            528
+          ],
+          "code": true
+        },
+        {
+          "text": "    return out",
+          "at": [
+            370,
+            564
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "If the rules change",
+      "chapter": "Other ways",
+      "caption": "Sort and sweep wins for one batch of ranges. Change the setting and another tool fits:",
+      "dur": 11,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Start/end events",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Sorted map of ranges",
+            "id": "alt1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Mark a number line",
+            "id": "alt2"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF YOU NEED THE MOST OVERLAP",
+          "at": [
+            300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "+1 at a start, −1 at an end · meeting rooms",
+          "at": [
+            300,
+            548
+          ]
+        },
+        {
+          "text": "IF RANGES ARRIVE ONE BY ONE",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "insert, merge neighbours · O(log n) each",
+          "at": [
+            800,
+            548
+          ]
+        },
+        {
+          "text": "IF ENDS ARE SMALL INTEGERS",
+          "at": [
+            1300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "O(range) work · no sorting at all",
+          "at": [
+            1300,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "chapter": "Recap",
+      "caption": "The big idea: *sort by start, then sweep*, stretching the current range or starting a new one. Most interval problems open with that sort.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      }
+    }
+  ]
+}

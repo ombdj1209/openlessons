@@ -1,0 +1,619 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-08",
+  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "title": "Container with most water",
+  "tags": [
+    "dsa",
+    "arrays",
+    "two-pointers",
+    "greedy",
+    "interview"
+  ],
+  "companies": [
+    "Google",
+    "Amazon",
+    "Microsoft"
+  ],
+  "difficulty": "Medium",
+  "dots": 1300,
+  "steps": [
+    {
+      "eyebrow": "The problem",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer reads you the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "CONTAINER WITH MOST WATER",
+            "size": 64
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LEETCODE 11 · MEDIUM",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "You are given an integer array *height* of length n. There are n vertical lines; the ends of line i are (i, 0) and (i, height[i]). Find two lines that, with the x-axis, form a container holding the most water. Return that amount. You may not slant the container.",
+        "example": [
+          "Input:  height = [1, 8, 6, 2, 5, 4, 8, 3, 7]",
+          "Output: 49",
+          "Lines 1 and 8 hold 7 × 7 = 49"
+        ],
+        "constraints": [
+          "n == height.length",
+          "2 <= n <= 10^5",
+          "0 <= height[i] <= 10^4"
+        ]
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Pick *two walls*. The water between them is as high as the shorter wall and as wide as the gap. Find the pair that holds the most.",
+        "points": [
+          "*You get:* wall heights, like [1, 8, 6, 2, 5, 4, 8, 3, 7].",
+          "*You return:* the most water, like 49.",
+          "*The catch:* n can be 100,000, so trying every pair is too slow."
+        ]
+      }
+    },
+    {
+      "eyebrow": "The picture",
+      "dur": 7,
+      "caption": "Each number is a wall. Pick any two walls: water fills the space between them, up to the *shorter* one.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "bars",
+            "at": [
+              800,
+              430
+            ],
+            "values": [
+              1,
+              8,
+              6,
+              2,
+              5,
+              4,
+              8,
+              3,
+              7
+            ],
+            "note": "Wall heights. The index under each wall is its position."
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "One pair",
+      "dur": 8,
+      "caption": "Take walls 8 and 5. Water rises only to 5, the shorter one, and it's 3 wide: *15*. The taller wall's extra height is wasted.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "bars",
+            "at": [
+              800,
+              430
+            ],
+            "values": [
+              1,
+              8,
+              6,
+              2,
+              5,
+              4,
+              8,
+              3,
+              7
+            ],
+            "span": [
+              1,
+              4
+            ],
+            "hi": [
+              1,
+              4
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "height 5 × width 3 = 15",
+          "at": [
+            800,
+            210
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "The answer",
+      "dur": 8,
+      "caption": "The best pair is 8 and 7, far apart: 7 high and 7 wide, *49*. Not the tallest pair, but the best balance of height and width.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "bars",
+            "at": [
+              800,
+              430
+            ],
+            "values": [
+              1,
+              8,
+              6,
+              2,
+              5,
+              4,
+              8,
+              3,
+              7
+            ],
+            "span": [
+              1,
+              8
+            ],
+            "hi": [
+              1,
+              8
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "height 7 × width 7 = 49",
+          "at": [
+            800,
+            210
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Not rain water",
+      "dur": 8,
+      "caption": "Careful: this isn't Trapping Rain Water. There, every dip holds water. Here you pick *one pair*, and the walls between are ignored."
+    },
+    {
+      "eyebrow": "The key idea",
+      "chapter": "Solution",
+      "dur": 9,
+      "caption": "Start with a finger on each end: the widest container. Every move makes it narrower, so a move only helps if the water gets *taller*.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "bars",
+            "at": [
+              800,
+              430
+            ],
+            "values": [
+              1,
+              8,
+              6,
+              2,
+              5,
+              4,
+              8,
+              3,
+              7
+            ],
+            "span": [
+              0,
+              8
+            ],
+            "marks": [
+              {
+                "i": 0,
+                "text": "left"
+              },
+              {
+                "i": 8,
+                "text": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "area = min(1, 7) × 8 = 8     best: 8",
+          "at": [
+            800,
+            210
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Move the shorter wall",
+      "dur": 10,
+      "caption": "The shorter wall caps the water. Moving the taller finger can't lift that cap, it only loses width. So always move the *shorter* one.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "bars",
+            "at": [
+              800,
+              430
+            ],
+            "values": [
+              1,
+              8,
+              6,
+              2,
+              5,
+              4,
+              8,
+              3,
+              7
+            ],
+            "span": [
+              0,
+              8
+            ],
+            "hi": [
+              0
+            ],
+            "marks": [
+              {
+                "i": 0,
+                "text": "left"
+              },
+              {
+                "i": 8,
+                "text": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "1 is shorter than 7 → move left",
+          "at": [
+            800,
+            210
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Walk",
+      "dur": 8,
+      "caption": "Left moves to 8. Now 8 and 7, 7 apart: *49*, the best so far. The right wall is shorter, so the right finger moves in.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "bars",
+            "at": [
+              800,
+              430
+            ],
+            "values": [
+              1,
+              8,
+              6,
+              2,
+              5,
+              4,
+              8,
+              3,
+              7
+            ],
+            "span": [
+              1,
+              8
+            ],
+            "hi": [
+              1,
+              8
+            ],
+            "dim": [
+              0
+            ],
+            "marks": [
+              {
+                "i": 1,
+                "text": "left"
+              },
+              {
+                "i": 8,
+                "text": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "min(8, 7) × 7 = 49     best: 49",
+          "at": [
+            800,
+            210
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Keep squeezing",
+      "dur": 9,
+      "caption": "Right moves in: 3 gives 18, 8 gives 40. Nothing beats 49 as the fingers close in, and they meet after *one pass*.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "bars",
+            "at": [
+              800,
+              430
+            ],
+            "values": [
+              1,
+              8,
+              6,
+              2,
+              5,
+              4,
+              8,
+              3,
+              7
+            ],
+            "span": [
+              1,
+              6
+            ],
+            "hi": [
+              1,
+              6
+            ],
+            "dim": [
+              0,
+              7,
+              8
+            ],
+            "marks": [
+              {
+                "i": 1,
+                "text": "left"
+              },
+              {
+                "i": 6,
+                "text": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "18 → 40 → 16 → 15 → 4 → 6     best stays 49 ✓",
+          "at": [
+            800,
+            210
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "The left wall is 4, the right wall is 9, and they are 6 apart. Which finger moves?",
+        "options": [
+          "The left one, on the 4",
+          "The right one, on the 9",
+          "Both at once"
+        ],
+        "answer": 0,
+        "explain": "The 4 caps the water. Moving the 9 only shrinks the width under the same cap of 4, so it can *never* do better."
+      }
+    },
+    {
+      "eyebrow": "The code",
+      "chapter": "Code",
+      "caption": "Here is the whole solution. Two fingers, one pass, O(n) time and no extra memory.",
+      "dur": 10,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 920,
+            "h": 378
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "def max_area(height):",
+          "at": [
+            370,
+            276
+          ],
+          "code": true
+        },
+        {
+          "text": "    l, r, best = 0, len(height) - 1, 0",
+          "at": [
+            370,
+            312
+          ],
+          "code": true
+        },
+        {
+          "text": "    while l < r:",
+          "at": [
+            370,
+            348
+          ],
+          "code": true
+        },
+        {
+          "text": "        best = max(best, min(height[l], height[r]) * (r - l))",
+          "at": [
+            370,
+            384
+          ],
+          "code": true
+        },
+        {
+          "text": "        if height[l] < height[r]:",
+          "at": [
+            370,
+            420
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "            l += 1          # the shorter wall is the cap: drop it",
+          "at": [
+            370,
+            456
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "        else:",
+          "at": [
+            370,
+            492
+          ],
+          "code": true
+        },
+        {
+          "text": "            r -= 1",
+          "at": [
+            370,
+            528
+          ],
+          "code": true
+        },
+        {
+          "text": "    return best",
+          "at": [
+            370,
+            564
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "If the rules change",
+      "chapter": "Other ways",
+      "caption": "Two fingers win when you need one best pair. Change the question and another approach fits:",
+      "dur": 11,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              500,
+              420
+            ],
+            "w": 480,
+            "h": 170,
+            "text": "Trapping Rain Water",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1100,
+              420
+            ],
+            "w": 480,
+            "h": 170,
+            "text": "Check every pair",
+            "id": "alt1"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF EVERY DIP HOLDS WATER",
+          "at": [
+            500,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "add up water at every spot, not one pair",
+          "at": [
+            500,
+            548
+          ]
+        },
+        {
+          "text": "IF n IS ONLY A FEW HUNDRED",
+          "at": [
+            1100,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "O(n²) · a handy test for the fast one",
+          "at": [
+            1100,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "chapter": "Recap",
+      "caption": "The big idea: start as wide as possible and *always give up the shorter wall*, because it is the only thing holding you back.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      }
+    }
+  ]
+}

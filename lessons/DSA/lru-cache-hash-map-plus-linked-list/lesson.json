@@ -1,0 +1,842 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-08",
+  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "title": "LRU cache: hash map plus linked list",
+  "tags": [
+    "dsa",
+    "design",
+    "hash-map",
+    "linked-list",
+    "interview"
+  ],
+  "companies": [
+    "Amazon"
+  ],
+  "difficulty": "Medium",
+  "dots": 1300,
+  "steps": [
+    {
+      "eyebrow": "The problem",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer reads you the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "LRU CACHE",
+            "size": 130
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LEETCODE 146 · MEDIUM",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Design a data structure that follows the constraints of a *Least Recently Used* (LRU) cache. get(key) returns the value, or −1 if the key is absent. put(key, value) inserts or updates the key; if the number of keys exceeds the capacity, evict the least recently used key.",
+        "example": [
+          "LRUCache(2); put(1, 1); put(2, 2); get(1) → 1",
+          "put(3, 3) evicts key 2; get(2) → −1",
+          "put(4, 4) evicts key 1; get(1) → −1; get(3) → 3; get(4) → 4"
+        ],
+        "constraints": [
+          "1 <= capacity <= 3000",
+          "0 <= key <= 10^4",
+          "At most 2 * 10^5 calls to get and put"
+        ],
+        "followUp": "get and put must each run in O(1) average time."
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Build a small memory with a fixed number of slots. When it is full, *throw out whatever was used longest ago*.",
+        "points": [
+          "*You get:* a stream of get and put calls.",
+          "*You return:* the stored value, or −1 if it was thrown out.",
+          "*The catch:* every call must be O(1), instant."
+        ]
+      }
+    },
+    {
+      "eyebrow": "One tool isn't enough",
+      "dur": 10,
+      "caption": "A *hash map* finds a key instantly but can't tell which key is oldest. A *list* keeps the order but is slow to search. We need both.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              500,
+              420
+            ],
+            "w": 480,
+            "h": 170,
+            "text": "Hash map"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1100,
+              420
+            ],
+            "w": 480,
+            "h": 170,
+            "text": "Linked list"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "FINDS ANY KEY INSTANTLY",
+          "at": [
+            500,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "✕ doesn't know what's oldest",
+          "at": [
+            500,
+            548
+          ]
+        },
+        {
+          "text": "KEEPS THE USE ORDER",
+          "at": [
+            1100,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "✕ finding a key means walking it",
+          "at": [
+            1100,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Use both",
+      "chapter": "Solution",
+      "dur": 10,
+      "via": true,
+      "caption": "So: a *map* from key to node, plus a *doubly linked list* in use order, newest at the front. Here is the state after put(1) and put(2).",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "map",
+            "at": [
+              380,
+              440
+            ],
+            "entries": [
+              [
+                "1",
+                "→ node"
+              ],
+              [
+                "2",
+                "→ node"
+              ]
+            ],
+            "head": [
+              "KEY",
+              "NODE"
+            ],
+            "hi": [],
+            "note": "The hash map: jumps from a key straight to its node in the list."
+          },
+          {
+            "shape": "circle",
+            "at": [
+              860,
+              440
+            ],
+            "r": 48,
+            "text": "2",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1060,
+              440
+            ],
+            "r": 48,
+            "text": "1",
+            "accent": false
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                912,
+                440
+              ],
+              [
+                1008,
+                440
+              ]
+            ],
+            "arrow": false
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "MOST RECENT",
+          "at": [
+            860,
+            350
+          ]
+        },
+        {
+          "text": "LEAST RECENT",
+          "at": [
+            1060,
+            530
+          ]
+        },
+        {
+          "text": "put(1, 1) · put(2, 2)",
+          "at": [
+            800,
+            640
+          ],
+          "accent": false
+        }
+      ]
+    },
+    {
+      "eyebrow": "get(1)",
+      "dur": 9,
+      "caption": "get(1): the map jumps straight to node 1. Unlink it and move it to the *front*: it is now the most recent. Return 1.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "map",
+            "at": [
+              380,
+              440
+            ],
+            "entries": [
+              [
+                "1",
+                "→ node"
+              ],
+              [
+                "2",
+                "→ node"
+              ]
+            ],
+            "head": [
+              "KEY",
+              "NODE"
+            ],
+            "hi": [
+              0
+            ],
+            "note": "The hash map: jumps from a key straight to its node in the list."
+          },
+          {
+            "shape": "circle",
+            "at": [
+              860,
+              440
+            ],
+            "r": 48,
+            "text": "1",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1060,
+              440
+            ],
+            "r": 48,
+            "text": "2",
+            "accent": false
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                912,
+                440
+              ],
+              [
+                1008,
+                440
+              ]
+            ],
+            "arrow": false
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "MOST RECENT",
+          "at": [
+            860,
+            350
+          ]
+        },
+        {
+          "text": "LEAST RECENT",
+          "at": [
+            1060,
+            530
+          ]
+        },
+        {
+          "text": "map finds node 1 → unlink → move to front → return 1",
+          "at": [
+            800,
+            640
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "put(3) · full",
+      "dur": 10,
+      "caption": "put(3, 3), but we are full. The back of the list is 2, used longest ago. Remove it from the list *and* the map, then add 3 at the front.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "map",
+            "at": [
+              380,
+              440
+            ],
+            "entries": [
+              [
+                "1",
+                "→ node"
+              ],
+              [
+                "3",
+                "→ node"
+              ]
+            ],
+            "head": [
+              "KEY",
+              "NODE"
+            ],
+            "hi": [
+              1
+            ],
+            "note": "The hash map: jumps from a key straight to its node in the list."
+          },
+          {
+            "shape": "circle",
+            "at": [
+              860,
+              440
+            ],
+            "r": 48,
+            "text": "3",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1060,
+              440
+            ],
+            "r": 48,
+            "text": "1",
+            "accent": false
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                912,
+                440
+              ],
+              [
+                1008,
+                440
+              ]
+            ],
+            "arrow": false
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "MOST RECENT",
+          "at": [
+            860,
+            350
+          ]
+        },
+        {
+          "text": "LEAST RECENT",
+          "at": [
+            1060,
+            530
+          ]
+        },
+        {
+          "text": "evict 2 (the back) · add 3 at the front",
+          "at": [
+            800,
+            640
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "get(2), put(4)",
+      "dur": 9,
+      "caption": "get(2) now returns −1: it is gone. Then put(4, 4) evicts 1, the new back of the list. Every step touched only a *few pointers*.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "map",
+            "at": [
+              380,
+              440
+            ],
+            "entries": [
+              [
+                "3",
+                "→ node"
+              ],
+              [
+                "4",
+                "→ node"
+              ]
+            ],
+            "head": [
+              "KEY",
+              "NODE"
+            ],
+            "hi": [
+              1
+            ],
+            "note": "The hash map: jumps from a key straight to its node in the list."
+          },
+          {
+            "shape": "circle",
+            "at": [
+              860,
+              440
+            ],
+            "r": 48,
+            "text": "4",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1060,
+              440
+            ],
+            "r": 48,
+            "text": "3",
+            "accent": false
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                912,
+                440
+              ],
+              [
+                1008,
+                440
+              ]
+            ],
+            "arrow": false
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "MOST RECENT",
+          "at": [
+            860,
+            350
+          ]
+        },
+        {
+          "text": "LEAST RECENT",
+          "at": [
+            1060,
+            530
+          ]
+        },
+        {
+          "text": "get(2) → −1 · put(4): evict 1, add 4",
+          "at": [
+            800,
+            640
+          ],
+          "accent": false
+        }
+      ]
+    },
+    {
+      "eyebrow": "Why doubly linked",
+      "dur": 9,
+      "caption": "Removing a node from the middle means fixing its neighbours' pointers. A *prev* pointer reaches the left neighbour instantly, so it stays O(1).",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "circle",
+            "at": [
+              560,
+              440
+            ],
+            "r": 48,
+            "text": "A"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              800,
+              440
+            ],
+            "r": 48,
+            "text": "B",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1040,
+              440
+            ],
+            "r": 48,
+            "text": "C"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                612,
+                440
+              ],
+              [
+                748,
+                440
+              ]
+            ],
+            "arrow": false
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                852,
+                440
+              ],
+              [
+                988,
+                440
+              ]
+            ],
+            "arrow": false
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "B.prev.next = B.next     B.next.prev = B.prev",
+          "at": [
+            800,
+            300
+          ],
+          "code": false,
+          "accent": true
+        },
+        {
+          "text": "two pointer changes and B is out",
+          "at": [
+            800,
+            580
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Capacity 2. put(1), put(2), get(1), put(3). Which key is evicted?",
+        "options": [
+          "1",
+          "2",
+          "3"
+        ],
+        "answer": 1,
+        "explain": "get(1) made 1 the most recent, so 2 sat at the back, the *least recently used*, when 3 arrived."
+      }
+    },
+    {
+      "eyebrow": "The code",
+      "chapter": "Code",
+      "caption": "Python's *OrderedDict* is exactly a hash map plus a doubly linked list. Be ready to build those two by hand if asked.",
+      "dur": 10,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 920,
+            "h": 522
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "from collections import OrderedDict   # hash map + linked list",
+          "at": [
+            370,
+            204
+          ],
+          "code": true
+        },
+        {
+          "text": "class LRUCache:",
+          "at": [
+            370,
+            240
+          ],
+          "code": true
+        },
+        {
+          "text": "    def __init__(self, capacity):",
+          "at": [
+            370,
+            276
+          ],
+          "code": true
+        },
+        {
+          "text": "        self.cap, self.d = capacity, OrderedDict()",
+          "at": [
+            370,
+            312
+          ],
+          "code": true
+        },
+        {
+          "text": "    def get(self, key):",
+          "at": [
+            370,
+            348
+          ],
+          "code": true
+        },
+        {
+          "text": "        if key not in self.d: return -1",
+          "at": [
+            370,
+            384
+          ],
+          "code": true
+        },
+        {
+          "text": "        self.d.move_to_end(key)             # now the most recent",
+          "at": [
+            370,
+            420
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "        return self.d[key]",
+          "at": [
+            370,
+            456
+          ],
+          "code": true
+        },
+        {
+          "text": "    def put(self, key, value):",
+          "at": [
+            370,
+            492
+          ],
+          "code": true
+        },
+        {
+          "text": "        self.d[key] = value",
+          "at": [
+            370,
+            528
+          ],
+          "code": true
+        },
+        {
+          "text": "        self.d.move_to_end(key)",
+          "at": [
+            370,
+            564
+          ],
+          "code": true
+        },
+        {
+          "text": "        if len(self.d) > self.cap:",
+          "at": [
+            370,
+            600
+          ],
+          "code": true
+        },
+        {
+          "text": "            self.d.popitem(last=False)      # drop the least recent",
+          "at": [
+            370,
+            636
+          ],
+          "code": true,
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "If the rules change",
+      "chapter": "Other ways",
+      "caption": "LRU wins when recent use predicts future use. Change the traffic and another policy fits:",
+      "dur": 11,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "LFU cache",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "CLOCK",
+            "id": "alt1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "TTL expiry",
+            "id": "alt2"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF ONE BIG SCAN MUST NOT FLUSH IT",
+          "at": [
+            300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "evict the least frequently used",
+          "at": [
+            300,
+            548
+          ]
+        },
+        {
+          "text": "IF HITS MUST NOT TAKE A LOCK",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "a used-bit per slot · no list moves",
+          "at": [
+            800,
+            548
+          ]
+        },
+        {
+          "text": "IF DATA GOES STALE WITH TIME",
+          "at": [
+            1300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "evict by age, not by use",
+          "at": [
+            1300,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "chapter": "Recap",
+      "caption": "The big idea: pair a *hash map* for instant lookup with a *doubly linked list* for order. Each covers the other one’s weakness.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      }
+    }
+  ]
+}

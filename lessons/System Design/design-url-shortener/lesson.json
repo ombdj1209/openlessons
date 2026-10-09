@@ -1,0 +1,5382 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-08",
+  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "companies": [],
+  "dots": 2400,
+  "spacing": 8,
+  "title": "Design a URL shortener",
+  "tags": [
+    "system-design",
+    "interview",
+    "caching",
+    "sharding",
+    "ids"
+  ],
+  "difficulty": "Easy",
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "chapter": "Question",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer sets the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "URL SHORTENER",
+            "size": 110
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "SYSTEM DESIGN · EASY",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Design a URL shortening service like TinyURL or bit.ly.",
+        "example": [
+          "Given a long URL, return a short one like tiny.url/2TX",
+          "Opening the short URL takes you to the original",
+          "Optional: custom aliases and expiry dates"
+        ],
+        "constraints": [
+          "100 million new links a day",
+          "Clicks outnumber new links about 100 to 1",
+          "A redirect must feel instant (under 50 ms)",
+          "A link must never break or point to the wrong place"
+        ],
+        "followUp": "How do you make sure two links never get the same short code?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Requirements",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Turn a long link into a short one. When anyone opens the short one, *send them to the long one, fast*, for years.",
+        "points": [
+          "*Must work:* make a short link; open it and land on the real page.",
+          "*Must be fast:* opening links, which happens 100× more than making them.",
+          "*Out of scope:* accounts, editing links, a website."
+        ]
+      }
+    },
+    {
+      "eyebrow": "Start tiny",
+      "caption": "Start with the simplest thing that works: your phone talks to *one server*, and the server keeps every link in *one database*.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youS"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Build it up"
+    },
+    {
+      "eyebrow": "Making a link",
+      "caption": "You send a long link. The server makes a new short code, *2TX*, and saves the pair “2TX → long link” in the database.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youS"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "POST /urls  cats.com/very/long/…",
+          "at": [
+            370,
+            400
+          ]
+        },
+        {
+          "text": "save 2TX → cats.com/…",
+          "at": [
+            1150,
+            520
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Opening a link",
+      "caption": "Someone opens tiny.url/2TX. The server finds 2TX and replies *“go to the long link”* (a 302 redirect). The browser goes there.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youS"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              130,
+              180
+            ],
+            "scale": 0.5,
+            "label": "THE REAL SITE",
+            "note": "Wherever the long link points.",
+            "id": "site"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                130,
+                360
+              ],
+              [
+                130,
+                226
+              ]
+            ],
+            "arrow": true,
+            "id": "p_site"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                572,
+                430
+              ],
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                572,
+                430
+              ],
+              [
+                170,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                130,
+                360
+              ],
+              [
+                130,
+                226
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "GET /2TX",
+          "at": [
+            370,
+            400
+          ]
+        },
+        {
+          "text": "302 → cats.com/…",
+          "at": [
+            370,
+            470
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Clicks pour in",
+      "caption": "Clicks run *100× new links*: about 120,000 a second. One server handles maybe 5,000. It falls over, and every short link stops working.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2",
+            "fail": true
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youS"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 14,
+            "speed": 0.7,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "120,000 clicks / second",
+          "at": [
+            370,
+            395
+          ],
+          "fail": true
+        },
+        {
+          "text": "✕ OVERLOADED",
+          "at": [
+            620,
+            360
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: many servers",
+      "caption": "Run *many identical servers*, with a *load balancer* in front giving each click to one that isn’t busy. Need more? Add servers.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              370,
+              430
+            ],
+            "w": 56,
+            "h": 260,
+            "label": "LOAD BALANCER",
+            "note": "Hands each request to a server that is alive and not busy.",
+            "id": "lb",
+            "accent": true
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              270
+            ],
+            "scale": 0.42,
+            "id": "s1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              590
+            ],
+            "scale": 0.42,
+            "id": "s3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youLb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b3"
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.33
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.66
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "Now the database chokes",
+      "caption": "Every click still asks the database. Three servers or thirty, they all queue at *the same database*, and redirects crawl.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              370,
+              430
+            ],
+            "w": 56,
+            "h": 260,
+            "label": "LOAD BALANCER",
+            "note": "Hands each request to a server that is alive and not busy.",
+            "id": "lb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              270
+            ],
+            "scale": 0.42,
+            "id": "s1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              590
+            ],
+            "scale": 0.42,
+            "id": "s3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youLb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b3"
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.33
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.66
+          },
+          {
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 6,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 6,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          },
+          {
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 6,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "✕ every click waits here",
+          "at": [
+            1200,
+            590
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: a cache",
+      "caption": "Most clicks hit a few popular links. Keep those in a *cache*, a small fast memory of code → link. It answers in ~1 ms; the database rests.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              370,
+              430
+            ],
+            "w": 56,
+            "h": 260,
+            "label": "LOAD BALANCER",
+            "note": "Hands each request to a server that is alive and not busy.",
+            "id": "lb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              270
+            ],
+            "scale": 0.42,
+            "id": "s1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              590
+            ],
+            "scale": 0.42,
+            "id": "s3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youLb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b3"
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              980,
+              270
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "2TX",
+                "cats.com"
+              ],
+              [
+                "aZ9",
+                "news.com"
+              ]
+            ],
+            "head": [
+              "CODE",
+              "LONG LINK"
+            ],
+            "label": "CACHE · IN MEMORY",
+            "note": "Redis: the hottest codes, answered in about 1 ms.",
+            "id": "cache",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toCache"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.33
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.66
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 5,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 1,
+            "speed": 0.4,
+            "accent": false
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "A cache miss",
+      "caption": "A code that isn’t cached is a *miss*: read it from the database once, then copy it into the cache, so the next click on it is fast.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              370,
+              430
+            ],
+            "w": 56,
+            "h": 260,
+            "label": "LOAD BALANCER",
+            "note": "Hands each request to a server that is alive and not busy.",
+            "id": "lb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              270
+            ],
+            "scale": 0.42,
+            "id": "s1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              590
+            ],
+            "scale": 0.42,
+            "id": "s3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youLb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b3"
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              980,
+              270
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "2TX",
+                "cats.com"
+              ],
+              [
+                "aZ9",
+                "news.com"
+              ]
+            ],
+            "head": [
+              "CODE",
+              "LONG LINK"
+            ],
+            "label": "CACHE · IN MEMORY",
+            "note": "Redis: the hottest codes, answered in about 1 ms.",
+            "id": "cache"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toCache"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "drop": true
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                980,
+                519
+              ],
+              [
+                980,
+                330
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "miss → database → copy into cache",
+          "at": [
+            1230,
+            430
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Two servers, one code",
+      "caption": "Who makes the codes? If each server counts 1, 2, 3 on its own, two servers make the *same code* for different links, and one overwrites the other.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              370,
+              430
+            ],
+            "w": 56,
+            "h": 260,
+            "label": "LOAD BALANCER",
+            "note": "Hands each request to a server that is alive and not busy.",
+            "id": "lb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              270
+            ],
+            "scale": 0.42,
+            "id": "s1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              590
+            ],
+            "scale": 0.42,
+            "id": "s3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youLb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b3"
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              980,
+              270
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "2TX",
+                "cats.com"
+              ],
+              [
+                "aZ9",
+                "news.com"
+              ]
+            ],
+            "head": [
+              "CODE",
+              "LONG LINK"
+            ],
+            "label": "CACHE · IN MEMORY",
+            "note": "Redis: the hottest codes, answered in about 1 ms.",
+            "id": "cache"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toCache"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "fail": true
+          },
+          {
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "fail": true,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "top server: #1 → cats.com",
+          "at": [
+            620,
+            195
+          ],
+          "fail": true
+        },
+        {
+          "text": "bottom server: #1 → news.com",
+          "at": [
+            620,
+            690
+          ],
+          "fail": true
+        },
+        {
+          "text": "same code ✕",
+          "at": [
+            1200,
+            590
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: ID blocks",
+      "caption": "An *ID block* service gives each server its own range of numbers: 1–1,000 to one, 1,001–2,000 to the next. No number is ever handed out twice.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              370,
+              430
+            ],
+            "w": 56,
+            "h": 260,
+            "label": "LOAD BALANCER",
+            "note": "Hands each request to a server that is alive and not busy.",
+            "id": "lb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              270
+            ],
+            "scale": 0.42,
+            "id": "s1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              590
+            ],
+            "scale": 0.42,
+            "id": "s3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youLb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b3"
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              980,
+              270
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "2TX",
+                "cats.com"
+              ],
+              [
+                "aZ9",
+                "news.com"
+              ]
+            ],
+            "head": [
+              "CODE",
+              "LONG LINK"
+            ],
+            "label": "CACHE · IN MEMORY",
+            "note": "Redis: the hottest codes, answered in about 1 ms.",
+            "id": "cache"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toCache"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              1330,
+              430
+            ],
+            "scale": 0.7,
+            "slots": 5,
+            "filled": 3,
+            "label": "ID BLOCKS",
+            "note": "Hands out blocks of 1,000 unused numbers, one block per server.",
+            "id": "ids",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1219,
+                430
+              ],
+              [
+                790,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ids"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1219,
+                430
+              ],
+              [
+                790,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.33
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.66
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "1 – 1,000",
+          "at": [
+            724,
+            250
+          ]
+        },
+        {
+          "text": "1,001 – 2,000",
+          "at": [
+            724,
+            410
+          ]
+        },
+        {
+          "text": "2,001 – 3,000",
+          "at": [
+            724,
+            570
+          ]
+        }
+      ],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "Number → short code",
+      "caption": "Each server writes its next number in *base 62* (0–9, a–z, A–Z). Number 11,157 becomes 2TX. Seven characters give 3.5 trillion codes: ~96 years of links.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              370,
+              430
+            ],
+            "w": 56,
+            "h": 260,
+            "label": "LOAD BALANCER",
+            "note": "Hands each request to a server that is alive and not busy.",
+            "id": "lb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              270
+            ],
+            "scale": 0.42,
+            "id": "s1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              590
+            ],
+            "scale": 0.42,
+            "id": "s3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youLb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b3"
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              980,
+              270
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "2TX",
+                "cats.com"
+              ],
+              [
+                "aZ9",
+                "news.com"
+              ]
+            ],
+            "head": [
+              "CODE",
+              "LONG LINK"
+            ],
+            "label": "CACHE · IN MEMORY",
+            "note": "Redis: the hottest codes, answered in about 1 ms.",
+            "id": "cache"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toCache"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              1330,
+              430
+            ],
+            "scale": 0.7,
+            "slots": 5,
+            "filled": 3,
+            "label": "ID BLOCKS",
+            "note": "Hands out blocks of 1,000 unused numbers, one block per server.",
+            "id": "ids"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1219,
+                430
+              ],
+              [
+                790,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ids"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.33
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.66
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 5,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "11,157 = 2·62² + 55·62 + 59 → “2” “T” “X”",
+          "at": [
+            1000,
+            150
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "A server crashes holding block 1,001–2,000, having used up to 1,200. What happens?",
+        "options": [
+          "Numbers 1,201–2,000 are simply never used",
+          "Two links get the same code",
+          "Every server must stop"
+        ],
+        "answer": 0,
+        "explain": "A lost block only leaves a *gap*. No other server ever gets that block, so codes stay unique. Gaps are cheap; duplicates are not."
+      }
+    },
+    {
+      "eyebrow": "The disk fills up",
+      "caption": "100 million links a day is *18 TB a year*. One database machine runs out of disk, and lookups slow down as it fills.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              370,
+              430
+            ],
+            "w": 56,
+            "h": 260,
+            "label": "LOAD BALANCER",
+            "note": "Hands each request to a server that is alive and not busy.",
+            "id": "lb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              270
+            ],
+            "scale": 0.42,
+            "id": "s1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              590
+            ],
+            "scale": 0.42,
+            "id": "s3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youLb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b3"
+          },
+          {
+            "shape": "database",
+            "at": [
+              980,
+              590
+            ],
+            "scale": 0.6,
+            "label": "DATABASE",
+            "note": "Every code → long link, kept forever.",
+            "id": "db",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toDb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              980,
+              270
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "2TX",
+                "cats.com"
+              ],
+              [
+                "aZ9",
+                "news.com"
+              ]
+            ],
+            "head": [
+              "CODE",
+              "LONG LINK"
+            ],
+            "label": "CACHE · IN MEMORY",
+            "note": "Redis: the hottest codes, answered in about 1 ms.",
+            "id": "cache"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toCache"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              1330,
+              430
+            ],
+            "scale": 0.7,
+            "slots": 5,
+            "filled": 3,
+            "label": "ID BLOCKS",
+            "note": "Hands out blocks of 1,000 unused numbers, one block per server.",
+            "id": "ids"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1219,
+                430
+              ],
+              [
+                790,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ids"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.33
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.66
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 5,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                912,
+                590
+              ]
+            ],
+            "count": 3,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "+18 TB every year ✕",
+          "at": [
+            1200,
+            590
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: shards",
+      "caption": "Split the data across *shards*: several databases, each owning the codes whose hash lands on it. Running out again? Add a shard.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              370,
+              430
+            ],
+            "w": 56,
+            "h": 260,
+            "label": "LOAD BALANCER",
+            "note": "Hands each request to a server that is alive and not busy.",
+            "id": "lb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              270
+            ],
+            "scale": 0.42,
+            "id": "s1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              590
+            ],
+            "scale": 0.42,
+            "id": "s3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youLb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b3"
+          },
+          {
+            "shape": "map",
+            "at": [
+              980,
+              270
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "2TX",
+                "cats.com"
+              ],
+              [
+                "aZ9",
+                "news.com"
+              ]
+            ],
+            "head": [
+              "CODE",
+              "LONG LINK"
+            ],
+            "label": "CACHE · IN MEMORY",
+            "note": "Redis: the hottest codes, answered in about 1 ms.",
+            "id": "cache"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toCache"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              1330,
+              430
+            ],
+            "scale": 0.7,
+            "slots": 5,
+            "filled": 3,
+            "label": "ID BLOCKS",
+            "note": "Hands out blocks of 1,000 unused numbers, one block per server.",
+            "id": "ids"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1219,
+                430
+              ],
+              [
+                790,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ids"
+          },
+          {
+            "shape": "database",
+            "at": [
+              880,
+              600
+            ],
+            "scale": 0.36,
+            "id": "sh1",
+            "accent": true
+          },
+          {
+            "shape": "database",
+            "at": [
+              1000,
+              600
+            ],
+            "scale": 0.36,
+            "id": "sh2",
+            "accent": true
+          },
+          {
+            "shape": "database",
+            "at": [
+              1120,
+              600
+            ],
+            "scale": 0.36,
+            "id": "sh3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                700
+              ],
+              [
+                1120,
+                700
+              ]
+            ],
+            "arrow": false,
+            "id": "p_shBus"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                880,
+                700
+              ],
+              [
+                880,
+                648
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sh1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1000,
+                700
+              ],
+              [
+                1000,
+                648
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sh2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1120,
+                700
+              ],
+              [
+                1120,
+                648
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sh3"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.33
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.66
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 5,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                700
+              ],
+              [
+                880,
+                700
+              ],
+              [
+                880,
+                648
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                700
+              ],
+              [
+                1120,
+                700
+              ],
+              [
+                1120,
+                648
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "shard = hash(code) mod 3",
+          "at": [
+            1000,
+            520
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "You want to count every click on a link. Which redirect should the server send?",
+        "options": [
+          "301 Moved Permanently",
+          "302 Found",
+          "200 OK"
+        ],
+        "answer": 1,
+        "explain": "A 301 is cached by the browser, so later clicks *never reach you*. A 302 brings every click back through your server, where it can be counted."
+      }
+    },
+    {
+      "eyebrow": "If the rules change",
+      "caption": "Counter codes are guessable: 2TX, 2TY, 2TZ… If that matters, swap the ID blocks for *random codes* plus an “is it taken?” check before saving.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              370,
+              430
+            ],
+            "w": 56,
+            "h": 260,
+            "label": "LOAD BALANCER",
+            "note": "Hands each request to a server that is alive and not busy.",
+            "id": "lb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              270
+            ],
+            "scale": 0.42,
+            "id": "s1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              590
+            ],
+            "scale": 0.42,
+            "id": "s3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youLb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b3"
+          },
+          {
+            "shape": "map",
+            "at": [
+              980,
+              270
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "2TX",
+                "cats.com"
+              ],
+              [
+                "aZ9",
+                "news.com"
+              ]
+            ],
+            "head": [
+              "CODE",
+              "LONG LINK"
+            ],
+            "label": "CACHE · IN MEMORY",
+            "note": "Redis: the hottest codes, answered in about 1 ms.",
+            "id": "cache"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toCache"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              1330,
+              430
+            ],
+            "scale": 0.7,
+            "slots": 5,
+            "filled": 3,
+            "label": "ID BLOCKS",
+            "note": "Hands out blocks of 1,000 unused numbers, one block per server.",
+            "id": "ids",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1219,
+                430
+              ],
+              [
+                790,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ids"
+          },
+          {
+            "shape": "database",
+            "at": [
+              880,
+              600
+            ],
+            "scale": 0.36,
+            "id": "sh1"
+          },
+          {
+            "shape": "database",
+            "at": [
+              1000,
+              600
+            ],
+            "scale": 0.36,
+            "id": "sh2"
+          },
+          {
+            "shape": "database",
+            "at": [
+              1120,
+              600
+            ],
+            "scale": 0.36,
+            "id": "sh3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                700
+              ],
+              [
+                1120,
+                700
+              ]
+            ],
+            "arrow": false,
+            "id": "p_shBus"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                880,
+                700
+              ],
+              [
+                880,
+                648
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sh1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1000,
+                700
+              ],
+              [
+                1000,
+                648
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sh2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1120,
+                700
+              ],
+              [
+                1120,
+                648
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sh3"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.33
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.66
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "random 7 chars + check",
+          "at": [
+            1330,
+            350
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Trade-offs",
+      "focus": [
+        "ids",
+        "s1",
+        "s2",
+        "s3"
+      ]
+    },
+    {
+      "eyebrow": "The whole system",
+      "caption": "Load balancer, many servers, a cache in front of sharded storage, and ID blocks so codes never collide. *That is a URL shortener.*",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.7,
+            "label": "YOU",
+            "note": "A browser or app making and opening short links.",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              370,
+              430
+            ],
+            "w": 56,
+            "h": 260,
+            "label": "LOAD BALANCER",
+            "note": "Hands each request to a server that is alive and not busy.",
+            "id": "lb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              270
+            ],
+            "scale": 0.42,
+            "id": "s1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              430
+            ],
+            "scale": 0.42,
+            "label": "APP SERVER",
+            "note": "Stateless: any server can handle any request.",
+            "id": "s2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              620,
+              590
+            ],
+            "scale": 0.42,
+            "id": "s3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youLb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lb3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ]
+            ],
+            "arrow": false,
+            "id": "p_b3"
+          },
+          {
+            "shape": "map",
+            "at": [
+              980,
+              270
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "2TX",
+                "cats.com"
+              ],
+              [
+                "aZ9",
+                "news.com"
+              ]
+            ],
+            "head": [
+              "CODE",
+              "LONG LINK"
+            ],
+            "label": "CACHE · IN MEMORY",
+            "note": "Redis: the hottest codes, answered in about 1 ms.",
+            "id": "cache"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "arrow": true,
+            "id": "p_toCache"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              1330,
+              430
+            ],
+            "scale": 0.7,
+            "slots": 5,
+            "filled": 3,
+            "label": "ID BLOCKS",
+            "note": "Hands out blocks of 1,000 unused numbers, one block per server.",
+            "id": "ids"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1219,
+                430
+              ],
+              [
+                790,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ids"
+          },
+          {
+            "shape": "database",
+            "at": [
+              880,
+              600
+            ],
+            "scale": 0.36,
+            "id": "sh1"
+          },
+          {
+            "shape": "database",
+            "at": [
+              1000,
+              600
+            ],
+            "scale": 0.36,
+            "id": "sh2"
+          },
+          {
+            "shape": "database",
+            "at": [
+              1120,
+              600
+            ],
+            "scale": 0.36,
+            "id": "sh3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                700
+              ],
+              [
+                1120,
+                700
+              ]
+            ],
+            "arrow": false,
+            "id": "p_shBus"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                880,
+                700
+              ],
+              [
+                880,
+                648
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sh1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1000,
+                700
+              ],
+              [
+                1000,
+                648
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sh2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1120,
+                700
+              ],
+              [
+                1120,
+                648
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sh3"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                270
+              ],
+              [
+                572,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                572,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.33
+          },
+          {
+            "path": [
+              [
+                170,
+                430
+              ],
+              [
+                340,
+                430
+              ],
+              [
+                398,
+                430
+              ],
+              [
+                500,
+                430
+              ],
+              [
+                500,
+                590
+              ],
+              [
+                572,
+                590
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.66
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 5,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                270
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                590
+              ],
+              [
+                780,
+                590
+              ],
+              [
+                780,
+                270
+              ],
+              [
+                894,
+                270
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                1219,
+                430
+              ],
+              [
+                790,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                668,
+                430
+              ],
+              [
+                780,
+                430
+              ],
+              [
+                780,
+                700
+              ],
+              [
+                1000,
+                700
+              ],
+              [
+                1000,
+                648
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Recap"
+    }
+  ]
+}

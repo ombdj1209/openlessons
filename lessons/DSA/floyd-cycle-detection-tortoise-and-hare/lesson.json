@@ -1,0 +1,1471 @@
+{
+  "engine": "dots",
+  "title": "Floyd's cycle detection: tortoise and hare",
+  "request": "add more impressive god-level DSA solutions",
+  "createdAt": "2026-10-08",
+  "tags": [
+    "dsa",
+    "linked-list",
+    "two-pointers",
+    "interview"
+  ],
+  "companies": [
+    "Google",
+    "Amazon",
+    "Microsoft",
+    "Goldman Sachs",
+    "Nvidia"
+  ],
+  "difficulty": "Easy",
+  "dots": 1300,
+  "steps": [
+    {
+      "eyebrow": "The problem",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer reads you the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "LINKED LIST CYCLE",
+            "size": 104
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LEETCODE 141 · EASY",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Given *head*, the head of a linked list, determine if the linked list has a cycle in it. There is a cycle if some node can be reached again by continuously following the next pointer.",
+        "example": [
+          "Input:  head = [3, 2, 0, -4], last node points back to index 1",
+          "Output: true"
+        ],
+        "constraints": [
+          "0 <= number of nodes <= 10^4",
+          "-10^5 <= Node.val <= 10^5"
+        ],
+        "followUp": "Can you solve it using O(1), constant, memory?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "You can only follow arrows from one item to the next. *Does following the arrows ever loop back*, or does the list end?",
+        "points": [
+          "*You get:* the first item of the list.",
+          "*You return:* true if it loops, false if it ends.",
+          "*The catch:* you can't keep a record of every item you visit."
+        ]
+      }
+    },
+    {
+      "eyebrow": "What's a linked list?",
+      "caption": "A *linked list* is a chain: each item points to the next one. You start at the first item and can only follow the arrows forward.",
+      "dur": 8,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "circle",
+            "at": [
+              260,
+              420
+            ],
+            "r": 34,
+            "text": "3",
+            "id": "n1",
+            "label": "START",
+            "note": "The only item you're given. Everything else is reached by following arrows."
+          },
+          {
+            "shape": "circle",
+            "at": [
+              400,
+              420
+            ],
+            "r": 34,
+            "text": "7",
+            "id": "n2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              540,
+              420
+            ],
+            "r": 34,
+            "text": "1",
+            "id": "n3"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              670,
+              420
+            ],
+            "r": 34,
+            "text": "8",
+            "id": "n4",
+            "note": "Two arrows point here. That's what makes the circle."
+          },
+          {
+            "shape": "circle",
+            "at": [
+              770,
+              247
+            ],
+            "r": 34,
+            "text": "4",
+            "id": "n5"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              970,
+              247
+            ],
+            "r": 34,
+            "text": "6",
+            "id": "n6"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1070,
+              420
+            ],
+            "r": 34,
+            "text": "2",
+            "id": "n7"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              970,
+              593
+            ],
+            "r": 34,
+            "text": "9",
+            "id": "n8"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              770,
+              593
+            ],
+            "r": 34,
+            "text": "5",
+            "id": "n9"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                300,
+                420
+              ],
+              [
+                360,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                440,
+                420
+              ],
+              [
+                500,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                580,
+                420
+              ],
+              [
+                630,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                385
+              ],
+              [
+                750,
+                281
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                810,
+                247
+              ],
+              [
+                930,
+                247
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                990,
+                282
+              ],
+              [
+                1050,
+                385
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1050,
+                455
+              ],
+              [
+                990,
+                558
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                930,
+                593
+              ],
+              [
+                810,
+                593
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                750,
+                558
+              ],
+              [
+                690,
+                455
+              ]
+            ],
+            "arrow": true,
+            "accent": true,
+            "note": "The last item points back into the middle instead of ending the list."
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "The circle",
+      "caption": "Here the last item points back to 8. Follow the arrows and you go round and round forever. That's called a *cycle*.",
+      "dur": 7.5,
+      "labels": [
+        {
+          "text": "← POINTS BACK HERE",
+          "at": [
+            560,
+            520
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Two runners",
+      "caption": "Send two runners from the start. The *slow* one moves 1 item at a time. The *fast* one moves 2 items at a time.",
+      "dur": 8,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "circle",
+            "at": [
+              260,
+              420
+            ],
+            "r": 34,
+            "text": "3",
+            "id": "n1",
+            "label": "START"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              400,
+              420
+            ],
+            "r": 34,
+            "text": "7",
+            "id": "n2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              540,
+              420
+            ],
+            "r": 34,
+            "text": "1",
+            "id": "n3"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              670,
+              420
+            ],
+            "r": 34,
+            "text": "8",
+            "id": "n4"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              770,
+              247
+            ],
+            "r": 34,
+            "text": "4",
+            "id": "n5"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              970,
+              247
+            ],
+            "r": 34,
+            "text": "6",
+            "id": "n6"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1070,
+              420
+            ],
+            "r": 34,
+            "text": "2",
+            "id": "n7"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              970,
+              593
+            ],
+            "r": 34,
+            "text": "9",
+            "id": "n8"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              770,
+              593
+            ],
+            "r": 34,
+            "text": "5",
+            "id": "n9"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                300,
+                420
+              ],
+              [
+                360,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                440,
+                420
+              ],
+              [
+                500,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                580,
+                420
+              ],
+              [
+                630,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                385
+              ],
+              [
+                750,
+                281
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                810,
+                247
+              ],
+              [
+                930,
+                247
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                990,
+                282
+              ],
+              [
+                1050,
+                385
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1050,
+                455
+              ],
+              [
+                990,
+                558
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                930,
+                593
+              ],
+              [
+                810,
+                593
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                750,
+                558
+              ],
+              [
+                690,
+                455
+              ]
+            ],
+            "arrow": true,
+            "accent": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                260,
+                420
+              ],
+              [
+                540,
+                420
+              ],
+              [
+                670,
+                420
+              ],
+              [
+                770,
+                247
+              ],
+              [
+                970,
+                247
+              ],
+              [
+                1070,
+                420
+              ],
+              [
+                970,
+                593
+              ],
+              [
+                770,
+                593
+              ],
+              [
+                670,
+                420
+              ]
+            ],
+            "count": 1,
+            "speed": 0.07,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                260,
+                420
+              ],
+              [
+                540,
+                420
+              ],
+              [
+                670,
+                420
+              ],
+              [
+                770,
+                247
+              ],
+              [
+                970,
+                247
+              ],
+              [
+                1070,
+                420
+              ],
+              [
+                970,
+                593
+              ],
+              [
+                770,
+                593
+              ],
+              [
+                670,
+                420
+              ]
+            ],
+            "count": 1,
+            "speed": 0.14
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "WHITE DOT = SLOW (1 STEP)",
+          "at": [
+            400,
+            300
+          ]
+        },
+        {
+          "text": "ORANGE DOT = FAST (2 STEPS)",
+          "at": [
+            400,
+            330
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Solution"
+    },
+    {
+      "eyebrow": "How it ends",
+      "caption": "No circle? The fast runner simply reaches the end. A circle? The fast runner keeps going round and *catches the slow one* from behind.",
+      "dur": 8,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "circle",
+            "at": [
+              260,
+              420
+            ],
+            "r": 34,
+            "text": "3",
+            "id": "n1",
+            "label": "START"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              400,
+              420
+            ],
+            "r": 34,
+            "text": "7",
+            "id": "n2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              540,
+              420
+            ],
+            "r": 34,
+            "text": "1",
+            "id": "n3"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              670,
+              420
+            ],
+            "r": 34,
+            "text": "8",
+            "id": "n4"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              770,
+              247
+            ],
+            "r": 34,
+            "text": "4",
+            "id": "n5"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              970,
+              247
+            ],
+            "r": 34,
+            "text": "6",
+            "id": "n6"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1070,
+              420
+            ],
+            "r": 34,
+            "text": "2",
+            "id": "n7"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              970,
+              593
+            ],
+            "r": 34,
+            "text": "9",
+            "id": "n8"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              770,
+              593
+            ],
+            "r": 34,
+            "text": "5",
+            "id": "n9"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                300,
+                420
+              ],
+              [
+                360,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                440,
+                420
+              ],
+              [
+                500,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                580,
+                420
+              ],
+              [
+                630,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                385
+              ],
+              [
+                750,
+                281
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                810,
+                247
+              ],
+              [
+                930,
+                247
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                990,
+                282
+              ],
+              [
+                1050,
+                385
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1050,
+                455
+              ],
+              [
+                990,
+                558
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                930,
+                593
+              ],
+              [
+                810,
+                593
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                750,
+                558
+              ],
+              [
+                690,
+                455
+              ]
+            ],
+            "arrow": true,
+            "accent": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                670,
+                420
+              ],
+              [
+                770,
+                247
+              ],
+              [
+                970,
+                247
+              ],
+              [
+                1070,
+                420
+              ],
+              [
+                970,
+                593
+              ],
+              [
+                770,
+                593
+              ],
+              [
+                670,
+                420
+              ]
+            ],
+            "count": 1,
+            "speed": 0.09,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                670,
+                420
+              ],
+              [
+                770,
+                247
+              ],
+              [
+                970,
+                247
+              ],
+              [
+                1070,
+                420
+              ],
+              [
+                970,
+                593
+              ],
+              [
+                770,
+                593
+              ],
+              [
+                670,
+                420
+              ]
+            ],
+            "count": 1,
+            "speed": 0.18,
+            "phase": 0.33
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "FAST CATCHES SLOW",
+          "at": [
+            870,
+            430
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Why they always meet",
+      "caption": "Every step, the fast runner gets exactly *1 item closer*. The gap goes 4, 3, 2, 1, 0. It can never jump over, so they must meet.",
+      "dur": 8,
+      "labels": [
+        {
+          "text": "GAP: 4 → 3 → 2 → 1 → 0  MEET!",
+          "at": [
+            870,
+            430
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Inside the circle, the fast runner is 4 items behind. How many steps until they meet?",
+        "options": [
+          "4",
+          "8",
+          "Never"
+        ],
+        "answer": 0,
+        "explain": "The gap shrinks by exactly 1 each step, so *4 steps*."
+      }
+    },
+    {
+      "eyebrow": "The code",
+      "caption": "Here is the whole solution. Two variables, and the list is never changed.",
+      "dur": 9,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              800,
+              410
+            ],
+            "w": 820,
+            "h": 320
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "def has_cycle(start):",
+          "at": [
+            430,
+            304
+          ],
+          "code": true
+        },
+        {
+          "text": "    slow = fast = start",
+          "at": [
+            430,
+            340
+          ],
+          "code": true
+        },
+        {
+          "text": "    while fast and fast.next:",
+          "at": [
+            430,
+            376
+          ],
+          "code": true
+        },
+        {
+          "text": "        slow = slow.next          # 1 step",
+          "at": [
+            430,
+            412
+          ],
+          "code": true
+        },
+        {
+          "text": "        fast = fast.next.next     # 2 steps",
+          "at": [
+            430,
+            448
+          ],
+          "code": true
+        },
+        {
+          "text": "        if slow is fast:          # caught up",
+          "at": [
+            430,
+            484
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "            return True",
+          "at": [
+            430,
+            520
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "    return False                  # fast hit the end",
+          "at": [
+            430,
+            556
+          ],
+          "code": true
+        }
+      ],
+      "chapter": "Code"
+    },
+    {
+      "eyebrow": "Bonus · Where does the circle start?",
+      "caption": "A common follow-up. After they meet, put one runner back at the start. Move both 1 step at a time: they meet again *exactly where the circle begins*.",
+      "dur": 9,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "circle",
+            "at": [
+              260,
+              420
+            ],
+            "r": 34,
+            "text": "3",
+            "id": "n1",
+            "label": "START"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              400,
+              420
+            ],
+            "r": 34,
+            "text": "7",
+            "id": "n2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              540,
+              420
+            ],
+            "r": 34,
+            "text": "1",
+            "id": "n3"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              670,
+              420
+            ],
+            "r": 34,
+            "text": "8",
+            "id": "n4",
+            "accent": true,
+            "label": "CIRCLE BEGINS",
+            "note": "The start-to-circle distance equals the meeting-point-to-circle distance, going round. That's why they arrive together."
+          },
+          {
+            "shape": "circle",
+            "at": [
+              770,
+              247
+            ],
+            "r": 34,
+            "text": "4",
+            "id": "n5"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              970,
+              247
+            ],
+            "r": 34,
+            "text": "6",
+            "id": "n6"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1070,
+              420
+            ],
+            "r": 34,
+            "text": "2",
+            "id": "n7",
+            "label": "THEY MET HERE"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              970,
+              593
+            ],
+            "r": 34,
+            "text": "9",
+            "id": "n8"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              770,
+              593
+            ],
+            "r": 34,
+            "text": "5",
+            "id": "n9"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                300,
+                420
+              ],
+              [
+                360,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                440,
+                420
+              ],
+              [
+                500,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                580,
+                420
+              ],
+              [
+                630,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                385
+              ],
+              [
+                750,
+                281
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                810,
+                247
+              ],
+              [
+                930,
+                247
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                990,
+                282
+              ],
+              [
+                1050,
+                385
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1050,
+                455
+              ],
+              [
+                990,
+                558
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                930,
+                593
+              ],
+              [
+                810,
+                593
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                750,
+                558
+              ],
+              [
+                690,
+                455
+              ]
+            ],
+            "arrow": true,
+            "accent": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                260,
+                420
+              ],
+              [
+                400,
+                420
+              ],
+              [
+                540,
+                420
+              ],
+              [
+                670,
+                420
+              ]
+            ],
+            "count": 1,
+            "speed": 0.25,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                1070,
+                420
+              ],
+              [
+                970,
+                593
+              ],
+              [
+                770,
+                593
+              ],
+              [
+                670,
+                420
+              ]
+            ],
+            "count": 1,
+            "speed": 0.25
+          }
+        ]
+      },
+      "chapter": "Follow-up"
+    },
+    {
+      "eyebrow": "If the rules change",
+      "chapter": "Other ways",
+      "caption": "Two runners win when memory is the limit. Loosen or change that rule and other methods fit:",
+      "dur": 10,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Remember visited",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Mark each node",
+            "id": "alt1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Brent's algorithm",
+            "id": "alt2"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF MEMORY IS NOT A CONCERN",
+          "at": [
+            300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "hash set · O(n) memory · simplest code",
+          "at": [
+            300,
+            548
+          ]
+        },
+        {
+          "text": "IF YOU MAY CHANGE THE LIST",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "O(1) memory · but the list is altered",
+          "at": [
+            800,
+            548
+          ]
+        },
+        {
+          "text": "IF EACH STEP IS EXPENSIVE",
+          "at": [
+            1300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "same idea · fewer pointer moves",
+          "at": [
+            1300,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "caption": "The big idea: two runners at *different speeds* reveal a loop without remembering anything. The same trick finds the middle of a list.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      },
+      "chapter": "Recap"
+    }
+  ]
+}

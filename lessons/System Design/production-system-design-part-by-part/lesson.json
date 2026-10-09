@@ -1,0 +1,1178 @@
+{
+  "engine": "dots",
+  "title": "Production system design, part by part",
+  "request": "best production system design explain each part properly in detail",
+  "createdAt": "2026-10-08",
+  "tags": [
+    "system-design",
+    "backend",
+    "scaling",
+    "interview"
+  ],
+  "difficulty": "Medium",
+  "dots": 1100,
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "caption": "The interviewer asks: design the backend for an app with 10 million users that survives a server dying and a traffic spike.",
+      "dur": 7,
+      "panel": false,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              380
+            ],
+            "text": "DESIGN AN APP FOR\n10 MILLION USERS",
+            "size": 100
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "THE INTERVIEWER ASKS",
+          "at": [
+            800,
+            200
+          ],
+          "accent": true
+        },
+        {
+          "text": "IT MUST SURVIVE A SERVER DYING AND A TRAFFIC SPIKE",
+          "at": [
+            800,
+            600
+          ]
+        }
+      ],
+      "chapter": "Question"
+    },
+    {
+      "eyebrow": "01 · Users and the edge",
+      "caption": "Users are everywhere. A *CDN* is a set of servers spread around the world, so each user downloads pages and pictures from one nearby.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              420,
+              410
+            ],
+            "scale": 1.2,
+            "label": "USERS",
+            "note": "Anyone, anywhere: phones on slow networks, laptops on fast ones."
+          },
+          {
+            "shape": "globe",
+            "at": [
+              1100,
+              410
+            ],
+            "scale": 1.4,
+            "label": "CDN · EDGE",
+            "note": "A content delivery network caches images, scripts and pages in hundreds of cities, and handles TLS."
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                520,
+                410
+              ],
+              [
+                960,
+                410
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                520,
+                410
+              ],
+              [
+                960,
+                410
+              ]
+            ],
+            "count": 6,
+            "speed": 0.45
+          }
+        ]
+      },
+      "chapter": "Traffic"
+    },
+    {
+      "eyebrow": "02 · Load balancer",
+      "caption": "Requests then reach a *load balancer*: a traffic officer that hands each request to one of several identical copies of the app.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "globe",
+            "at": [
+              230,
+              420
+            ],
+            "scale": 0.8,
+            "label": "CDN"
+          },
+          {
+            "shape": "box",
+            "at": [
+              560,
+              420
+            ],
+            "w": 130,
+            "h": 240,
+            "label": "LOAD BALANCER",
+            "note": "Picks a healthy copy for each request, round robin or least-busy, and can drain one gracefully during a deploy."
+          },
+          {
+            "shape": "server",
+            "at": [
+              1080,
+              250
+            ],
+            "scale": 0.5
+          },
+          {
+            "shape": "server",
+            "at": [
+              1080,
+              420
+            ],
+            "scale": 0.5,
+            "note": "Every copy runs the same code. None is special."
+          },
+          {
+            "shape": "server",
+            "at": [
+              1080,
+              590
+            ],
+            "scale": 0.5
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                300,
+                420
+              ],
+              [
+                480,
+                420
+              ]
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                640,
+                420
+              ],
+              [
+                840,
+                420
+              ],
+              [
+                840,
+                250
+              ],
+              [
+                1010,
+                250
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                640,
+                420
+              ],
+              [
+                1010,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                640,
+                420
+              ],
+              [
+                840,
+                420
+              ],
+              [
+                840,
+                590
+              ],
+              [
+                1010,
+                590
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                300,
+                420
+              ],
+              [
+                480,
+                420
+              ]
+            ],
+            "count": 3,
+            "speed": 0.7
+          },
+          {
+            "path": [
+              [
+                640,
+                420
+              ],
+              [
+                840,
+                420
+              ],
+              [
+                840,
+                250
+              ],
+              [
+                1010,
+                250
+              ]
+            ],
+            "count": 3,
+            "speed": 0.45
+          },
+          {
+            "path": [
+              [
+                640,
+                420
+              ],
+              [
+                1010,
+                420
+              ]
+            ],
+            "count": 3,
+            "speed": 0.5,
+            "phase": 0.33
+          },
+          {
+            "path": [
+              [
+                640,
+                420
+              ],
+              [
+                840,
+                420
+              ],
+              [
+                840,
+                590
+              ],
+              [
+                1010,
+                590
+              ]
+            ],
+            "count": 3,
+            "speed": 0.45,
+            "phase": 0.66
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "API · 3 COPIES",
+          "at": [
+            1230,
+            425
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "03 · Health checks",
+      "caption": "Every few seconds it checks that each copy still answers. If one breaks, it simply stops sending people there, so nobody notices.",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "globe",
+            "at": [
+              230,
+              420
+            ],
+            "scale": 0.8,
+            "label": "CDN"
+          },
+          {
+            "shape": "box",
+            "at": [
+              560,
+              420
+            ],
+            "w": 130,
+            "h": 240,
+            "label": "LOAD BALANCER"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1080,
+              250
+            ],
+            "scale": 0.5
+          },
+          {
+            "shape": "server",
+            "at": [
+              1080,
+              420
+            ],
+            "scale": 0.5
+          },
+          {
+            "shape": "server",
+            "at": [
+              1080,
+              590
+            ],
+            "scale": 0.5,
+            "accent": true,
+            "note": "Failed three health checks in a row. It stays out of rotation until it passes again."
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                300,
+                420
+              ],
+              [
+                480,
+                420
+              ]
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                640,
+                420
+              ],
+              [
+                840,
+                420
+              ],
+              [
+                840,
+                250
+              ],
+              [
+                1010,
+                250
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                640,
+                420
+              ],
+              [
+                1010,
+                420
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                300,
+                420
+              ],
+              [
+                480,
+                420
+              ]
+            ],
+            "count": 3,
+            "speed": 0.7
+          },
+          {
+            "path": [
+              [
+                640,
+                420
+              ],
+              [
+                840,
+                420
+              ],
+              [
+                840,
+                250
+              ],
+              [
+                1010,
+                250
+              ]
+            ],
+            "count": 4,
+            "speed": 0.5
+          },
+          {
+            "path": [
+              [
+                640,
+                420
+              ],
+              [
+                1010,
+                420
+              ]
+            ],
+            "count": 4,
+            "speed": 0.55,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "✕ NO REPLY",
+          "at": [
+            1250,
+            595
+          ],
+          "accent": true
+        },
+        {
+          "text": "✓ HEALTHY",
+          "at": [
+            1240,
+            425
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "04 · Stateless services",
+      "caption": "Each copy forgets everything between requests, so any copy can serve any user. When traffic grows, just *add more copies*.",
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "server",
+            "at": [
+              460,
+              400
+            ],
+            "scale": 0.85,
+            "label": "COPY 1"
+          },
+          {
+            "shape": "server",
+            "at": [
+              800,
+              400
+            ],
+            "scale": 0.85,
+            "label": "COPY 2"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1140,
+              400
+            ],
+            "scale": 0.85,
+            "accent": true,
+            "label": "+ AUTOSCALED",
+            "note": "An autoscaler watches CPU and request rate, and starts a new copy within a minute when they climb."
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Before we add a cache, test yourself.",
+      "check": {
+        "question": "Why can any copy of the API serve any user?",
+        "options": [
+          "The copies share memory",
+          "Each copy keeps no state between requests",
+          "The load balancer remembers users"
+        ],
+        "answer": 1,
+        "explain": "Because they're *stateless*. Sessions live in a cache or a token, so every copy is interchangeable and safe to add or remove."
+      }
+    },
+    {
+      "eyebrow": "05 · Caching",
+      "caption": "Some data is asked for constantly. Keep it in a *cache*, a fast memory store that answers in about 1 ms instead of 50.",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "server",
+            "at": [
+              330,
+              440
+            ],
+            "scale": 0.8,
+            "label": "API"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              820,
+              250
+            ],
+            "r": 70,
+            "label": "CACHE · ~1 MS",
+            "note": "An in-memory store like Redis. Data expires after a set time, so it never drifts far from the truth."
+          },
+          {
+            "shape": "database",
+            "at": [
+              1230,
+              470
+            ],
+            "scale": 0.9,
+            "label": "DATABASE · ~50 MS",
+            "note": "Read only on a cache miss, and the result is then cached for the next request."
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                430,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                250
+              ],
+              [
+                735,
+                250
+              ]
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                430,
+                480
+              ],
+              [
+                1110,
+                480
+              ]
+            ]
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                430,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                250
+              ],
+              [
+                735,
+                250
+              ]
+            ],
+            "count": 7,
+            "speed": 0.95
+          },
+          {
+            "path": [
+              [
+                430,
+                480
+              ],
+              [
+                1110,
+                480
+              ]
+            ],
+            "count": 3,
+            "speed": 0.2,
+            "accent": false
+          }
+        ]
+      },
+      "chapter": "Data"
+    },
+    {
+      "eyebrow": "06 · Tables",
+      "caption": "Inside the database, data sits in tables: rows and columns, like a spreadsheet. Finding one row by scanning them all would take ages.",
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "table",
+            "at": [
+              800,
+              410
+            ],
+            "rows": 8,
+            "cols": 5,
+            "lit": 5,
+            "label": "TABLE · ORDERS",
+            "note": "Millions of rows. A full scan reads every one of them from disk."
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "← ORDER #48213",
+          "at": [
+            1200,
+            474
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "07 · Indexes",
+      "caption": "An *index* works like the index at the back of a book: a sorted tree that finds any row in just a few hops.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "tree",
+            "at": [
+              800,
+              430
+            ],
+            "hot": true,
+            "note": "Each level narrows the search a hundredfold. Writes pay a small cost to keep the tree sorted."
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "ROOT",
+          "at": [
+            800,
+            206
+          ]
+        },
+        {
+          "text": "3 HOPS",
+          "at": [
+            1000,
+            568
+          ],
+          "accent": true
+        },
+        {
+          "text": "ROWS ON DISK",
+          "at": [
+            800,
+            658
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "08 · Replication",
+      "caption": "All changes go to one main database. *Copies* of it answer reads, and if the main one dies, a copy takes over.",
+      "dur": 7.5,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "database",
+            "at": [
+              560,
+              450
+            ],
+            "scale": 1.05,
+            "label": "PRIMARY · WRITES",
+            "note": "Records every change in a write-ahead log before applying it."
+          },
+          {
+            "shape": "database",
+            "at": [
+              1140,
+              280
+            ],
+            "scale": 0.62,
+            "label": "REPLICA · READS",
+            "note": "Replays the log, usually milliseconds behind. Read your own writes from the primary."
+          },
+          {
+            "shape": "database",
+            "at": [
+              1140,
+              600
+            ],
+            "scale": 0.62,
+            "label": "REPLICA · READS"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                700,
+                410
+              ],
+              [
+                880,
+                410
+              ],
+              [
+                880,
+                280
+              ],
+              [
+                1050,
+                280
+              ]
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                700,
+                490
+              ],
+              [
+                880,
+                490
+              ],
+              [
+                880,
+                600
+              ],
+              [
+                1050,
+                600
+              ]
+            ]
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                700,
+                410
+              ],
+              [
+                880,
+                410
+              ],
+              [
+                880,
+                280
+              ],
+              [
+                1050,
+                280
+              ]
+            ],
+            "count": 6,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                700,
+                490
+              ],
+              [
+                880,
+                490
+              ],
+              [
+                880,
+                600
+              ],
+              [
+                1050,
+                600
+              ]
+            ],
+            "count": 6,
+            "speed": 0.4,
+            "phase": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Replication has one catch.",
+      "check": {
+        "question": "A user just saved their profile. Where should the next read come from?",
+        "options": [
+          "A replica",
+          "The primary",
+          "The CDN"
+        ],
+        "answer": 1,
+        "explain": "Replicas run a few milliseconds behind, so a replica might still show the old profile. *Read your own writes from the primary.*"
+      }
+    },
+    {
+      "eyebrow": "09 · Queues",
+      "caption": "Slow jobs, like sending emails, go into a *queue*: a to-do list. The app replies instantly and workers clear the list in the background.",
+      "dur": 7.5,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "server",
+            "at": [
+              260,
+              420
+            ],
+            "scale": 0.8,
+            "label": "API"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              760,
+              420
+            ],
+            "slots": 6,
+            "filled": 4,
+            "label": "QUEUE",
+            "note": "Durable: jobs survive crashes. A failed job is retried with growing delays, then parked for a human."
+          },
+          {
+            "shape": "server",
+            "at": [
+              1260,
+              290
+            ],
+            "scale": 0.55,
+            "label": "WORKER"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1260,
+              560
+            ],
+            "scale": 0.55,
+            "label": "WORKER",
+            "note": "Workers scale separately from the API, so a backlog never slows the website."
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                360,
+                420
+              ],
+              [
+                565,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                955,
+                400
+              ],
+              [
+                1060,
+                400
+              ],
+              [
+                1060,
+                290
+              ],
+              [
+                1190,
+                290
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                955,
+                440
+              ],
+              [
+                1060,
+                440
+              ],
+              [
+                1060,
+                560
+              ],
+              [
+                1190,
+                560
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                360,
+                420
+              ],
+              [
+                565,
+                420
+              ]
+            ],
+            "count": 4,
+            "speed": 0.7
+          },
+          {
+            "path": [
+              [
+                955,
+                400
+              ],
+              [
+                1060,
+                400
+              ],
+              [
+                1060,
+                290
+              ],
+              [
+                1190,
+                290
+              ]
+            ],
+            "count": 3,
+            "speed": 0.35
+          },
+          {
+            "path": [
+              [
+                955,
+                440
+              ],
+              [
+                1060,
+                440
+              ],
+              [
+                1060,
+                560
+              ],
+              [
+                1190,
+                560
+              ]
+            ],
+            "count": 3,
+            "speed": 0.35,
+            "phase": 0.5
+          }
+        ]
+      },
+      "chapter": "Reliability"
+    },
+    {
+      "eyebrow": "10 · Security",
+      "caption": "Every request carries a pass, called a *token*. It is checked at the door, before the app does anything else.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              300,
+              420
+            ],
+            "label": "REQUEST"
+          },
+          {
+            "shape": "lock",
+            "at": [
+              800,
+              400
+            ],
+            "scale": 1.3,
+            "label": "AUTH · TOKEN CHECK",
+            "note": "Short-lived tokens limit the damage if one leaks. Expired ones are refreshed, never trusted."
+          },
+          {
+            "shape": "server",
+            "at": [
+              1300,
+              420
+            ],
+            "scale": 0.8,
+            "label": "API"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                380,
+                420
+              ],
+              [
+                700,
+                420
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                900,
+                420
+              ],
+              [
+                1200,
+                420
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                380,
+                420
+              ],
+              [
+                700,
+                420
+              ]
+            ],
+            "count": 4,
+            "speed": 0.5
+          },
+          {
+            "path": [
+              [
+                900,
+                420
+              ],
+              [
+                1200,
+                420
+              ]
+            ],
+            "count": 4,
+            "speed": 0.5,
+            "phase": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "11 · The result",
+      "caption": "Together, these parts keep the app running through crashes, traffic spikes and updates: up *99.99% of the time*.",
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              380
+            ],
+            "text": "99.99%",
+            "size": 190,
+            "accent": true,
+            "label": "UPTIME",
+            "note": "Four nines: under an hour of downtime a year."
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "Recap",
+      "caption": "Edge, load balancer, stateless services, cache, indexes, replicas, queues, auth. Same dots, different shapes.",
+      "dur": 8,
+      "form": {
+        "type": "sphere",
+        "r": 160
+      },
+      "chapter": "Recap"
+    }
+  ]
+}

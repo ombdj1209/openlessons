@@ -1,0 +1,3220 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-08",
+  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "companies": [],
+  "dots": 2400,
+  "spacing": 8,
+  "title": "Design a chat app like WhatsApp",
+  "tags": [
+    "system-design",
+    "interview",
+    "websockets",
+    "messaging",
+    "real-time"
+  ],
+  "difficulty": "Medium",
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "chapter": "Question",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer sets the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "CHAT APP LIKE WHATSAPP",
+            "size": 72
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "SYSTEM DESIGN · MEDIUM",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Design a chat service like WhatsApp: people send text messages one-to-one and in small groups, and see whether their messages were delivered and read.",
+        "example": [
+          "1:1 chats and groups of up to 256 people",
+          "Sent, delivered and read ticks",
+          "Messages reach people who were offline once they return"
+        ],
+        "constraints": [
+          "500 million daily users, ~40 messages each a day",
+          "Under 200 ms between two online phones",
+          "No message is ever lost or shown out of order"
+        ],
+        "followUp": "How does a message reach someone whose phone is switched off?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Requirements",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Get a message from one phone to another *instantly if both are online, later if not*, without ever losing it or mixing up the order.",
+        "points": [
+          "*Must work:* send; delivered and read ticks; groups; offline delivery.",
+          "*Must be fast:* under 200 ms between two online phones.",
+          "*Out of scope:* calls, payments, stories."
+        ]
+      }
+    },
+    {
+      "eyebrow": "The naive way: keep asking",
+      "caption": "Simplest idea: Bob’s phone asks the server *“anything new?”* every few seconds. Nearly every answer is “no”, and 100 million phones asking burns servers for nothing.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.5,
+            "label": "CHAT SERVER",
+            "id": "sv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                745,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aS"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                855,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_sB"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1434,
+                430
+              ],
+              [
+                855,
+                430
+              ]
+            ],
+            "count": 6,
+            "speed": 0.6,
+            "accent": false,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“anything new?” “no.” “anything new?” “no.”",
+          "at": [
+            1140,
+            380
+          ]
+        }
+      ],
+      "chapter": "Build it up"
+    },
+    {
+      "eyebrow": "Keep a line open",
+      "caption": "Better: every phone keeps one connection *open*, a WebSocket. Nobody asks; the server pushes a message down it the instant one arrives.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.5,
+            "label": "CHAT SERVER",
+            "id": "sv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                745,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aS",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                855,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_sB",
+            "accent": true
+          }
+        ],
+        "flows": []
+      },
+      "labels": []
+    },
+    {
+      "eyebrow": "Sending “hi”",
+      "caption": "Alice sends “hi”. It goes up her open connection, and the server pushes it straight down Bob’s. Well under 200 ms.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.5,
+            "label": "CHAT SERVER",
+            "id": "sv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                745,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aS"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                855,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_sB"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                745,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                855,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": []
+    },
+    {
+      "eyebrow": "Too many phones",
+      "caption": "100 million phones are online at once, each holding a connection open. One server can hold about 200,000. It falls over.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.5,
+            "label": "CHAT SERVER",
+            "id": "sv",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                745,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aS"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                855,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_sB"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                745,
+                430
+              ]
+            ],
+            "count": 10,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          },
+          {
+            "path": [
+              [
+                1434,
+                430
+              ],
+              [
+                855,
+                430
+              ]
+            ],
+            "count": 10,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "100,000,000 open connections ✕",
+          "at": [
+            800,
+            330
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Many servers… where is Bob?",
+      "caption": "So run *hundreds of chat servers*. Alice is connected to A, Bob to C. But server A has Alice’s message and *no idea which server holds Bob*.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER A",
+            "note": "Holds Alice’s open connection, and ~200,000 others.",
+            "id": "A",
+            "fail": true
+          },
+          {
+            "shape": "server",
+            "at": [
+              1120,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER C",
+            "note": "Holds Bob’s open connection.",
+            "id": "Cs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_AC"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_Cb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "Bob? ✕",
+          "at": [
+            800,
+            390
+          ],
+          "fail": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Fix: who is where",
+      "caption": "Keep a *registry*: user → server, updated whenever a phone connects. Server A looks up Bob (“C”) and forwards the message there.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER A",
+            "note": "Holds Alice’s open connection, and ~200,000 others.",
+            "id": "A"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1120,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER C",
+            "note": "Holds Bob’s open connection.",
+            "id": "Cs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_AC"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_Cb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "alice",
+                "A"
+              ],
+              [
+                "bob",
+                "C"
+              ]
+            ],
+            "head": [
+              "WHO",
+              "CONNECTED TO"
+            ],
+            "hi": [
+              1
+            ],
+            "label": "WHO IS WHERE",
+            "note": "A session registry in Redis, updated on every connect and disconnect.",
+            "id": "reg",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_reg"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.6
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "✓ Sent",
+      "caption": "Server A first saves the message in a *store*, then answers Alice. That answer is the first grey tick: the server has it, it won’t be lost.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER A",
+            "note": "Holds Alice’s open connection, and ~200,000 others.",
+            "id": "A"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1120,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER C",
+            "note": "Holds Bob’s open connection.",
+            "id": "Cs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_AC"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_Cb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "alice",
+                "A"
+              ],
+              [
+                "bob",
+                "C"
+              ]
+            ],
+            "head": [
+              "WHO",
+              "CONNECTED TO"
+            ],
+            "hi": [
+              1
+            ],
+            "label": "WHO IS WHERE",
+            "note": "A session registry in Redis, updated on every connect and disconnect.",
+            "id": "reg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_reg"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              620
+            ],
+            "scale": 0.45,
+            "label": "MESSAGE STORE",
+            "note": "Keeps each message until every recipient has it.",
+            "id": "store",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "arrow": true,
+            "id": "p_store"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                428,
+                430
+              ],
+              [
+                166,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "✓",
+          "at": [
+            230,
+            380
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "The ticks"
+    },
+    {
+      "eyebrow": "✓✓ Delivered, then read",
+      "caption": "When Bob’s phone receives it, it sends a *receipt* back the same way: second tick. When Bob opens the chat, another receipt turns the ticks blue.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER A",
+            "note": "Holds Alice’s open connection, and ~200,000 others.",
+            "id": "A"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1120,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER C",
+            "note": "Holds Bob’s open connection.",
+            "id": "Cs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_AC"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_Cb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "alice",
+                "A"
+              ],
+              [
+                "bob",
+                "C"
+              ]
+            ],
+            "head": [
+              "WHO",
+              "CONNECTED TO"
+            ],
+            "hi": [
+              1
+            ],
+            "label": "WHO IS WHERE",
+            "note": "A session registry in Redis, updated on every connect and disconnect.",
+            "id": "reg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_reg"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              620
+            ],
+            "scale": 0.45,
+            "label": "MESSAGE STORE",
+            "note": "Keeps each message until every recipient has it.",
+            "id": "store"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "arrow": true,
+            "id": "p_store"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.6
+          },
+          {
+            "path": [
+              [
+                1434,
+                430
+              ],
+              [
+                1172,
+                430
+              ],
+              [
+                1068,
+                430
+              ],
+              [
+                532,
+                430
+              ],
+              [
+                428,
+                430
+              ],
+              [
+                166,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "✓✓",
+          "at": [
+            230,
+            380
+          ],
+          "accent": true
+        },
+        {
+          "text": "receipt",
+          "at": [
+            1300,
+            470
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Bob’s phone is off",
+      "caption": "Bob is offline: the registry has no entry for him. The message waits in his *inbox* in the store, and a push notification wakes his phone.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob",
+            "fail": true
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER A",
+            "note": "Holds Alice’s open connection, and ~200,000 others.",
+            "id": "A"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1120,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER C",
+            "note": "Holds Bob’s open connection.",
+            "id": "Cs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_AC"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_Cb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "alice",
+                "A"
+              ],
+              [
+                "bob",
+                "—"
+              ]
+            ],
+            "head": [
+              "WHO",
+              "CONNECTED TO"
+            ],
+            "hi": [
+              1
+            ],
+            "label": "WHO IS WHERE",
+            "note": "A session registry in Redis, updated on every connect and disconnect.",
+            "id": "reg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_reg"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              620
+            ],
+            "scale": 0.45,
+            "label": "MESSAGE STORE",
+            "note": "Keeps each message until every recipient has it.",
+            "id": "store"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "arrow": true,
+            "id": "p_store"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1470,
+              195
+            ],
+            "scale": 0.6,
+            "label": "PUSH SERVICE",
+            "note": "Apple’s and Google’s push services can wake a sleeping phone.",
+            "id": "push"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                400
+              ],
+              [
+                620,
+                400
+              ],
+              [
+                620,
+                130
+              ],
+              [
+                1470,
+                130
+              ],
+              [
+                1470,
+                152
+              ]
+            ],
+            "arrow": true,
+            "id": "p_push"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1470,
+                232
+              ],
+              [
+                1470,
+                368
+              ]
+            ],
+            "arrow": true,
+            "id": "p_pushB"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "count": 1,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                532,
+                400
+              ],
+              [
+                620,
+                400
+              ],
+              [
+                620,
+                130
+              ],
+              [
+                1470,
+                130
+              ],
+              [
+                1470,
+                152
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1470,
+                232
+              ],
+              [
+                1470,
+                368
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "OFFLINE",
+          "at": [
+            1470,
+            520
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Offline"
+    },
+    {
+      "eyebrow": "Bob comes back",
+      "caption": "Bob’s phone reconnects to C and says the last message number it has. C pulls *everything newer* from his inbox and sends it in order.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER A",
+            "note": "Holds Alice’s open connection, and ~200,000 others.",
+            "id": "A"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1120,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER C",
+            "note": "Holds Bob’s open connection.",
+            "id": "Cs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_AC"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_Cb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "alice",
+                "A"
+              ],
+              [
+                "bob",
+                "C"
+              ]
+            ],
+            "head": [
+              "WHO",
+              "CONNECTED TO"
+            ],
+            "hi": [
+              1
+            ],
+            "label": "WHO IS WHERE",
+            "note": "A session registry in Redis, updated on every connect and disconnect.",
+            "id": "reg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_reg"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              620
+            ],
+            "scale": 0.45,
+            "label": "MESSAGE STORE",
+            "note": "Keeps each message until every recipient has it.",
+            "id": "store"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "arrow": true,
+            "id": "p_store"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                852,
+                620
+              ],
+              [
+                1120,
+                620
+              ],
+              [
+                1120,
+                475
+              ]
+            ],
+            "arrow": true,
+            "id": "p_storeC"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                852,
+                620
+              ],
+              [
+                1120,
+                620
+              ],
+              [
+                1120,
+                475
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“I have up to #1,041” → sends #1,042 … #1,057",
+          "at": [
+            1120,
+            690
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Bob’s phone is off when Alice writes. Where does her message wait?",
+        "options": [
+          "In Bob’s inbox in the message store",
+          "On Alice’s phone",
+          "Nowhere: it is dropped"
+        ],
+        "answer": 0,
+        "explain": "The server keeps it until Bob’s phone *confirms* it, and the push notification tells his phone to reconnect and fetch it."
+      }
+    },
+    {
+      "eyebrow": "A lost tick, a double send",
+      "caption": "Alice’s “sent” tick gets lost on a bad network, so her phone *sends again*. Without care, Bob would see “hi” twice.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER A",
+            "note": "Holds Alice’s open connection, and ~200,000 others.",
+            "id": "A"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1120,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER C",
+            "note": "Holds Bob’s open connection.",
+            "id": "Cs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_AC"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_Cb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "alice",
+                "A"
+              ],
+              [
+                "bob",
+                "C"
+              ]
+            ],
+            "head": [
+              "WHO",
+              "CONNECTED TO"
+            ],
+            "hi": [
+              1
+            ],
+            "label": "WHO IS WHERE",
+            "note": "A session registry in Redis, updated on every connect and disconnect.",
+            "id": "reg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_reg"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              620
+            ],
+            "scale": 0.45,
+            "label": "MESSAGE STORE",
+            "note": "Keeps each message until every recipient has it.",
+            "id": "store"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "arrow": true,
+            "id": "p_store"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                428,
+                430
+              ],
+              [
+                166,
+                430
+              ]
+            ],
+            "count": 1,
+            "speed": 0.4,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "tick lost ✕ → resend",
+          "at": [
+            300,
+            380
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: one id per message",
+      "caption": "The phone stamps each message with its own *id* once, and reuses it on every retry. Seeing an id it already has, the server just ticks again.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER A",
+            "note": "Holds Alice’s open connection, and ~200,000 others.",
+            "id": "A"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1120,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER C",
+            "note": "Holds Bob’s open connection.",
+            "id": "Cs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_AC"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_Cb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "alice",
+                "A"
+              ],
+              [
+                "bob",
+                "C"
+              ]
+            ],
+            "head": [
+              "WHO",
+              "CONNECTED TO"
+            ],
+            "hi": [
+              1
+            ],
+            "label": "WHO IS WHERE",
+            "note": "A session registry in Redis, updated on every connect and disconnect.",
+            "id": "reg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_reg"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              620
+            ],
+            "scale": 0.45,
+            "label": "MESSAGE STORE",
+            "note": "Keeps each message until every recipient has it.",
+            "id": "store"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "arrow": true,
+            "id": "p_store"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                428,
+                430
+              ],
+              [
+                166,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "count": 1,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "id 7f3a… already stored → just ✓ again",
+          "at": [
+            480,
+            560
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "Groups",
+      "caption": "In a group, the server sends a copy towards *every member*’s server. A 256-person group means 256 deliveries for each message.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER A",
+            "note": "Holds Alice’s open connection, and ~200,000 others.",
+            "id": "A"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1120,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER C",
+            "note": "Holds Bob’s open connection.",
+            "id": "Cs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_AC"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_Cb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "alice",
+                "A"
+              ],
+              [
+                "bob",
+                "C"
+              ]
+            ],
+            "head": [
+              "WHO",
+              "CONNECTED TO"
+            ],
+            "hi": [
+              1
+            ],
+            "label": "WHO IS WHERE",
+            "note": "A session registry in Redis, updated on every connect and disconnect.",
+            "id": "reg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_reg"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1360,
+              250
+            ],
+            "scale": 0.35,
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1360,
+              610
+            ],
+            "scale": 0.35,
+            "label": "GROUP",
+            "id": "m2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1120,
+                385
+              ],
+              [
+                1120,
+                250
+              ],
+              [
+                1326,
+                250
+              ]
+            ],
+            "arrow": true,
+            "id": "p_m1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                470
+              ],
+              [
+                1250,
+                470
+              ],
+              [
+                1250,
+                610
+              ],
+              [
+                1326,
+                610
+              ]
+            ],
+            "arrow": true,
+            "id": "p_m2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.6
+          },
+          {
+            "path": [
+              [
+                1120,
+                385
+              ],
+              [
+                1120,
+                250
+              ],
+              [
+                1326,
+                250
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1172,
+                470
+              ],
+              [
+                1250,
+                470
+              ],
+              [
+                1250,
+                610
+              ],
+              [
+                1326,
+                610
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Groups"
+    },
+    {
+      "eyebrow": "A server restarts",
+      "caption": "When server C restarts, its 200,000 phones all reconnect *at the same moment* and swamp the others. So phones wait a random few seconds first.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER A",
+            "note": "Holds Alice’s open connection, and ~200,000 others.",
+            "id": "A"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1120,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER C",
+            "note": "Holds Bob’s open connection.",
+            "id": "Cs",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_AC"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_Cb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "alice",
+                "A"
+              ],
+              [
+                "bob",
+                "C"
+              ]
+            ],
+            "head": [
+              "WHO",
+              "CONNECTED TO"
+            ],
+            "hi": [
+              1
+            ],
+            "label": "WHO IS WHERE",
+            "note": "A session registry in Redis, updated on every connect and disconnect.",
+            "id": "reg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_reg"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              620
+            ],
+            "scale": 0.45,
+            "label": "MESSAGE STORE",
+            "note": "Keeps each message until every recipient has it.",
+            "id": "store"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "arrow": true,
+            "id": "p_store"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1434,
+                430
+              ],
+              [
+                1172,
+                430
+              ]
+            ],
+            "count": 8,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "reconnect after a random 0–30 s",
+          "at": [
+            1300,
+            520
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Trade-offs"
+    },
+    {
+      "eyebrow": "The whole system",
+      "caption": "Open connections, a registry to find people, a store for safety and the offline, and ids so retries are harmless. *Every tick is a receipt travelling back.*",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.6,
+            "label": "ALICE",
+            "id": "alice"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.6,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              480,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER A",
+            "note": "Holds Alice’s open connection, and ~200,000 others.",
+            "id": "A"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1120,
+              430
+            ],
+            "scale": 0.45,
+            "label": "SERVER C",
+            "note": "Holds Bob’s open connection.",
+            "id": "Cs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_aA"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_AC"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "arrow": false,
+            "id": "p_Cb"
+          },
+          {
+            "shape": "map",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.7,
+            "entries": [
+              [
+                "alice",
+                "A"
+              ],
+              [
+                "bob",
+                "C"
+              ]
+            ],
+            "head": [
+              "WHO",
+              "CONNECTED TO"
+            ],
+            "hi": [
+              1
+            ],
+            "label": "WHO IS WHERE",
+            "note": "A session registry in Redis, updated on every connect and disconnect.",
+            "id": "reg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_reg"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              620
+            ],
+            "scale": 0.45,
+            "label": "MESSAGE STORE",
+            "note": "Keeps each message until every recipient has it.",
+            "id": "store"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "arrow": true,
+            "id": "p_store"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1470,
+              195
+            ],
+            "scale": 0.6,
+            "label": "PUSH SERVICE",
+            "note": "Apple’s and Google’s push services can wake a sleeping phone.",
+            "id": "push"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                532,
+                400
+              ],
+              [
+                620,
+                400
+              ],
+              [
+                620,
+                130
+              ],
+              [
+                1470,
+                130
+              ],
+              [
+                1470,
+                152
+              ]
+            ],
+            "arrow": true,
+            "id": "p_push"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1470,
+                232
+              ],
+              [
+                1470,
+                368
+              ]
+            ],
+            "arrow": true,
+            "id": "p_pushB"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                166,
+                430
+              ],
+              [
+                428,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                480,
+                385
+              ],
+              [
+                480,
+                230
+              ],
+              [
+                714,
+                230
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                532,
+                430
+              ],
+              [
+                1068,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                1172,
+                430
+              ],
+              [
+                1434,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.6
+          },
+          {
+            "path": [
+              [
+                480,
+                475
+              ],
+              [
+                480,
+                620
+              ],
+              [
+                748,
+                620
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Recap"
+    }
+  ]
+}

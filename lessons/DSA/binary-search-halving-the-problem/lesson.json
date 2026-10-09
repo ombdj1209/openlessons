@@ -1,0 +1,641 @@
+{
+  "engine": "dots",
+  "title": "Binary search: halving the problem",
+  "request": "add more impressive god-level DSA solutions",
+  "createdAt": "2026-10-08",
+  "tags": [
+    "dsa",
+    "arrays",
+    "binary-search",
+    "interview"
+  ],
+  "companies": [
+    "Amazon",
+    "Google",
+    "Meta",
+    "Microsoft"
+  ],
+  "difficulty": "Easy",
+  "dots": 1300,
+  "steps": [
+    {
+      "eyebrow": "The problem",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer reads you the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "BINARY SEARCH",
+            "size": 120
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LEETCODE 704 · EASY",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Given an array of integers *nums* sorted in ascending order, and an integer *target*, return the index of target if it exists, otherwise return -1. You must write an algorithm with *O(log n)* runtime.",
+        "example": [
+          "Input:  nums = [-1, 0, 3, 5, 9, 12], target = 9",
+          "Output: 4",
+          "9 exists in nums and its index is 4"
+        ],
+        "constraints": [
+          "1 <= nums.length <= 10^4",
+          "All integers in nums are unique",
+          "nums is sorted in ascending order"
+        ]
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "The list is already sorted. *Find where the target is*, or say it isn't there, without checking every number.",
+        "points": [
+          "*You get:* a sorted list and a target number.",
+          "*You return:* its position, or -1 if it's missing.",
+          "*The catch:* it must be much faster than checking one by one."
+        ]
+      }
+    },
+    {
+      "eyebrow": "The example",
+      "caption": "Here's a sorted list, smallest to biggest. We want to find where *37* is, without checking every number.",
+      "dur": 7,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.7,
+            "values": [
+              2,
+              5,
+              8,
+              12,
+              16,
+              23,
+              27,
+              31,
+              37,
+              42,
+              48,
+              56,
+              61,
+              72,
+              90
+            ],
+            "note": "Sorted means every number is bigger than the one before. That's the whole trick."
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LOOKING FOR 37",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Look in the middle",
+      "caption": "Look at the *middle* number first. It's 31, smaller than 37. The list is sorted, so 37 can't be anywhere to its left.",
+      "dur": 8,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              420
+            ],
+            "scale": 0.7,
+            "values": [
+              2,
+              5,
+              8,
+              12,
+              16,
+              23,
+              27,
+              31,
+              37,
+              42,
+              48,
+              56,
+              61,
+              72,
+              90
+            ],
+            "hi": [
+              7
+            ],
+            "marks": [
+              {
+                "i": 0,
+                "text": "start"
+              },
+              {
+                "i": 7,
+                "text": "middle"
+              },
+              {
+                "i": 14,
+                "text": "end"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "31 IS TOO SMALL  →  37 MUST BE ON THE RIGHT",
+          "at": [
+            800,
+            290
+          ]
+        }
+      ],
+      "chapter": "Solution"
+    },
+    {
+      "eyebrow": "Half gone",
+      "caption": "One look ruled out *half the list*. Now check the middle of what's left: 56. Too big, so 37 must be to its left.",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              420
+            ],
+            "scale": 0.7,
+            "values": [
+              2,
+              5,
+              8,
+              12,
+              16,
+              23,
+              27,
+              31,
+              37,
+              42,
+              48,
+              56,
+              61,
+              72,
+              90
+            ],
+            "hi": [
+              11
+            ],
+            "dim": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "marks": [
+              {
+                "i": 8,
+                "text": "start"
+              },
+              {
+                "i": 11,
+                "text": "middle"
+              },
+              {
+                "i": 14,
+                "text": "end"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "56 IS TOO BIG  →  37 MUST BE ON THE LEFT",
+          "at": [
+            800,
+            290
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Again",
+      "caption": "Only three numbers left. The middle is 42, still too big. Rule it out, along with everything after it.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              420
+            ],
+            "scale": 0.7,
+            "values": [
+              2,
+              5,
+              8,
+              12,
+              16,
+              23,
+              27,
+              31,
+              37,
+              42,
+              48,
+              56,
+              61,
+              72,
+              90
+            ],
+            "hi": [
+              9
+            ],
+            "dim": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              11,
+              12,
+              13,
+              14
+            ],
+            "marks": [
+              {
+                "i": 8,
+                "text": "start"
+              },
+              {
+                "i": 9,
+                "text": "middle"
+              },
+              {
+                "i": 10,
+                "text": "end"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "42 IS TOO BIG  →  LOOK LEFT",
+          "at": [
+            800,
+            290
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Found it",
+      "caption": "The middle is now 37. *Found it* in just 4 looks. Checking one by one would have taken 9.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              420
+            ],
+            "scale": 0.7,
+            "values": [
+              2,
+              5,
+              8,
+              12,
+              16,
+              23,
+              27,
+              31,
+              37,
+              42,
+              48,
+              56,
+              61,
+              72,
+              90
+            ],
+            "hi": [
+              8
+            ],
+            "dim": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14
+            ],
+            "marks": [
+              {
+                "i": 8,
+                "text": "found"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "37 ✓   ANSWER: POSITION 8",
+          "at": [
+            800,
+            290
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Start is at position 8 and end is at 10. Which position do we check next?",
+        "options": [
+          "8",
+          "9",
+          "10"
+        ],
+        "answer": 1,
+        "explain": "The middle of 8 and 10 is 9. We always check *the middle of what's left*."
+      }
+    },
+    {
+      "eyebrow": "Why it's so fast",
+      "caption": "Every look cuts what's left in half. Even a *billion* numbers shrink down to one after about 30 looks.",
+      "dur": 7.5,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              360
+            ],
+            "text": "30 LOOKS",
+            "size": 170,
+            "accent": true,
+            "label": "FOR A BILLION SORTED NUMBERS"
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "One more.",
+      "check": {
+        "question": "About how many looks for a million sorted numbers?",
+        "options": [
+          "About 20",
+          "About 1,000",
+          "About 500,000"
+        ],
+        "answer": 0,
+        "explain": "Halving a million about 20 times gets you to one number. *Double the list, and you add just one look.*"
+      }
+    },
+    {
+      "eyebrow": "The code",
+      "caption": "Here is the whole solution. The comments match the steps we just walked through.",
+      "dur": 9.5,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              800,
+              390
+            ],
+            "w": 880,
+            "h": 420
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "def find(nums, target):",
+          "at": [
+            390,
+            224
+          ],
+          "code": true
+        },
+        {
+          "text": "    start, end = 0, len(nums) - 1",
+          "at": [
+            390,
+            258
+          ],
+          "code": true
+        },
+        {
+          "text": "    while start <= end:",
+          "at": [
+            390,
+            292
+          ],
+          "code": true
+        },
+        {
+          "text": "        middle = (start + end) // 2",
+          "at": [
+            390,
+            326
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "        if nums[middle] == target:",
+          "at": [
+            390,
+            360
+          ],
+          "code": true
+        },
+        {
+          "text": "            return middle              # found it",
+          "at": [
+            390,
+            394
+          ],
+          "code": true
+        },
+        {
+          "text": "        if nums[middle] < target:",
+          "at": [
+            390,
+            428
+          ],
+          "code": true
+        },
+        {
+          "text": "            start = middle + 1         # rule out the left half",
+          "at": [
+            390,
+            462
+          ],
+          "code": true
+        },
+        {
+          "text": "        else:",
+          "at": [
+            390,
+            496
+          ],
+          "code": true
+        },
+        {
+          "text": "            end = middle - 1           # rule out the right half",
+          "at": [
+            390,
+            530
+          ],
+          "code": true
+        },
+        {
+          "text": "    return -1                          # not in the list",
+          "at": [
+            390,
+            564
+          ],
+          "code": true
+        }
+      ],
+      "chapter": "Code"
+    },
+    {
+      "eyebrow": "If the rules change",
+      "chapter": "Other ways",
+      "caption": "Halving wins for one search in a sorted list. Change the situation and something else fits better:",
+      "dur": 10,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              500,
+              420
+            ],
+            "w": 480,
+            "h": 170,
+            "text": "Hash set",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1100,
+              420
+            ],
+            "w": 480,
+            "h": 170,
+            "text": "Check one by one",
+            "id": "alt1"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF YOU SEARCH THE SAME LIST A LOT",
+          "at": [
+            500,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "O(1) per lookup · O(n) memory",
+          "at": [
+            500,
+            548
+          ]
+        },
+        {
+          "text": "IF THE LIST ISN'T SORTED",
+          "at": [
+            1100,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "sorting first costs more than one scan",
+          "at": [
+            1100,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "caption": "The big idea: when things are in order, *rule out half at a time*. That's binary search, and it hides inside many tricky problems.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      },
+      "chapter": "Recap"
+    }
+  ]
+}

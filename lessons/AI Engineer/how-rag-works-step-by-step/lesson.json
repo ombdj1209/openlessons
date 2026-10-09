@@ -1,0 +1,2939 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-09",
+  "request": "add an AI Engineer folder with RAG in detail: how it works, types of RAG and use cases",
+  "companies": [],
+  "dots": 2400,
+  "spacing": 8,
+  "difficulty": "Medium",
+  "title": "How RAG works, step by step",
+  "tags": [
+    "ai-engineering",
+    "rag",
+    "llm",
+    "embeddings",
+    "vector-database",
+    "interview"
+  ],
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "chapter": "Question",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer sets the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "HOW RAG WORKS",
+            "size": 120
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "AI ENGINEERING · MEDIUM",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Design an AI assistant that answers questions about your company’s own documents, with answers you can trust and trace back to a source.",
+        "example": [
+          "“What is our refund window for annual plans?”",
+          "→ “30 days from purchase (Refund Policy v3, §2)”",
+          "If the documents don’t say, it says so"
+        ],
+        "constraints": [
+          "50,000 pages of internal documents, updated every week",
+          "Answers in under 3 seconds",
+          "No made-up facts"
+        ],
+        "followUp": "How would you know the assistant is getting it right?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Requirements",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Build an AI that *looks things up in your documents before it answers*, and shows where it found the answer.",
+        "points": [
+          "*Must work:* answer from your own documents, and cite them.",
+          "*Must be honest:* if the documents don’t say, say so.",
+          "*Out of scope:* training a model from scratch."
+        ]
+      }
+    },
+    {
+      "eyebrow": "A plain AI",
+      "caption": "Start with a plain AI model. You ask it: “What is our refund window?” It answers from whatever it learned during training.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                1418,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_qDirect"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "arrow": true,
+            "id": "p_llmYou"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                1418,
+                575
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "count": 2,
+            "speed": 0.3,
+            "accent": false
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“What is our refund window?”",
+          "at": [
+            780,
+            545
+          ]
+        }
+      ],
+      "chapter": "The problem"
+    },
+    {
+      "eyebrow": "It doesn’t know",
+      "caption": "But your refund policy was never in its training data. It may say it doesn’t know, or *confidently invent* an answer. That is a hallucination.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                1418,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_qDirect"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "arrow": true,
+            "id": "p_llmYou"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                1418,
+                575
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "count": 4,
+            "speed": 0.3,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“30 days.”  (a guess ✕)",
+          "at": [
+            700,
+            692
+          ],
+          "fail": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Idea: hand it the documents",
+      "caption": "Idea: paste your documents into the question. The AI reads them first, then answers from them. Now it can use *your* policy.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "doc",
+            "at": [
+              70,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d1"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              140,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "label": "YOUR DOCUMENTS",
+            "note": "Policies, manuals, tickets, wikis: whatever the AI should be able to answer from.",
+            "id": "d2"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              210,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d3"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm"
+          },
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                1490,
+                200
+              ],
+              [
+                1490,
+                524
+              ]
+            ],
+            "arrow": true,
+            "id": "p_docsLlm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                1418,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_qDirect"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "arrow": true,
+            "id": "p_llmYou"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                1490,
+                200
+              ],
+              [
+                1490,
+                524
+              ]
+            ],
+            "count": 5,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                1418,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "count": 2,
+            "speed": 0.3
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "The idea"
+    },
+    {
+      "eyebrow": "Too much to paste",
+      "caption": "But you have 50,000 pages, and a prompt only holds so much. Even if it fit, it would be slow and costly, and facts buried in the middle get missed.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "doc",
+            "at": [
+              70,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d1"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              140,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "label": "YOUR DOCUMENTS",
+            "note": "Policies, manuals, tickets, wikis: whatever the AI should be able to answer from.",
+            "id": "d2"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              210,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d3"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              70,
+              340
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d4"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              140,
+              340
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d5"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              210,
+              340
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d6"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                1490,
+                200
+              ],
+              [
+                1490,
+                524
+              ]
+            ],
+            "arrow": true,
+            "id": "p_docsLlm"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                1490,
+                200
+              ],
+              [
+                1490,
+                524
+              ]
+            ],
+            "count": 14,
+            "speed": 0.7,
+            "fail": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "50,000 pages ✕ won’t fit in a prompt",
+          "at": [
+            800,
+            150
+          ],
+          "fail": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Send only what matters",
+      "caption": "So send only the few paragraphs that matter for *this* question. That needs a way to *find* them. The finding step is the “R” in RAG: Retrieval.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "doc",
+            "at": [
+              70,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d1"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              140,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "label": "YOUR DOCUMENTS",
+            "note": "Policies, manuals, tickets, wikis: whatever the AI should be able to answer from.",
+            "id": "d2",
+            "accent": true
+          },
+          {
+            "shape": "doc",
+            "at": [
+              210,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d3"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm"
+          },
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                1490,
+                200
+              ],
+              [
+                1490,
+                524
+              ]
+            ],
+            "arrow": true,
+            "id": "p_docsLlm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                1418,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_qDirect"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "arrow": true,
+            "id": "p_llmYou"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                1490,
+                200
+              ],
+              [
+                1490,
+                524
+              ]
+            ],
+            "count": 1,
+            "speed": 0.3
+          },
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                1418,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "FIND THE 3 RIGHT PARAGRAPHS",
+          "at": [
+            800,
+            380
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Step 1 · cut into chunks",
+      "caption": "First, cut every document into small pieces called *chunks*: a few paragraphs each, with a little overlap so no sentence is split in half.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "doc",
+            "at": [
+              70,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d1"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              140,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "label": "YOUR DOCUMENTS",
+            "note": "Policies, manuals, tickets, wikis: whatever the AI should be able to answer from.",
+            "id": "d2"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              210,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d3"
+          },
+          {
+            "shape": "array",
+            "at": [
+              470,
+              200
+            ],
+            "scale": 0.5,
+            "values": [
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6"
+            ],
+            "label": "CHUNKS",
+            "note": "Small pieces of the documents: a few paragraphs each, with a little overlap.",
+            "id": "chunks",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                318,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_docsChunks"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                318,
+                200
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "a few hundred words each",
+          "at": [
+            470,
+            130
+          ]
+        }
+      ],
+      "chapter": "Build the index"
+    },
+    {
+      "eyebrow": "Step 2 · text becomes numbers",
+      "caption": "An *embedding model* reads each chunk and outputs a list of numbers that captures its *meaning*. Similar meanings give similar numbers.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              470,
+              200
+            ],
+            "scale": 0.5,
+            "values": [
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6"
+            ],
+            "label": "CHUNKS",
+            "note": "Small pieces of the documents: a few paragraphs each, with a little overlap.",
+            "id": "chunks"
+          },
+          {
+            "shape": "server",
+            "at": [
+              760,
+              200
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "Turns text into a list of numbers that captures its meaning.",
+            "id": "embA",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                620,
+                200
+              ],
+              [
+                715,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_chunksEmb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                620,
+                200
+              ],
+              [
+                715,
+                200
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“refunds within 30 days”  →  [0.12, −0.80, 0.33, …]",
+          "at": [
+            760,
+            330
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Meaning as a map",
+      "caption": "Picture those lists of numbers as points on a map. Refund chunks land together, shipping chunks elsewhere. *Close on the map means close in meaning.*",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "note": "Stores every chunk as a point, and finds the points nearest to a query, fast.",
+            "id": "vdb"
+          }
+        ],
+        "flows": []
+      },
+      "labels": [
+        {
+          "text": "REFUNDS",
+          "at": [
+            942,
+            283.2
+          ]
+        },
+        {
+          "text": "SHIPPING",
+          "at": [
+            1098,
+            274.4
+          ]
+        },
+        {
+          "text": "SECURITY",
+          "at": [
+            945,
+            483.4
+          ]
+        },
+        {
+          "text": "PRICING",
+          "at": [
+            1101,
+            483.4
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Step 3 · store them",
+      "caption": "Every chunk’s point goes into a *vector database*, built to find the nearest points fast. All of this happens once, ahead of time, before anyone asks.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "doc",
+            "at": [
+              70,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d1"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              140,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "label": "YOUR DOCUMENTS",
+            "note": "Policies, manuals, tickets, wikis: whatever the AI should be able to answer from.",
+            "id": "d2"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              210,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d3"
+          },
+          {
+            "shape": "array",
+            "at": [
+              470,
+              200
+            ],
+            "scale": 0.5,
+            "values": [
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6"
+            ],
+            "label": "CHUNKS",
+            "note": "Small pieces of the documents: a few paragraphs each, with a little overlap.",
+            "id": "chunks"
+          },
+          {
+            "shape": "server",
+            "at": [
+              760,
+              200
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "Turns text into a list of numbers that captures its meaning.",
+            "id": "embA"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "note": "Stores every chunk as a point, and finds the points nearest to a query, fast.",
+            "id": "vdb",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                318,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_docsChunks"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                620,
+                200
+              ],
+              [
+                715,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_chunksEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                805,
+                200
+              ],
+              [
+                1020,
+                200
+              ],
+              [
+                1020,
+                266
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                318,
+                200
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                620,
+                200
+              ],
+              [
+                715,
+                200
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                805,
+                200
+              ],
+              [
+                1020,
+                200
+              ],
+              [
+                1020,
+                266
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.6
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "INDEXING · DONE AHEAD OF TIME",
+          "at": [
+            800,
+            120
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Why turn chunks into numbers (embeddings) instead of searching for the words themselves?",
+        "options": [
+          "Numbers capture meaning, so “money back” can find “refund”",
+          "Numbers are cheaper to store than words",
+          "Words can’t be searched at all"
+        ],
+        "answer": 0,
+        "explain": "Embeddings capture *meaning*, so a question can find a chunk that uses different words. Exact words still matter sometimes; the next lesson fixes that."
+      }
+    },
+    {
+      "eyebrow": "A question arrives",
+      "caption": "Now someone asks: “How long do customers have to get their money back?” The *same* embedding model turns the question into a point on the map.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB",
+            "accent": true
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "note": "Stores every chunk as a point, and finds the points nearest to a query, fast.",
+            "id": "vdb",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "QUESTION",
+          "at": [
+            1026,
+            331.6
+          ],
+          "accent": true
+        },
+        {
+          "text": "SAME MODEL AS THE CHUNKS",
+          "at": [
+            470,
+            635
+          ]
+        }
+      ],
+      "chapter": "Answer a question"
+    },
+    {
+      "eyebrow": "Find the nearest chunks",
+      "caption": "The database returns the chunks nearest to the question: the top 3, called “top-k”. The question never said “refund”, yet meaning put it right beside them.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "note": "Stores every chunk as a point, and finds the points nearest to a query, fast.",
+            "id": "vdb",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ],
+            "r": 40
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "TOP 3 NEAREST",
+          "at": [
+            1050,
+            384.4
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Build the prompt",
+      "caption": "Those chunks go into a prompt with the question and one rule: “answer only from this context, and say where it came from.”",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "note": "Stores every chunk as a point, and finds the points nearest to a query, fast.",
+            "id": "vdb",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1490,
+              380
+            ],
+            "w": 110,
+            "h": 100,
+            "text": "PROMPT",
+            "label": "PROMPT",
+            "note": "Question + the retrieved chunks + the rules for answering.",
+            "id": "prompt",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vdbPrompt"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "QUESTION + CHUNKS + RULES",
+          "at": [
+            1420,
+            305
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "The AI answers",
+      "caption": "The AI reads the chunks and writes: “30 days from purchase (Refund Policy v3, §2).” It can *name its source*, because the source was in front of it.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "note": "Stores every chunk as a point, and finds the points nearest to a query, fast.",
+            "id": "vdb",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1490,
+              380
+            ],
+            "w": 110,
+            "h": 100,
+            "text": "PROMPT",
+            "label": "PROMPT",
+            "note": "Question + the retrieved chunks + the rules for answering.",
+            "id": "prompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vdbPrompt"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1490,
+                434
+              ],
+              [
+                1490,
+                522
+              ]
+            ],
+            "arrow": true,
+            "id": "p_promptLlm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "arrow": true,
+            "id": "p_llmYou"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1490,
+                434
+              ],
+              [
+                1490,
+                522
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "count": 3,
+            "speed": 0.3,
+            "phase": 0.2
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“30 days from purchase (Refund Policy v3, §2)”",
+          "at": [
+            700,
+            692
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "That is RAG",
+      "caption": "That is *RAG*: Retrieval-Augmented Generation. *Retrieve* the right chunks, *augment* the prompt with them, then let the AI *generate* the answer.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "doc",
+            "at": [
+              70,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d1"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              140,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "label": "YOUR DOCUMENTS",
+            "note": "Policies, manuals, tickets, wikis: whatever the AI should be able to answer from.",
+            "id": "d2"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              210,
+              200
+            ],
+            "scale": 0.45,
+            "rows": 5,
+            "id": "d3"
+          },
+          {
+            "shape": "array",
+            "at": [
+              470,
+              200
+            ],
+            "scale": 0.5,
+            "values": [
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6"
+            ],
+            "label": "CHUNKS",
+            "note": "Small pieces of the documents: a few paragraphs each, with a little overlap.",
+            "id": "chunks"
+          },
+          {
+            "shape": "server",
+            "at": [
+              760,
+              200
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "Turns text into a list of numbers that captures its meaning.",
+            "id": "embA"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1020,
+              380
+            ],
+            "w": 300,
+            "h": 220,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "note": "Stores every chunk as a point, and finds the points nearest to a query, fast.",
+            "id": "vdb",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                318,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_docsChunks"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                620,
+                200
+              ],
+              [
+                715,
+                200
+              ]
+            ],
+            "arrow": true,
+            "id": "p_chunksEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                805,
+                200
+              ],
+              [
+                1020,
+                200
+              ],
+              [
+                1020,
+                266
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb"
+          },
+          {
+            "shape": "user",
+            "at": [
+              110,
+              575
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              470,
+              575
+            ],
+            "scale": 0.33,
+            "label": "EMBEDDING MODEL",
+            "note": "The SAME model that embedded the chunks. Different models give maps that can’t be compared.",
+            "id": "embB"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "arrow": true,
+            "id": "p_youEmb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_embVdb2"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1490,
+              380
+            ],
+            "w": 110,
+            "h": 100,
+            "text": "PROMPT",
+            "label": "PROMPT",
+            "note": "Question + the retrieved chunks + the rules for answering.",
+            "id": "prompt"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vdbPrompt"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1490,
+              575
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "note": "A large language model: great at writing, but it only knows what it was trained on.",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1490,
+                434
+              ],
+              [
+                1490,
+                522
+              ]
+            ],
+            "arrow": true,
+            "id": "p_promptLlm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "arrow": true,
+            "id": "p_llmYou"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                250,
+                200
+              ],
+              [
+                318,
+                200
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                620,
+                200
+              ],
+              [
+                715,
+                200
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                805,
+                200
+              ],
+              [
+                1020,
+                200
+              ],
+              [
+                1020,
+                266
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.6
+          },
+          {
+            "path": [
+              [
+                150,
+                575
+              ],
+              [
+                425,
+                575
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                515,
+                575
+              ],
+              [
+                700,
+                575
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                866,
+                380
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                1175,
+                380
+              ],
+              [
+                1432,
+                380
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1490,
+                434
+              ],
+              [
+                1490,
+                522
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1428,
+                600
+              ],
+              [
+                1300,
+                600
+              ],
+              [
+                1300,
+                660
+              ],
+              [
+                110,
+                660
+              ],
+              [
+                110,
+                614
+              ]
+            ],
+            "count": 3,
+            "speed": 0.3,
+            "phase": 0.2
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "The whole system"
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "A RAG answer is wrong. What do you check first?",
+        "options": [
+          "Whether the right chunk was in the retrieved results",
+          "Whether the AI model is too small",
+          "Whether the database is full"
+        ],
+        "answer": 0,
+        "explain": "If the right chunk never reached the prompt, no model can answer correctly. Check *retrieval* first, then *generation*."
+      }
+    },
+    {
+      "eyebrow": "Takeaway",
+      "chapter": "Recap",
+      "caption": "The big idea: don’t make the AI memorise your data. *Look up the relevant pieces at question time* and hand them over. Next: where this basic version breaks.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      }
+    }
+  ]
+}

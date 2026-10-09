@@ -1,0 +1,3991 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-08",
+  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "companies": [],
+  "dots": 2400,
+  "spacing": 8,
+  "title": "Design a ride-hailing app like Uber",
+  "tags": [
+    "system-design",
+    "interview",
+    "geospatial",
+    "real-time",
+    "matching"
+  ],
+  "difficulty": "Hard",
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "chapter": "Question",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer sets the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "RIDE HAILING LIKE UBER",
+            "size": 72
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "SYSTEM DESIGN · HARD",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Design a ride-hailing service like Uber: a rider asks for a ride, the system finds a nearby driver, and both follow each other on a live map until the trip ends.",
+        "example": [
+          "A rider requests a ride from a pickup point",
+          "Match a nearby free driver",
+          "Both see live locations and an arrival time"
+        ],
+        "constraints": [
+          "5 million active drivers, each sending a location every 4 seconds",
+          "Match within a few seconds",
+          "A driver must never get two rides at once"
+        ],
+        "followUp": "How do you find the drivers within 2 km of a rider in milliseconds?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Requirements",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Know where every driver is *right now*, find the closest free ones to a rider quickly, and make sure each driver gets only one ride at a time.",
+        "points": [
+          "*Must work:* request, match, live tracking.",
+          "*Must be fast:* matching, while soaking up a flood of location updates.",
+          "*Out of scope:* payments, surge pricing, driver sign-up."
+        ]
+      }
+    },
+    {
+      "eyebrow": "Drivers report in",
+      "caption": "Every driver’s phone sends its location every 4 seconds. Start simple: write each one into a *drivers table* in a database.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.6,
+            "label": "DRIVERS TABLE",
+            "id": "sql"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                732,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locDb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.6
+          },
+          {
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                732,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Build it up"
+    },
+    {
+      "eyebrow": "Finding drivers, naively",
+      "caption": "A rider asks for a car. The matcher asks the table for “drivers within 2 km”, which means checking the distance of *every* driver.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.6,
+            "label": "DRIVERS TABLE",
+            "id": "sql"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                732,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locDb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              430
+            ],
+            "scale": 0.45,
+            "label": "MATCHER",
+            "note": "Finds nearby drivers, ranks them by time to reach the rider.",
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.5,
+            "label": "RIDER",
+            "id": "rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                868,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mDb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.6
+          },
+          {
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                732,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                868,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": []
+    },
+    {
+      "eyebrow": "Too much, too often",
+      "caption": "5 million drivers ÷ 4 seconds = *1.25 million writes a second*, while every ride request scans all 5 million rows. The table can’t keep up.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.6,
+            "label": "DRIVERS TABLE",
+            "id": "sql",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                732,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locDb"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              430
+            ],
+            "scale": 0.45,
+            "label": "MATCHER",
+            "note": "Finds nearby drivers, ranks them by time to reach the rider.",
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.5,
+            "label": "RIDER",
+            "id": "rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                868,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mDb"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.6
+          },
+          {
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                732,
+                430
+              ]
+            ],
+            "count": 8,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          },
+          {
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                868,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "1,250,000 writes / s + full scans ✕",
+          "at": [
+            800,
+            260
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: map cells in memory",
+      "caption": "We only need each driver’s *latest* position, about 500 MB: it fits in memory. File drivers by *map cell*, like squares on a grid.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "grid",
+            "at": [
+              800,
+              430
+            ],
+            "rows": 4,
+            "cols": 4,
+            "size": 70,
+            "values": [
+              "2",
+              "0",
+              "1",
+              "3",
+              "1",
+              "◉",
+              "2",
+              "0",
+              "0",
+              "4",
+              "1",
+              "2",
+              "3",
+              "0",
+              "0",
+              "1"
+            ],
+            "hi": [
+              5
+            ],
+            "label": "MAP CELLS · IN MEMORY",
+            "note": "cell → the free drivers inside it. ◉ is the rider.",
+            "id": "grid",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locGrid"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              430
+            ],
+            "scale": 0.45,
+            "label": "MATCHER",
+            "note": "Finds nearby drivers, ranks them by time to reach the rider.",
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.5,
+            "label": "RIDER",
+            "id": "rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mGrid"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.6
+          },
+          {
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "Search near the rider",
+      "caption": "Look in the rider’s cell *and the 8 around it*. A driver 50 m away might sit just across a cell’s edge. 9 quick lookups find 11 drivers.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "grid",
+            "at": [
+              800,
+              430
+            ],
+            "rows": 4,
+            "cols": 4,
+            "size": 70,
+            "values": [
+              "2",
+              "0",
+              "1",
+              "3",
+              "1",
+              "◉",
+              "2",
+              "0",
+              "0",
+              "4",
+              "1",
+              "2",
+              "3",
+              "0",
+              "0",
+              "1"
+            ],
+            "hi": [
+              0,
+              1,
+              2,
+              4,
+              5,
+              6,
+              8,
+              9,
+              10
+            ],
+            "label": "MAP CELLS · IN MEMORY",
+            "note": "cell → the free drivers inside it. ◉ is the rider.",
+            "id": "grid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locGrid"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              430
+            ],
+            "scale": 0.45,
+            "label": "MATCHER",
+            "note": "Finds nearby drivers, ranks them by time to reach the rider.",
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.5,
+            "label": "RIDER",
+            "id": "rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mGrid"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.6
+          }
+        ]
+      },
+      "labels": []
+    },
+    {
+      "eyebrow": "Drivers move",
+      "caption": "When a driver crosses into another cell, remove them from the old cell and add them to the new one. Most updates stay in the same cell: *cheap*.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "grid",
+            "at": [
+              800,
+              430
+            ],
+            "rows": 4,
+            "cols": 4,
+            "size": 70,
+            "values": [
+              "2",
+              "0",
+              "1",
+              "3",
+              "1",
+              "◉",
+              "1",
+              "1",
+              "0",
+              "4",
+              "1",
+              "2",
+              "3",
+              "0",
+              "0",
+              "1"
+            ],
+            "hi": [
+              6,
+              7
+            ],
+            "label": "MAP CELLS · IN MEMORY",
+            "note": "cell → the free drivers inside it. ◉ is the rider.",
+            "id": "grid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locGrid"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              430
+            ],
+            "scale": 0.45,
+            "label": "MATCHER",
+            "note": "Finds nearby drivers, ranks them by time to reach the rider.",
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.5,
+            "label": "RIDER",
+            "id": "rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mGrid"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.6
+          },
+          {
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "cell 6 → cell 7",
+          "at": [
+            800,
+            230
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "The rider is right at the edge of their cell. Why search the neighbouring cells too?",
+        "options": [
+          "The closest driver may sit just across the edge",
+          "Neighbouring cells are cheaper to read",
+          "Cells are random"
+        ],
+        "answer": 0,
+        "explain": "Cells are just a filing system. A driver 50 m away *across the border* lives in the next cell, so always check the ring around the rider."
+      }
+    },
+    {
+      "eyebrow": "Offer the ride",
+      "caption": "The matcher ranks nearby drivers by *time to reach the rider*, not straight-line distance, and sends the ride offer to the best one.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "grid",
+            "at": [
+              800,
+              430
+            ],
+            "rows": 4,
+            "cols": 4,
+            "size": 70,
+            "values": [
+              "2",
+              "0",
+              "1",
+              "3",
+              "1",
+              "◉",
+              "2",
+              "0",
+              "0",
+              "4",
+              "1",
+              "2",
+              "3",
+              "0",
+              "0",
+              "1"
+            ],
+            "hi": [
+              5
+            ],
+            "label": "MAP CELLS · IN MEMORY",
+            "note": "cell → the free drivers inside it. ◉ is the rider.",
+            "id": "grid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locGrid"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              430
+            ],
+            "scale": 0.45,
+            "label": "MATCHER",
+            "note": "Finds nearby drivers, ranks them by time to reach the rider.",
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.5,
+            "label": "RIDER",
+            "id": "rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mGrid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1220,
+                385
+              ],
+              [
+                1220,
+                330
+              ],
+              [
+                1330,
+                330
+              ],
+              [
+                1330,
+                110
+              ],
+              [
+                120,
+                110
+              ],
+              [
+                120,
+                208
+              ]
+            ],
+            "arrow": true,
+            "id": "p_offer"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                1220,
+                385
+              ],
+              [
+                1220,
+                330
+              ],
+              [
+                1330,
+                330
+              ],
+              [
+                1330,
+                110
+              ],
+              [
+                120,
+                110
+              ],
+              [
+                120,
+                208
+              ]
+            ],
+            "count": 3,
+            "speed": 0.3
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Matching"
+    },
+    {
+      "eyebrow": "One driver, two rides",
+      "caption": "Two riders nearby, two matchers, the same best driver. Both offers go out at the same instant: *one driver, two rides*.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1",
+            "fail": true
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "grid",
+            "at": [
+              800,
+              430
+            ],
+            "rows": 4,
+            "cols": 4,
+            "size": 70,
+            "values": [
+              "2",
+              "0",
+              "1",
+              "3",
+              "1",
+              "◉",
+              "2",
+              "0",
+              "0",
+              "4",
+              "1",
+              "2",
+              "3",
+              "0",
+              "0",
+              "1"
+            ],
+            "hi": [
+              5
+            ],
+            "label": "MAP CELLS · IN MEMORY",
+            "note": "cell → the free drivers inside it. ◉ is the rider.",
+            "id": "grid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locGrid"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              430
+            ],
+            "scale": 0.45,
+            "label": "MATCHER",
+            "note": "Finds nearby drivers, ranks them by time to reach the rider.",
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.5,
+            "label": "RIDER",
+            "id": "rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mGrid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1220,
+                385
+              ],
+              [
+                1220,
+                330
+              ],
+              [
+                1330,
+                330
+              ],
+              [
+                1330,
+                110
+              ],
+              [
+                120,
+                110
+              ],
+              [
+                120,
+                208
+              ]
+            ],
+            "arrow": true,
+            "id": "p_offer"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              250
+            ],
+            "scale": 0.4,
+            "id": "m2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              250
+            ],
+            "scale": 0.4,
+            "label": "RIDER 2",
+            "id": "rider2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1447,
+                250
+              ],
+              [
+                1265,
+                250
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1220,
+                210
+              ],
+              [
+                1220,
+                110
+              ]
+            ],
+            "arrow": true,
+            "id": "p_offer2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1220,
+                385
+              ],
+              [
+                1220,
+                330
+              ],
+              [
+                1330,
+                330
+              ],
+              [
+                1330,
+                110
+              ],
+              [
+                120,
+                110
+              ],
+              [
+                120,
+                208
+              ]
+            ],
+            "count": 3,
+            "speed": 0.3,
+            "fail": true
+          },
+          {
+            "path": [
+              [
+                1220,
+                210
+              ],
+              [
+                1220,
+                110
+              ],
+              [
+                120,
+                110
+              ],
+              [
+                120,
+                208
+              ]
+            ],
+            "count": 3,
+            "speed": 0.3,
+            "fail": true
+          },
+          {
+            "path": [
+              [
+                1447,
+                250
+              ],
+              [
+                1265,
+                250
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "two offers ✕",
+          "at": [
+            120,
+            170
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: reserve first",
+      "caption": "Before offering, a matcher must *reserve* the driver in one atomic step, timing out after 15 s. The second matcher finds them taken and tries the next driver.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "grid",
+            "at": [
+              800,
+              430
+            ],
+            "rows": 4,
+            "cols": 4,
+            "size": 70,
+            "values": [
+              "2",
+              "0",
+              "1",
+              "3",
+              "1",
+              "◉",
+              "2",
+              "0",
+              "0",
+              "4",
+              "1",
+              "2",
+              "3",
+              "0",
+              "0",
+              "1"
+            ],
+            "hi": [
+              5
+            ],
+            "label": "MAP CELLS · IN MEMORY",
+            "note": "cell → the free drivers inside it. ◉ is the rider.",
+            "id": "grid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locGrid"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              430
+            ],
+            "scale": 0.45,
+            "label": "MATCHER",
+            "note": "Finds nearby drivers, ranks them by time to reach the rider.",
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.5,
+            "label": "RIDER",
+            "id": "rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mGrid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1220,
+                385
+              ],
+              [
+                1220,
+                330
+              ],
+              [
+                1330,
+                330
+              ],
+              [
+                1330,
+                110
+              ],
+              [
+                120,
+                110
+              ],
+              [
+                120,
+                208
+              ]
+            ],
+            "arrow": true,
+            "id": "p_offer"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              250
+            ],
+            "scale": 0.4,
+            "id": "m2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              250
+            ],
+            "scale": 0.4,
+            "label": "RIDER 2",
+            "id": "rider2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1447,
+                250
+              ],
+              [
+                1265,
+                250
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1220,
+                210
+              ],
+              [
+                1220,
+                110
+              ]
+            ],
+            "arrow": true,
+            "id": "p_offer2"
+          },
+          {
+            "shape": "lock",
+            "at": [
+              700,
+              110
+            ],
+            "scale": 0.32,
+            "note": "Reserve-if-free, in one atomic step, expiring after 15 s.",
+            "id": "lock",
+            "accent": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1220,
+                385
+              ],
+              [
+                1220,
+                330
+              ],
+              [
+                1330,
+                330
+              ],
+              [
+                1330,
+                110
+              ],
+              [
+                120,
+                110
+              ],
+              [
+                120,
+                208
+              ]
+            ],
+            "count": 3,
+            "speed": 0.3
+          },
+          {
+            "path": [
+              [
+                1220,
+                210
+              ],
+              [
+                1220,
+                110
+              ],
+              [
+                700,
+                110
+              ]
+            ],
+            "count": 3,
+            "speed": 0.3,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "reserved ✓",
+          "at": [
+            700,
+            175
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Two matchers pick the same driver at the same moment. What makes sure only one gets them?",
+        "options": [
+          "An atomic reserve-if-free with a timeout",
+          "Whichever offer arrives first",
+          "The driver picks one"
+        ],
+        "answer": 0,
+        "explain": "Checking and claiming happen as *one step*, so the second matcher sees “reserved” and moves on to the next driver."
+      }
+    },
+    {
+      "eyebrow": "A stadium empties",
+      "caption": "After a concert, thousands of riders and drivers crowd *one cell*. Every search there gets slow and that cell’s server runs hot.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "grid",
+            "at": [
+              800,
+              430
+            ],
+            "rows": 4,
+            "cols": 4,
+            "size": 70,
+            "values": [
+              "2",
+              "0",
+              "1",
+              "3",
+              "1",
+              "◉",
+              "2",
+              "0",
+              "0",
+              "900",
+              "1",
+              "2",
+              "3",
+              "0",
+              "0",
+              "1"
+            ],
+            "hi": [
+              5
+            ],
+            "label": "MAP CELLS · IN MEMORY",
+            "note": "cell → the free drivers inside it. ◉ is the rider.",
+            "id": "grid",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locGrid"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              430
+            ],
+            "scale": 0.45,
+            "label": "MATCHER",
+            "note": "Finds nearby drivers, ranks them by time to reach the rider.",
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.5,
+            "label": "RIDER",
+            "id": "rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mGrid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1220,
+                385
+              ],
+              [
+                1220,
+                330
+              ],
+              [
+                1330,
+                330
+              ],
+              [
+                1330,
+                110
+              ],
+              [
+                120,
+                110
+              ],
+              [
+                120,
+                208
+              ]
+            ],
+            "arrow": true,
+            "id": "p_offer"
+          },
+          {
+            "shape": "lock",
+            "at": [
+              700,
+              110
+            ],
+            "scale": 0.32,
+            "note": "Reserve-if-free, in one atomic step, expiring after 15 s.",
+            "id": "lock"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.6
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "one cell, 900 drivers ✕",
+          "at": [
+            800,
+            230
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Trade-offs"
+    },
+    {
+      "eyebrow": "If the rules change",
+      "caption": "Where density varies this much, a *quadtree* fits better: it splits busy cells into smaller ones and keeps quiet areas as big cells.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "grid",
+            "at": [
+              800,
+              430
+            ],
+            "rows": 4,
+            "cols": 4,
+            "size": 70,
+            "values": [
+              "2",
+              "0",
+              "1",
+              "3",
+              "1",
+              "◉",
+              "2",
+              "0",
+              "0",
+              "4",
+              "1",
+              "2",
+              "3",
+              "0",
+              "0",
+              "1"
+            ],
+            "hi": [
+              5
+            ],
+            "label": "MAP CELLS · IN MEMORY",
+            "note": "cell → the free drivers inside it. ◉ is the rider.",
+            "id": "grid",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locGrid"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              430
+            ],
+            "scale": 0.45,
+            "label": "MATCHER",
+            "note": "Finds nearby drivers, ranks them by time to reach the rider.",
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.5,
+            "label": "RIDER",
+            "id": "rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mGrid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1220,
+                385
+              ],
+              [
+                1220,
+                330
+              ],
+              [
+                1330,
+                330
+              ],
+              [
+                1330,
+                110
+              ],
+              [
+                120,
+                110
+              ],
+              [
+                120,
+                208
+              ]
+            ],
+            "arrow": true,
+            "id": "p_offer"
+          },
+          {
+            "shape": "lock",
+            "at": [
+              700,
+              110
+            ],
+            "scale": 0.32,
+            "note": "Reserve-if-free, in one atomic step, expiring after 15 s.",
+            "id": "lock"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.6
+          }
+        ]
+      },
+      "labels": [],
+      "focus": [
+        "grid"
+      ]
+    },
+    {
+      "eyebrow": "The whole system",
+      "caption": "Latest positions in *in-memory map cells*, a search of the rider’s cell and its neighbours, and an atomic reserve before every offer. That is ride matching.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              250
+            ],
+            "scale": 0.4,
+            "id": "d1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              430
+            ],
+            "scale": 0.4,
+            "id": "d2"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              120,
+              610
+            ],
+            "scale": 0.4,
+            "label": "DRIVERS",
+            "note": "Each phone sends its position every 4 seconds.",
+            "id": "d3"
+          },
+          {
+            "shape": "server",
+            "at": [
+              380,
+              430
+            ],
+            "scale": 0.45,
+            "label": "LOCATION SERVICE",
+            "id": "loc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          },
+          {
+            "shape": "grid",
+            "at": [
+              800,
+              430
+            ],
+            "rows": 4,
+            "cols": 4,
+            "size": 70,
+            "values": [
+              "2",
+              "0",
+              "1",
+              "3",
+              "1",
+              "◉",
+              "2",
+              "0",
+              "0",
+              "4",
+              "1",
+              "2",
+              "3",
+              "0",
+              "0",
+              "1"
+            ],
+            "hi": [
+              5
+            ],
+            "label": "MAP CELLS · IN MEMORY",
+            "note": "cell → the free drivers inside it. ◉ is the rider.",
+            "id": "grid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_locGrid"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1220,
+              430
+            ],
+            "scale": 0.45,
+            "label": "MATCHER",
+            "note": "Finds nearby drivers, ranks them by time to reach the rider.",
+            "id": "m1"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              1470,
+              430
+            ],
+            "scale": 0.5,
+            "label": "RIDER",
+            "id": "rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rider"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mGrid"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1220,
+                385
+              ],
+              [
+                1220,
+                330
+              ],
+              [
+                1330,
+                330
+              ],
+              [
+                1330,
+                110
+              ],
+              [
+                120,
+                110
+              ],
+              [
+                120,
+                208
+              ]
+            ],
+            "arrow": true,
+            "id": "p_offer"
+          },
+          {
+            "shape": "lock",
+            "at": [
+              700,
+              110
+            ],
+            "scale": 0.32,
+            "note": "Reserve-if-free, in one atomic step, expiring after 15 s.",
+            "id": "lock"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                145,
+                250
+              ],
+              [
+                250,
+                250
+              ],
+              [
+                250,
+                415
+              ],
+              [
+                328,
+                415
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                145,
+                430
+              ],
+              [
+                328,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                145,
+                610
+              ],
+              [
+                250,
+                610
+              ],
+              [
+                250,
+                445
+              ],
+              [
+                328,
+                445
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.6
+          },
+          {
+            "path": [
+              [
+                432,
+                430
+              ],
+              [
+                644,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1442,
+                430
+              ],
+              [
+                1272,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1168,
+                430
+              ],
+              [
+                956,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                1220,
+                385
+              ],
+              [
+                1220,
+                330
+              ],
+              [
+                1330,
+                330
+              ],
+              [
+                1330,
+                110
+              ],
+              [
+                120,
+                110
+              ],
+              [
+                120,
+                208
+              ]
+            ],
+            "count": 2,
+            "speed": 0.3
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Recap"
+    }
+  ]
+}

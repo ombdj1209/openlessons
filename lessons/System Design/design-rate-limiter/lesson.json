@@ -1,0 +1,4057 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-08",
+  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "companies": [],
+  "dots": 2400,
+  "spacing": 8,
+  "title": "Design a rate limiter",
+  "tags": [
+    "system-design",
+    "interview",
+    "redis",
+    "api",
+    "token-bucket"
+  ],
+  "difficulty": "Medium",
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "chapter": "Question",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer sets the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "RATE LIMITER",
+            "size": 110
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "SYSTEM DESIGN · MEDIUM",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Design a rate limiter for a public API: each client may make at most 100 requests per minute.",
+        "example": [
+          "Limit by user, API key or IP address",
+          "Refuse extra requests with HTTP 429",
+          "Tell the client when to try again"
+        ],
+        "constraints": [
+          "1 million requests per second across many servers",
+          "Adds under 2 ms to each request",
+          "The limit holds no matter which server a request lands on",
+          "If the limiter breaks, the API keeps working"
+        ],
+        "followUp": "How do you stop two servers both letting the 101st request through?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Requirements",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Give every client a *fair share* of the API, and politely turn away whatever goes over it, the same way on every server.",
+        "points": [
+          "*Must work:* count requests per client; refuse the extras with a retry time.",
+          "*Must be fast:* every single request pays for this check.",
+          "*Out of scope:* billing, detecting attackers by behaviour."
+        ]
+      }
+    },
+    {
+      "eyebrow": "An open door",
+      "caption": "Your API is open to everyone. Ana and Raj make a few requests each. Then a *buggy script* starts firing thousands a second.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              130,
+              250
+            ],
+            "scale": 0.45,
+            "label": "ANA",
+            "id": "ana"
+          },
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.45,
+            "label": "BUGGY SCRIPT",
+            "note": "A client stuck in a retry loop, firing as fast as it can.",
+            "id": "bot"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              610
+            ],
+            "scale": 0.45,
+            "label": "RAJ",
+            "id": "raj"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1250,
+              430
+            ],
+            "scale": 0.55,
+            "label": "API SERVERS",
+            "note": "The real work: database queries, business logic.",
+            "id": "api"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                900,
+                250
+              ],
+              [
+                900,
+                400
+              ],
+              [
+                1186,
+                400
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                1186,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                900,
+                610
+              ],
+              [
+                900,
+                460
+              ],
+              [
+                1186,
+                460
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                900,
+                250
+              ],
+              [
+                900,
+                400
+              ],
+              [
+                1186,
+                400
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                900,
+                610
+              ],
+              [
+                900,
+                460
+              ],
+              [
+                1186,
+                460
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                1186,
+                430
+              ]
+            ],
+            "count": 14,
+            "speed": 0.8,
+            "accent": false
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Build it up"
+    },
+    {
+      "eyebrow": "Everyone suffers",
+      "caption": "The servers spend all their time on the script. Ana’s and Raj’s requests time out. One noisy client has *taken the API down for everyone*.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              130,
+              250
+            ],
+            "scale": 0.45,
+            "label": "ANA",
+            "id": "ana"
+          },
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.45,
+            "label": "BUGGY SCRIPT",
+            "note": "A client stuck in a retry loop, firing as fast as it can.",
+            "id": "bot"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              610
+            ],
+            "scale": 0.45,
+            "label": "RAJ",
+            "id": "raj"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1250,
+              430
+            ],
+            "scale": 0.55,
+            "label": "API SERVERS",
+            "note": "The real work: database queries, business logic.",
+            "id": "api",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                900,
+                250
+              ],
+              [
+                900,
+                400
+              ],
+              [
+                1186,
+                400
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                1186,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                900,
+                610
+              ],
+              [
+                900,
+                460
+              ],
+              [
+                1186,
+                460
+              ]
+            ],
+            "arrow": true,
+            "id": "p_d3"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                900,
+                250
+              ],
+              [
+                900,
+                400
+              ],
+              [
+                1186,
+                400
+              ]
+            ],
+            "count": 2,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          },
+          {
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                900,
+                610
+              ],
+              [
+                900,
+                460
+              ],
+              [
+                1186,
+                460
+              ]
+            ],
+            "count": 2,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          },
+          {
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                1186,
+                430
+              ]
+            ],
+            "count": 14,
+            "speed": 0.8,
+            "fail": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "✕ TIMEOUTS",
+          "at": [
+            1250,
+            340
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: a doorman",
+      "caption": "Put a *rate limiter* at the door. Each client gets a fair share, say 100 requests a minute. Anything extra is turned away right there.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              130,
+              250
+            ],
+            "scale": 0.45,
+            "label": "ANA",
+            "id": "ana"
+          },
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.45,
+            "label": "BUGGY SCRIPT",
+            "note": "A client stuck in a retry loop, firing as fast as it can.",
+            "id": "bot"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              610
+            ],
+            "scale": 0.45,
+            "label": "RAJ",
+            "id": "raj"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1250,
+              430
+            ],
+            "scale": 0.55,
+            "label": "API SERVERS",
+            "note": "The real work: database queries, business logic.",
+            "id": "api"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              430
+            ],
+            "w": 70,
+            "h": 300,
+            "label": "RATE LIMITER",
+            "note": "Runs before any app code: one quick check per request.",
+            "id": "gw",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                400
+              ],
+              [
+                483,
+                400
+              ]
+            ],
+            "arrow": true,
+            "id": "p_u1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                483,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_u2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                460
+              ],
+              [
+                483,
+                460
+              ]
+            ],
+            "arrow": true,
+            "id": "p_u3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                430
+              ],
+              [
+                1186,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_out"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                400
+              ],
+              [
+                483,
+                400
+              ],
+              [
+                557,
+                430
+              ],
+              [
+                1186,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                460
+              ],
+              [
+                483,
+                460
+              ],
+              [
+                557,
+                430
+              ],
+              [
+                1186,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                483,
+                430
+              ],
+              [
+                557,
+                430
+              ],
+              [
+                1186,
+                430
+              ]
+            ],
+            "count": 1,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                483,
+                430
+              ]
+            ],
+            "count": 12,
+            "speed": 0.8,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "Saying no politely",
+      "caption": "Refused requests get *429 Too Many Requests* and a hint: “try again in 12 seconds”. A well-behaved client waits instead of hammering.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              130,
+              250
+            ],
+            "scale": 0.45,
+            "label": "ANA",
+            "id": "ana"
+          },
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.45,
+            "label": "BUGGY SCRIPT",
+            "note": "A client stuck in a retry loop, firing as fast as it can.",
+            "id": "bot"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              610
+            ],
+            "scale": 0.45,
+            "label": "RAJ",
+            "id": "raj"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1250,
+              430
+            ],
+            "scale": 0.55,
+            "label": "API SERVERS",
+            "note": "The real work: database queries, business logic.",
+            "id": "api"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              430
+            ],
+            "w": 70,
+            "h": 300,
+            "label": "RATE LIMITER",
+            "note": "Runs before any app code: one quick check per request.",
+            "id": "gw"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                400
+              ],
+              [
+                483,
+                400
+              ]
+            ],
+            "arrow": true,
+            "id": "p_u1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                483,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_u2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                460
+              ],
+              [
+                483,
+                460
+              ]
+            ],
+            "arrow": true,
+            "id": "p_u3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                430
+              ],
+              [
+                1186,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_out"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                400
+              ],
+              [
+                483,
+                400
+              ],
+              [
+                557,
+                430
+              ],
+              [
+                1186,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                460
+              ],
+              [
+                483,
+                460
+              ],
+              [
+                557,
+                430
+              ],
+              [
+                1186,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                483,
+                430
+              ],
+              [
+                202,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.5,
+            "fail": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "429 · Retry-After: 12",
+          "at": [
+            330,
+            400
+          ],
+          "fail": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "How it counts: a bucket",
+      "caption": "How does the limiter count? Picture each client holding a *bucket of tokens*. A tap drips new tokens in at a steady rate.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              180,
+              470
+            ],
+            "scale": 0.5,
+            "label": "CLIENT",
+            "id": "client"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                800,
+                170
+              ],
+              [
+                800,
+                280
+              ]
+            ],
+            "arrow": true,
+            "id": "tap"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                260,
+                470
+              ],
+              [
+                640,
+                470
+              ]
+            ],
+            "arrow": true,
+            "id": "inn"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                960,
+                470
+              ],
+              [
+                1360,
+                470
+              ]
+            ],
+            "arrow": true,
+            "id": "outp"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1440,
+              470
+            ],
+            "scale": 0.4,
+            "label": "API",
+            "id": "api"
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 1.2,
+            "slots": 10,
+            "filled": 10,
+            "label": "ONE BUCKET PER CLIENT",
+            "id": "bucket"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                800,
+                150
+              ],
+              [
+                800,
+                360
+              ]
+            ],
+            "count": 1,
+            "speed": 0.25,
+            "accent": false
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Inside the limiter",
+      "via": true
+    },
+    {
+      "eyebrow": "A request takes a token",
+      "caption": "Every request must take *one token* out to get through. Here one goes in, takes a token, and reaches the API. 9 tokens left.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              180,
+              470
+            ],
+            "scale": 0.5,
+            "label": "CLIENT",
+            "id": "client"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                800,
+                170
+              ],
+              [
+                800,
+                280
+              ]
+            ],
+            "arrow": true,
+            "id": "tap"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                260,
+                470
+              ],
+              [
+                640,
+                470
+              ]
+            ],
+            "arrow": true,
+            "id": "inn"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                960,
+                470
+              ],
+              [
+                1360,
+                470
+              ]
+            ],
+            "arrow": true,
+            "id": "outp"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1440,
+              470
+            ],
+            "scale": 0.4,
+            "label": "API",
+            "id": "api"
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 1.2,
+            "slots": 10,
+            "filled": 9,
+            "label": "ONE BUCKET PER CLIENT",
+            "id": "bucket"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                800,
+                150
+              ],
+              [
+                800,
+                360
+              ]
+            ],
+            "count": 1,
+            "speed": 0.25,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                260,
+                470
+              ],
+              [
+                1360,
+                470
+              ]
+            ],
+            "count": 1,
+            "speed": 0.35
+          }
+        ]
+      },
+      "labels": []
+    },
+    {
+      "eyebrow": "A burst empties it",
+      "caption": "A sudden burst of requests drains the bucket fast. Once it is *empty*, the next request finds no token and is refused.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              180,
+              470
+            ],
+            "scale": 0.5,
+            "label": "CLIENT",
+            "id": "client"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                800,
+                170
+              ],
+              [
+                800,
+                280
+              ]
+            ],
+            "arrow": true,
+            "id": "tap"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                260,
+                470
+              ],
+              [
+                640,
+                470
+              ]
+            ],
+            "arrow": true,
+            "id": "inn"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                960,
+                470
+              ],
+              [
+                1360,
+                470
+              ]
+            ],
+            "arrow": true,
+            "id": "outp"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1440,
+              470
+            ],
+            "scale": 0.4,
+            "label": "API",
+            "id": "api"
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 1.2,
+            "slots": 10,
+            "filled": 0,
+            "label": "ONE BUCKET PER CLIENT",
+            "id": "bucket",
+            "fail": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                800,
+                150
+              ],
+              [
+                800,
+                360
+              ]
+            ],
+            "count": 1,
+            "speed": 0.25,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                260,
+                470
+              ],
+              [
+                680,
+                470
+              ]
+            ],
+            "count": 6,
+            "speed": 0.6,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "no token → 429",
+          "at": [
+            800,
+            600
+          ],
+          "fail": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "The tap refills it",
+      "caption": "The tap keeps dripping: one token every 0.6 seconds, so 100 a minute. *Short bursts are allowed, but the average is capped.*",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              180,
+              470
+            ],
+            "scale": 0.5,
+            "label": "CLIENT",
+            "id": "client"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                800,
+                170
+              ],
+              [
+                800,
+                280
+              ]
+            ],
+            "arrow": true,
+            "id": "tap"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                260,
+                470
+              ],
+              [
+                640,
+                470
+              ]
+            ],
+            "arrow": true,
+            "id": "inn"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                960,
+                470
+              ],
+              [
+                1360,
+                470
+              ]
+            ],
+            "arrow": true,
+            "id": "outp"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1440,
+              470
+            ],
+            "scale": 0.4,
+            "label": "API",
+            "id": "api"
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 1.2,
+            "slots": 10,
+            "filled": 3,
+            "label": "ONE BUCKET PER CLIENT",
+            "id": "bucket"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                800,
+                150
+              ],
+              [
+                800,
+                360
+              ]
+            ],
+            "count": 2,
+            "speed": 0.45,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                260,
+                470
+              ],
+              [
+                1360,
+                470
+              ]
+            ],
+            "count": 1,
+            "speed": 0.35
+          }
+        ]
+      },
+      "labels": []
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "The bucket holds 10 tokens and gains 1 per second. A client sends 10 requests at once, then an 11th right after. What happens?",
+        "options": [
+          "All 10 pass; the 11th waits for the next token",
+          "All 11 pass",
+          "All 11 are refused"
+        ],
+        "answer": 0,
+        "explain": "The full bucket pays for the burst of 10. The 11th finds it *empty* and is refused until a token drips back in about a second later."
+      }
+    },
+    {
+      "eyebrow": "Many doors",
+      "caption": "At scale there are many limiter copies. If each keeps its *own* bucket, a client whose requests land on two copies gets *double* the limit.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              130,
+              250
+            ],
+            "scale": 0.45,
+            "label": "ANA",
+            "id": "ana"
+          },
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.45,
+            "label": "BUGGY SCRIPT",
+            "note": "A client stuck in a retry loop, firing as fast as it can.",
+            "id": "bot"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              610
+            ],
+            "scale": 0.45,
+            "label": "RAJ",
+            "id": "raj"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1250,
+              430
+            ],
+            "scale": 0.55,
+            "label": "API SERVERS",
+            "note": "The real work: database queries, business logic.",
+            "id": "api"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              300
+            ],
+            "w": 70,
+            "h": 160,
+            "id": "gw1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              580
+            ],
+            "w": 70,
+            "h": 160,
+            "label": "GATEWAYS",
+            "note": "Many copies of the limiter, behind a load balancer.",
+            "id": "gw2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                300
+              ],
+              [
+                483,
+                300
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                320
+              ],
+              [
+                483,
+                320
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                580
+              ],
+              [
+                483,
+                580
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                560
+              ],
+              [
+                483,
+                560
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o2"
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              680,
+              370
+            ],
+            "scale": 0.35,
+            "slots": 8,
+            "filled": 6,
+            "id": "bk1",
+            "fail": true
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              680,
+              510
+            ],
+            "scale": 0.35,
+            "slots": 8,
+            "filled": 6,
+            "id": "bk2",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                634,
+                360
+              ]
+            ],
+            "arrow": true,
+            "id": "p_k1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                634,
+                520
+              ]
+            ],
+            "arrow": true,
+            "id": "p_k2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                320
+              ],
+              [
+                483,
+                320
+              ],
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                560
+              ],
+              [
+                483,
+                560
+              ],
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                634,
+                360
+              ]
+            ],
+            "count": 1,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                634,
+                520
+              ]
+            ],
+            "count": 1,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "100 + 100 = 200 a minute ✕",
+          "at": [
+            680,
+            220
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: one shared bucket",
+      "caption": "Keep the buckets in one fast shared store, *Redis*. Every limiter copy takes tokens from the same bucket, so the limit holds wherever a request lands.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              130,
+              250
+            ],
+            "scale": 0.45,
+            "label": "ANA",
+            "id": "ana"
+          },
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.45,
+            "label": "BUGGY SCRIPT",
+            "note": "A client stuck in a retry loop, firing as fast as it can.",
+            "id": "bot"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              610
+            ],
+            "scale": 0.45,
+            "label": "RAJ",
+            "id": "raj"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1250,
+              430
+            ],
+            "scale": 0.55,
+            "label": "API SERVERS",
+            "note": "The real work: database queries, business logic.",
+            "id": "api"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              300
+            ],
+            "w": 70,
+            "h": 160,
+            "id": "gw1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              580
+            ],
+            "w": 70,
+            "h": 160,
+            "label": "GATEWAYS",
+            "note": "Many copies of the limiter, behind a load balancer.",
+            "id": "gw2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                300
+              ],
+              [
+                483,
+                300
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                320
+              ],
+              [
+                483,
+                320
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                580
+              ],
+              [
+                483,
+                580
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                560
+              ],
+              [
+                483,
+                560
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o2"
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              880,
+              430
+            ],
+            "scale": 0.5,
+            "slots": 8,
+            "filled": 5,
+            "label": "REDIS · SHARED BUCKETS",
+            "note": "One bucket per client, in a fast shared memory store.",
+            "id": "shared",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                760,
+                360
+              ],
+              [
+                760,
+                410
+              ],
+              [
+                824,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                760,
+                520
+              ],
+              [
+                760,
+                450
+              ],
+              [
+                830,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                760,
+                360
+              ],
+              [
+                760,
+                410
+              ],
+              [
+                824,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                760,
+                520
+              ],
+              [
+                760,
+                450
+              ],
+              [
+                830,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                300
+              ],
+              [
+                483,
+                300
+              ],
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                580
+              ],
+              [
+                483,
+                580
+              ],
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "The race",
+      "caption": "Careful: two limiter copies look at the bucket at the same instant and both see *1 token left*. Both take it. One token, two requests through.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              130,
+              250
+            ],
+            "scale": 0.45,
+            "label": "ANA",
+            "id": "ana"
+          },
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.45,
+            "label": "BUGGY SCRIPT",
+            "note": "A client stuck in a retry loop, firing as fast as it can.",
+            "id": "bot"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              610
+            ],
+            "scale": 0.45,
+            "label": "RAJ",
+            "id": "raj"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1250,
+              430
+            ],
+            "scale": 0.55,
+            "label": "API SERVERS",
+            "note": "The real work: database queries, business logic.",
+            "id": "api",
+            "fail": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              300
+            ],
+            "w": 70,
+            "h": 160,
+            "id": "gw1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              580
+            ],
+            "w": 70,
+            "h": 160,
+            "label": "GATEWAYS",
+            "note": "Many copies of the limiter, behind a load balancer.",
+            "id": "gw2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                300
+              ],
+              [
+                483,
+                300
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                320
+              ],
+              [
+                483,
+                320
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                580
+              ],
+              [
+                483,
+                580
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                560
+              ],
+              [
+                483,
+                560
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o2"
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              880,
+              430
+            ],
+            "scale": 0.5,
+            "slots": 8,
+            "filled": 1,
+            "label": "REDIS · SHARED BUCKETS",
+            "note": "One bucket per client, in a fast shared memory store.",
+            "id": "shared"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                760,
+                360
+              ],
+              [
+                760,
+                410
+              ],
+              [
+                824,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                760,
+                520
+              ],
+              [
+                760,
+                450
+              ],
+              [
+                830,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                760,
+                360
+              ],
+              [
+                760,
+                410
+              ],
+              [
+                824,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                760,
+                520
+              ],
+              [
+                760,
+                450
+              ],
+              [
+                830,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "count": 1,
+            "speed": 0.4,
+            "fail": true
+          },
+          {
+            "path": [
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "count": 1,
+            "speed": 0.4,
+            "fail": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "both read “1 left” ✕",
+          "at": [
+            880,
+            560
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: one atomic step",
+      "caption": "Make “check and take a token” a single *atomic* step inside Redis, a tiny script that can’t be interrupted. The second copy finds the bucket empty.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              130,
+              250
+            ],
+            "scale": 0.45,
+            "label": "ANA",
+            "id": "ana"
+          },
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.45,
+            "label": "BUGGY SCRIPT",
+            "note": "A client stuck in a retry loop, firing as fast as it can.",
+            "id": "bot"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              610
+            ],
+            "scale": 0.45,
+            "label": "RAJ",
+            "id": "raj"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1250,
+              430
+            ],
+            "scale": 0.55,
+            "label": "API SERVERS",
+            "note": "The real work: database queries, business logic.",
+            "id": "api"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              300
+            ],
+            "w": 70,
+            "h": 160,
+            "id": "gw1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              580
+            ],
+            "w": 70,
+            "h": 160,
+            "label": "GATEWAYS",
+            "note": "Many copies of the limiter, behind a load balancer.",
+            "id": "gw2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                300
+              ],
+              [
+                483,
+                300
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                320
+              ],
+              [
+                483,
+                320
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                580
+              ],
+              [
+                483,
+                580
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                560
+              ],
+              [
+                483,
+                560
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o2"
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              880,
+              430
+            ],
+            "scale": 0.5,
+            "slots": 8,
+            "filled": 0,
+            "label": "REDIS · SHARED BUCKETS",
+            "note": "One bucket per client, in a fast shared memory store.",
+            "id": "shared"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                760,
+                360
+              ],
+              [
+                760,
+                410
+              ],
+              [
+                824,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                760,
+                520
+              ],
+              [
+                760,
+                450
+              ],
+              [
+                830,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                760,
+                360
+              ],
+              [
+                760,
+                410
+              ],
+              [
+                824,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                760,
+                520
+              ],
+              [
+                760,
+                450
+              ],
+              [
+                830,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          },
+          {
+            "path": [
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "count": 1,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "take-if-available: one step ✓",
+          "at": [
+            880,
+            560
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Why is “read the tokens, then write tokens − 1” unsafe with many limiter copies?",
+        "options": [
+          "Two copies can read the same value before either writes",
+          "Redis loses writes under load",
+          "Tokens can go negative"
+        ],
+        "answer": 0,
+        "explain": "Between one copy’s read and its write, another copy can read the same value. An *atomic* script closes that gap."
+      }
+    },
+    {
+      "eyebrow": "If Redis goes down",
+      "caption": "If Redis itself fails, choose: *fail open* (let traffic through, unlimited for a while) or fail closed (refuse everything). Most APIs fail open.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              130,
+              250
+            ],
+            "scale": 0.45,
+            "label": "ANA",
+            "id": "ana"
+          },
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.45,
+            "label": "BUGGY SCRIPT",
+            "note": "A client stuck in a retry loop, firing as fast as it can.",
+            "id": "bot"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              610
+            ],
+            "scale": 0.45,
+            "label": "RAJ",
+            "id": "raj"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1250,
+              430
+            ],
+            "scale": 0.55,
+            "label": "API SERVERS",
+            "note": "The real work: database queries, business logic.",
+            "id": "api"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              300
+            ],
+            "w": 70,
+            "h": 160,
+            "id": "gw1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              580
+            ],
+            "w": 70,
+            "h": 160,
+            "label": "GATEWAYS",
+            "note": "Many copies of the limiter, behind a load balancer.",
+            "id": "gw2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                300
+              ],
+              [
+                483,
+                300
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                320
+              ],
+              [
+                483,
+                320
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                580
+              ],
+              [
+                483,
+                580
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                560
+              ],
+              [
+                483,
+                560
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o2"
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              880,
+              430
+            ],
+            "scale": 0.5,
+            "slots": 8,
+            "filled": 5,
+            "label": "REDIS · SHARED BUCKETS",
+            "note": "One bucket per client, in a fast shared memory store.",
+            "id": "shared",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                760,
+                360
+              ],
+              [
+                760,
+                410
+              ],
+              [
+                824,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                760,
+                520
+              ],
+              [
+                760,
+                450
+              ],
+              [
+                830,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                300
+              ],
+              [
+                483,
+                300
+              ],
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                580
+              ],
+              [
+                483,
+                580
+              ],
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "✕ DOWN → let requests through",
+          "at": [
+            880,
+            560
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Trade-offs"
+    },
+    {
+      "eyebrow": "If the rules change",
+      "caption": "Buckets allow short bursts. If the limit must be *exact* in every 60-second window, a sliding-window log stores each request’s time instead, at more memory.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              130,
+              250
+            ],
+            "scale": 0.45,
+            "label": "ANA",
+            "id": "ana"
+          },
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.45,
+            "label": "BUGGY SCRIPT",
+            "note": "A client stuck in a retry loop, firing as fast as it can.",
+            "id": "bot"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              610
+            ],
+            "scale": 0.45,
+            "label": "RAJ",
+            "id": "raj"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1250,
+              430
+            ],
+            "scale": 0.55,
+            "label": "API SERVERS",
+            "note": "The real work: database queries, business logic.",
+            "id": "api"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              300
+            ],
+            "w": 70,
+            "h": 160,
+            "id": "gw1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              580
+            ],
+            "w": 70,
+            "h": 160,
+            "label": "GATEWAYS",
+            "note": "Many copies of the limiter, behind a load balancer.",
+            "id": "gw2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                300
+              ],
+              [
+                483,
+                300
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                320
+              ],
+              [
+                483,
+                320
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                580
+              ],
+              [
+                483,
+                580
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                560
+              ],
+              [
+                483,
+                560
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o2"
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              880,
+              430
+            ],
+            "scale": 0.5,
+            "slots": 8,
+            "filled": 5,
+            "label": "REDIS · SHARED BUCKETS",
+            "note": "One bucket per client, in a fast shared memory store.",
+            "id": "shared",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                760,
+                360
+              ],
+              [
+                760,
+                410
+              ],
+              [
+                824,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                760,
+                520
+              ],
+              [
+                760,
+                450
+              ],
+              [
+                830,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                760,
+                360
+              ],
+              [
+                760,
+                410
+              ],
+              [
+                824,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                760,
+                520
+              ],
+              [
+                760,
+                450
+              ],
+              [
+                830,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [],
+      "focus": [
+        "shared"
+      ]
+    },
+    {
+      "eyebrow": "The whole system",
+      "caption": "Limiter copies at the door, *one shared bucket per client* in Redis, atomic take-a-token, and a polite 429. That is a rate limiter.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              130,
+              250
+            ],
+            "scale": 0.45,
+            "label": "ANA",
+            "id": "ana"
+          },
+          {
+            "shape": "laptop",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.45,
+            "label": "BUGGY SCRIPT",
+            "note": "A client stuck in a retry loop, firing as fast as it can.",
+            "id": "bot"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              610
+            ],
+            "scale": 0.45,
+            "label": "RAJ",
+            "id": "raj"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1250,
+              430
+            ],
+            "scale": 0.55,
+            "label": "API SERVERS",
+            "note": "The real work: database queries, business logic.",
+            "id": "api"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              300
+            ],
+            "w": 70,
+            "h": 160,
+            "id": "gw1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              520,
+              580
+            ],
+            "w": 70,
+            "h": 160,
+            "label": "GATEWAYS",
+            "note": "Many copies of the limiter, behind a load balancer.",
+            "id": "gw2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                300
+              ],
+              [
+                483,
+                300
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                320
+              ],
+              [
+                483,
+                320
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g1b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                580
+              ],
+              [
+                483,
+                580
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2a"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                560
+              ],
+              [
+                483,
+                560
+              ]
+            ],
+            "arrow": true,
+            "id": "p_g2b"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_o2"
+          },
+          {
+            "shape": "bucket",
+            "at": [
+              880,
+              430
+            ],
+            "scale": 0.5,
+            "slots": 8,
+            "filled": 5,
+            "label": "REDIS · SHARED BUCKETS",
+            "note": "One bucket per client, in a fast shared memory store.",
+            "id": "shared"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                760,
+                360
+              ],
+              [
+                760,
+                410
+              ],
+              [
+                824,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                760,
+                520
+              ],
+              [
+                760,
+                450
+              ],
+              [
+                830,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r2"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                557,
+                360
+              ],
+              [
+                760,
+                360
+              ],
+              [
+                760,
+                410
+              ],
+              [
+                824,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                557,
+                520
+              ],
+              [
+                760,
+                520
+              ],
+              [
+                760,
+                450
+              ],
+              [
+                830,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                165,
+                250
+              ],
+              [
+                300,
+                250
+              ],
+              [
+                300,
+                300
+              ],
+              [
+                483,
+                300
+              ],
+              [
+                557,
+                300
+              ],
+              [
+                1000,
+                300
+              ],
+              [
+                1000,
+                410
+              ],
+              [
+                1186,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                165,
+                610
+              ],
+              [
+                300,
+                610
+              ],
+              [
+                300,
+                580
+              ],
+              [
+                483,
+                580
+              ],
+              [
+                557,
+                580
+              ],
+              [
+                1000,
+                580
+              ],
+              [
+                1000,
+                450
+              ],
+              [
+                1186,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                320
+              ],
+              [
+                483,
+                320
+              ]
+            ],
+            "count": 4,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          },
+          {
+            "path": [
+              [
+                202,
+                430
+              ],
+              [
+                400,
+                430
+              ],
+              [
+                400,
+                560
+              ],
+              [
+                483,
+                560
+              ]
+            ],
+            "count": 4,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Recap"
+    }
+  ]
+}

@@ -1,0 +1,546 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-08",
+  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "title": "Top K frequent elements: bucket sort",
+  "tags": [
+    "dsa",
+    "hash-map",
+    "heap",
+    "bucket-sort",
+    "interview"
+  ],
+  "companies": [
+    "Amazon",
+    "Microsoft"
+  ],
+  "difficulty": "Medium",
+  "dots": 1300,
+  "steps": [
+    {
+      "eyebrow": "The problem",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer reads you the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "TOP K FREQUENT ELEMENTS",
+            "size": 68
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LEETCODE 347 · MEDIUM",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Given an integer array *nums* and an integer *k*, return the k most frequent elements. You may return the answer in any order.",
+        "example": [
+          "Input:  nums = [1, 1, 1, 2, 2, 3], k = 2",
+          "Output: [1, 2]"
+        ],
+        "constraints": [
+          "1 <= nums.length <= 10^5",
+          "-10^4 <= nums[i] <= 10^4",
+          "k is in the range [1, number of unique elements]",
+          "The answer is guaranteed to be unique"
+        ],
+        "followUp": "Your algorithm's time complexity must be better than O(n log n), where n is the array's size."
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Find the *k numbers that show up most often*.",
+        "points": [
+          "*You get:* a list and a number k, like k = 2.",
+          "*You return:* the k most common numbers, like [1, 2].",
+          "*The catch:* it must beat sorting, so better than O(n log n)."
+        ]
+      }
+    },
+    {
+      "eyebrow": "The example",
+      "dur": 7,
+      "caption": "Here's the list. 1 shows up three times, 2 twice, 3 once. With k = 2 the answer is *1 and 2*.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.9,
+            "values": [
+              1,
+              1,
+              1,
+              2,
+              2,
+              3
+            ],
+            "hi": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "Step 1 · count",
+      "chapter": "Solution",
+      "dur": 8,
+      "via": true,
+      "caption": "One pass with a *hash map* counts how often each number appears. That part is O(n).",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              560,
+              440
+            ],
+            "scale": 0.75,
+            "values": [
+              1,
+              1,
+              1,
+              2,
+              2,
+              3
+            ]
+          },
+          {
+            "shape": "map",
+            "at": [
+              1250,
+              440
+            ],
+            "entries": [
+              [
+                1,
+                3
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                3,
+                1
+              ]
+            ],
+            "head": [
+              "NUMBER",
+              "COUNT"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "The key idea",
+      "dur": 10,
+      "caption": "A count can never be more than n, the length of the list. So make *n + 1 buckets*, one per possible count, and drop each number into its bucket.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.9,
+            "values": [
+              "·",
+              "3",
+              "2",
+              "1",
+              "·",
+              "·",
+              "·"
+            ],
+            "note": "Bucket i holds the numbers that appear exactly i times."
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "bucket index = how many times it appears",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Fill the buckets",
+      "dur": 9,
+      "caption": "1 appears 3 times, so it goes in bucket 3. 2 goes in bucket 2, and 3 in bucket 1. Nothing was sorted: each number was *placed directly*.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.9,
+            "values": [
+              "·",
+              "3",
+              "2",
+              "1",
+              "·",
+              "·",
+              "·"
+            ],
+            "hi": [
+              1,
+              2,
+              3
+            ],
+            "dim": [
+              0,
+              4,
+              5,
+              6
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "1 → bucket 3     2 → bucket 2     3 → bucket 1",
+          "at": [
+            800,
+            300
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Read from the top",
+      "dur": 9,
+      "caption": "Walk the buckets from the top. 6, 5 and 4 are empty. Bucket 3 gives 1, bucket 2 gives 2. That is k = 2 numbers: *[1, 2]*.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.9,
+            "values": [
+              "·",
+              "3",
+              "2",
+              "1",
+              "·",
+              "·",
+              "·"
+            ],
+            "hi": [
+              3,
+              2
+            ],
+            "dim": [
+              0,
+              1,
+              4,
+              5,
+              6
+            ],
+            "marks": [
+              {
+                "i": 3,
+                "text": "1st"
+              },
+              {
+                "i": 2,
+                "text": "2nd"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "6, 5, 4 empty → bucket 3: take 1 → bucket 2: take 2 → done ✓",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Why can the bucket list stop at n + 1 slots?",
+        "options": [
+          "No number can appear more than n times",
+          "k is never bigger than n",
+          "Python lists have a size limit"
+        ],
+        "answer": 0,
+        "explain": "In a list of n numbers, any value appears at most n times, so counts run from 1 to n. That bound is what makes *bucket sort* work here."
+      }
+    },
+    {
+      "eyebrow": "The code",
+      "chapter": "Code",
+      "caption": "Here is the whole solution: count, bucket, read from the top. O(n) time.",
+      "dur": 10,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 920,
+            "h": 486
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "from collections import Counter",
+          "at": [
+            370,
+            222
+          ],
+          "code": true
+        },
+        {
+          "text": "def top_k_frequent(nums, k):",
+          "at": [
+            370,
+            258
+          ],
+          "code": true
+        },
+        {
+          "text": "    count = Counter(nums)                     # number -> count",
+          "at": [
+            370,
+            294
+          ],
+          "code": true
+        },
+        {
+          "text": "    buckets = [[] for _ in range(len(nums) + 1)]",
+          "at": [
+            370,
+            330
+          ],
+          "code": true
+        },
+        {
+          "text": "    for num, c in count.items():",
+          "at": [
+            370,
+            366
+          ],
+          "code": true
+        },
+        {
+          "text": "        buckets[c].append(num)                # index = how often",
+          "at": [
+            370,
+            402
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "    out = []",
+          "at": [
+            370,
+            438
+          ],
+          "code": true
+        },
+        {
+          "text": "    for c in range(len(nums), 0, -1):         # most frequent first",
+          "at": [
+            370,
+            474
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "        for num in buckets[c]:",
+          "at": [
+            370,
+            510
+          ],
+          "code": true
+        },
+        {
+          "text": "            out.append(num)",
+          "at": [
+            370,
+            546
+          ],
+          "code": true
+        },
+        {
+          "text": "            if len(out) == k:",
+          "at": [
+            370,
+            582
+          ],
+          "code": true
+        },
+        {
+          "text": "                return out",
+          "at": [
+            370,
+            618
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "If the rules change",
+      "chapter": "Other ways",
+      "caption": "Counting plus buckets wins for one list in memory. Change the setting and another tool fits:",
+      "dur": 11,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Min-heap of size k",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Quickselect",
+            "id": "alt1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Count-Min sketch",
+            "id": "alt2"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF k IS SMALL OR DATA STREAMS IN",
+          "at": [
+            300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "O(n log k) · only k items in the heap",
+          "at": [
+            300,
+            548
+          ]
+        },
+        {
+          "text": "IF BUCKET MEMORY IS TOO MUCH",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "average O(n) · partitions in place",
+          "at": [
+            800,
+            548
+          ]
+        },
+        {
+          "text": "IF THE STREAM IS TOO BIG TO COUNT",
+          "at": [
+            1300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "approximate counts · small fixed memory",
+          "at": [
+            1300,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "chapter": "Recap",
+      "caption": "The big idea: when values are bounded, *index by the value instead of sorting*. Counts never exceed n, so buckets replace the sort.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      }
+    }
+  ]
+}

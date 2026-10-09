@@ -1,0 +1,3667 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-08",
+  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "companies": [],
+  "dots": 2400,
+  "spacing": 8,
+  "title": "Design Twitter's home timeline",
+  "tags": [
+    "system-design",
+    "interview",
+    "caching",
+    "fan-out",
+    "feeds"
+  ],
+  "difficulty": "Medium",
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "chapter": "Question",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer sets the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "TWITTER HOME TIMELINE",
+            "size": 72
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "SYSTEM DESIGN · MEDIUM",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Design the home timeline for a service like Twitter: users post short tweets, follow other users, and see the newest tweets from the people they follow.",
+        "example": [
+          "Post a tweet with text and optional photos",
+          "Follow other users",
+          "Home timeline: newest tweets from people you follow, and scroll for more"
+        ],
+        "constraints": [
+          "200 million daily users, each opening the app ~10 times a day",
+          "The timeline loads in under 200 ms",
+          "A new tweet may take a few seconds to show up"
+        ],
+        "followUp": "What happens when someone with 100 million followers tweets?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Requirements",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "When you open the app, show *the newest tweets from everyone you follow*, instantly, even though thousands of different people wrote them.",
+        "points": [
+          "*Must work:* post, follow, a newest-first timeline that scrolls.",
+          "*Must be fast:* opening the timeline, far more common than posting.",
+          "*Out of scope:* search, trends, ads, ranking by interest."
+        ]
+      }
+    },
+    {
+      "eyebrow": "Start simple",
+      "caption": "Ann posts a tweet. An app server saves it in the *tweets* database. Simple.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Build it up"
+    },
+    {
+      "eyebrow": "Reading, the naive way",
+      "caption": "Bob opens the app. The server searches the database: *tweets by all 300 people Bob follows*, sorted by time, newest 20.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "accent": false
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "300 people → their tweets → sort → top 20",
+          "at": [
+            800,
+            120
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "It doesn’t scale",
+      "caption": "23,000 people open the app every second, each running that big search. The database *melts*, and timelines take seconds to load.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "count": 8,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          },
+          {
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "count": 8,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "23,000 big searches / second ✕",
+          "at": [
+            800,
+            120
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: a ready-made timeline",
+      "caption": "Keep each user’s timeline *ready-made*: a short list of the newest tweet ids, in a fast cache. Opening the app becomes one quick read.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          },
+          {
+            "shape": "array",
+            "at": [
+              1150,
+              640
+            ],
+            "scale": 0.55,
+            "values": [
+              "975",
+              "962",
+              "950",
+              "944"
+            ],
+            "hi": [],
+            "note": "Bob’s timeline: the newest tweet ids from people he follows, kept in a cache.",
+            "id": "tl",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "arrow": true,
+            "id": "p_read"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "BOB’S TIMELINE · CACHE",
+          "at": [
+            1150,
+            560
+          ]
+        }
+      ],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "Fan-out on write",
+      "caption": "When Ann posts, a job goes on a *queue*. Workers copy the new tweet’s id onto the list of *every one of her followers*. Bob’s list gets 981 on top.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          },
+          {
+            "shape": "array",
+            "at": [
+              1150,
+              640
+            ],
+            "scale": 0.55,
+            "values": [
+              "981",
+              "975",
+              "962",
+              "950"
+            ],
+            "hi": [
+              0
+            ],
+            "note": "Bob’s timeline: the newest tweet ids from people he follows, kept in a cache.",
+            "id": "tl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "arrow": true,
+            "id": "p_read"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.6,
+            "slots": 5,
+            "filled": 2,
+            "label": "FAN-OUT QUEUE",
+            "note": "Jobs like “copy tweet 981 to Ann’s followers”.",
+            "id": "q",
+            "accent": true
+          },
+          {
+            "shape": "server",
+            "at": [
+              1130,
+              430
+            ],
+            "scale": 0.4,
+            "label": "WORKERS",
+            "id": "w",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_q"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1130,
+                472
+              ],
+              [
+                1130,
+                612
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tl"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1130,
+                472
+              ],
+              [
+                1130,
+                612
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "BOB’S TIMELINE · CACHE",
+          "at": [
+            1150,
+            560
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Reading is now cheap",
+      "caption": "Bob opens the app: read his list, fetch those 20 tweets, done. The heavy work happened *once per tweet*, not once per read.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          },
+          {
+            "shape": "array",
+            "at": [
+              1150,
+              640
+            ],
+            "scale": 0.55,
+            "values": [
+              "981",
+              "975",
+              "962",
+              "950"
+            ],
+            "hi": [
+              0
+            ],
+            "note": "Bob’s timeline: the newest tweet ids from people he follows, kept in a cache.",
+            "id": "tl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "arrow": true,
+            "id": "p_read"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.6,
+            "slots": 5,
+            "filled": 2,
+            "label": "FAN-OUT QUEUE",
+            "note": "Jobs like “copy tweet 981 to Ann’s followers”.",
+            "id": "q"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1130,
+              430
+            ],
+            "scale": 0.4,
+            "label": "WORKERS",
+            "id": "w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_q"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1130,
+                472
+              ],
+              [
+                1130,
+                612
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tl"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "BOB’S TIMELINE · CACHE",
+          "at": [
+            1150,
+            560
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Why do the work when a tweet is posted, rather than when a timeline is opened?",
+        "options": [
+          "Timelines are opened about 20× more often than tweets are posted",
+          "Posting is slower than reading",
+          "The database can’t store tweets"
+        ],
+        "answer": 0,
+        "explain": "Work done at post time is done *once*; work done at read time is repeated on every open. With 20 reads per post, pushing at write time wins."
+      }
+    },
+    {
+      "eyebrow": "The celebrity problem",
+      "caption": "Now a star with *100 million followers* tweets. Fan-out means 100 million list updates for one tweet: about 7 minutes, delaying everyone else’s tweets too.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          },
+          {
+            "shape": "array",
+            "at": [
+              1150,
+              640
+            ],
+            "scale": 0.55,
+            "values": [
+              "981",
+              "975",
+              "962",
+              "950"
+            ],
+            "hi": [
+              0
+            ],
+            "note": "Bob’s timeline: the newest tweet ids from people he follows, kept in a cache.",
+            "id": "tl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "arrow": true,
+            "id": "p_read"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.6,
+            "slots": 5,
+            "filled": 2,
+            "label": "FAN-OUT QUEUE",
+            "note": "Jobs like “copy tweet 981 to Ann’s followers”.",
+            "id": "q",
+            "fail": true
+          },
+          {
+            "shape": "server",
+            "at": [
+              1130,
+              430
+            ],
+            "scale": 0.4,
+            "label": "WORKERS",
+            "id": "w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_q"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1130,
+                472
+              ],
+              [
+                1130,
+                612
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tl"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.55,
+            "label": "STAR · 100 M FOLLOWERS",
+            "id": "star"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                168,
+                430
+              ],
+              [
+                393,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_star"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                168,
+                430
+              ],
+              [
+                393,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "count": 10,
+            "speed": 0.8,
+            "fail": true
+          },
+          {
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "count": 4,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "1 tweet → 100,000,000 copies ✕",
+          "at": [
+            800,
+            340
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Where it breaks"
+    },
+    {
+      "eyebrow": "Fix: mix push and pull",
+      "caption": "Don’t fan out stars’ tweets. When Bob opens the app, take his ready-made list *and* fetch the latest tweets of the few stars he follows, then merge.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          },
+          {
+            "shape": "array",
+            "at": [
+              1150,
+              640
+            ],
+            "scale": 0.55,
+            "values": [
+              "981",
+              "975",
+              "962",
+              "950"
+            ],
+            "hi": [
+              0
+            ],
+            "note": "Bob’s timeline: the newest tweet ids from people he follows, kept in a cache.",
+            "id": "tl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "arrow": true,
+            "id": "p_read"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.6,
+            "slots": 5,
+            "filled": 2,
+            "label": "FAN-OUT QUEUE",
+            "note": "Jobs like “copy tweet 981 to Ann’s followers”.",
+            "id": "q"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1130,
+              430
+            ],
+            "scale": 0.4,
+            "label": "WORKERS",
+            "id": "w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_q"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1130,
+                472
+              ],
+              [
+                1130,
+                612
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tl"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.55,
+            "label": "STAR · 100 M FOLLOWERS",
+            "id": "star"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                168,
+                430
+              ],
+              [
+                393,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_star"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                168,
+                430
+              ],
+              [
+                393,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                748,
+                230
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                487,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "your list + stars’ newest tweets → merge by id",
+          "at": [
+            800,
+            120
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Fix it"
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Why not copy a star’s tweet into every follower’s list, like everyone else’s?",
+        "options": [
+          "One tweet would mean 100 M copies and minutes of delay",
+          "Caches can’t hold tweet ids",
+          "Followers would see it twice"
+        ],
+        "answer": 0,
+        "explain": "The cost of copying grows with the number of followers. For stars it explodes, so their tweets are *fetched when you read* instead."
+      }
+    },
+    {
+      "eyebrow": "Scrolling",
+      "caption": "Scrolling asks for “tweets *older than 950*”, a cursor, not “page 2”. New tweets landing on top can’t shift what you see next, so nothing repeats.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          },
+          {
+            "shape": "array",
+            "at": [
+              1150,
+              640
+            ],
+            "scale": 0.55,
+            "values": [
+              "981",
+              "975",
+              "962",
+              "950"
+            ],
+            "hi": [
+              3
+            ],
+            "note": "Bob’s timeline: the newest tweet ids from people he follows, kept in a cache.",
+            "id": "tl",
+            "marks": [
+              {
+                "i": 3,
+                "text": "cursor"
+              }
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "arrow": true,
+            "id": "p_read"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.6,
+            "slots": 5,
+            "filled": 2,
+            "label": "FAN-OUT QUEUE",
+            "note": "Jobs like “copy tweet 981 to Ann’s followers”.",
+            "id": "q"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1130,
+              430
+            ],
+            "scale": 0.4,
+            "label": "WORKERS",
+            "id": "w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_q"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1130,
+                472
+              ],
+              [
+                1130,
+                612
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tl"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.55,
+            "label": "STAR · 100 M FOLLOWERS",
+            "id": "star"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                168,
+                430
+              ],
+              [
+                393,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_star"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Details"
+    },
+    {
+      "eyebrow": "Photos and video",
+      "caption": "Photos and video don’t pass through these servers at all. They sit in file storage and reach phones from a nearby *CDN*.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          },
+          {
+            "shape": "array",
+            "at": [
+              1150,
+              640
+            ],
+            "scale": 0.55,
+            "values": [
+              "981",
+              "975",
+              "962",
+              "950"
+            ],
+            "hi": [
+              0
+            ],
+            "note": "Bob’s timeline: the newest tweet ids from people he follows, kept in a cache.",
+            "id": "tl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "arrow": true,
+            "id": "p_read"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.6,
+            "slots": 5,
+            "filled": 2,
+            "label": "FAN-OUT QUEUE",
+            "note": "Jobs like “copy tweet 981 to Ann’s followers”.",
+            "id": "q"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1130,
+              430
+            ],
+            "scale": 0.4,
+            "label": "WORKERS",
+            "id": "w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_q"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1130,
+                472
+              ],
+              [
+                1130,
+                612
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tl"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.55,
+            "label": "STAR · 100 M FOLLOWERS",
+            "id": "star"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                168,
+                430
+              ],
+              [
+                393,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_star"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              440,
+              180
+            ],
+            "scale": 0.4,
+            "label": "CDN",
+            "note": "Photos and videos, served from a city near the viewer.",
+            "id": "cdn",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                404,
+                180
+              ],
+              [
+                240,
+                180
+              ],
+              [
+                240,
+                650
+              ],
+              [
+                160,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_cdn"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                404,
+                180
+              ],
+              [
+                240,
+                180
+              ],
+              [
+                240,
+                650
+              ],
+              [
+                160,
+                650
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": []
+    },
+    {
+      "eyebrow": "If the rules change",
+      "caption": "If most users rarely log in, building lists for them wastes work: *pull at read time* for inactive users, and rebuild a list when they come back.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          },
+          {
+            "shape": "array",
+            "at": [
+              1150,
+              640
+            ],
+            "scale": 0.55,
+            "values": [
+              "981",
+              "975",
+              "962",
+              "950"
+            ],
+            "hi": [
+              0
+            ],
+            "note": "Bob’s timeline: the newest tweet ids from people he follows, kept in a cache.",
+            "id": "tl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "arrow": true,
+            "id": "p_read"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.6,
+            "slots": 5,
+            "filled": 2,
+            "label": "FAN-OUT QUEUE",
+            "note": "Jobs like “copy tweet 981 to Ann’s followers”.",
+            "id": "q",
+            "accent": true
+          },
+          {
+            "shape": "server",
+            "at": [
+              1130,
+              430
+            ],
+            "scale": 0.4,
+            "label": "WORKERS",
+            "id": "w",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_q"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1130,
+                472
+              ],
+              [
+                1130,
+                612
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tl"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.55,
+            "label": "STAR · 100 M FOLLOWERS",
+            "id": "star"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                168,
+                430
+              ],
+              [
+                393,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_star"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              440,
+              180
+            ],
+            "scale": 0.4,
+            "label": "CDN",
+            "note": "Photos and videos, served from a city near the viewer.",
+            "id": "cdn"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                404,
+                180
+              ],
+              [
+                240,
+                180
+              ],
+              [
+                240,
+                650
+              ],
+              [
+                160,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_cdn"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1130,
+                472
+              ],
+              [
+                1130,
+                612
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Trade-offs",
+      "focus": [
+        "q",
+        "w",
+        "tl"
+      ]
+    },
+    {
+      "eyebrow": "The whole system",
+      "caption": "Ready-made timelines filled by fan-out on write, stars pulled at read time, cursors for scrolling and a CDN for media. *That is a news feed.*",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              230
+            ],
+            "scale": 0.5,
+            "label": "ANN",
+            "id": "ann"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              130,
+              630
+            ],
+            "scale": 0.5,
+            "label": "BOB",
+            "id": "bob"
+          },
+          {
+            "shape": "server",
+            "at": [
+              440,
+              430
+            ],
+            "scale": 0.45,
+            "label": "APP SERVERS",
+            "id": "svc"
+          },
+          {
+            "shape": "database",
+            "at": [
+              800,
+              230
+            ],
+            "scale": 0.45,
+            "label": "TWEETS",
+            "note": "Every tweet ever posted, by id. Ids grow with time.",
+            "id": "db"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ann"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_bob"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "arrow": true,
+            "id": "p_db"
+          },
+          {
+            "shape": "array",
+            "at": [
+              1150,
+              640
+            ],
+            "scale": 0.55,
+            "values": [
+              "981",
+              "975",
+              "962",
+              "950"
+            ],
+            "hi": [
+              0
+            ],
+            "note": "Bob’s timeline: the newest tweet ids from people he follows, kept in a cache.",
+            "id": "tl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "arrow": true,
+            "id": "p_read"
+          },
+          {
+            "shape": "queue",
+            "at": [
+              800,
+              430
+            ],
+            "scale": 0.6,
+            "slots": 5,
+            "filled": 2,
+            "label": "FAN-OUT QUEUE",
+            "note": "Jobs like “copy tweet 981 to Ann’s followers”.",
+            "id": "q"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1130,
+              430
+            ],
+            "scale": 0.4,
+            "label": "WORKERS",
+            "id": "w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_q"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_w"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1130,
+                472
+              ],
+              [
+                1130,
+                612
+              ]
+            ],
+            "arrow": true,
+            "id": "p_tl"
+          },
+          {
+            "shape": "user",
+            "at": [
+              130,
+              430
+            ],
+            "scale": 0.55,
+            "label": "STAR · 100 M FOLLOWERS",
+            "id": "star"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                168,
+                430
+              ],
+              [
+                393,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_star"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              440,
+              180
+            ],
+            "scale": 0.4,
+            "label": "CDN",
+            "note": "Photos and videos, served from a city near the viewer.",
+            "id": "cdn"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                404,
+                180
+              ],
+              [
+                240,
+                180
+              ],
+              [
+                240,
+                650
+              ],
+              [
+                160,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_cdn"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                158,
+                230
+              ],
+              [
+                300,
+                230
+              ],
+              [
+                300,
+                410
+              ],
+              [
+                393,
+                410
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                410
+              ],
+              [
+                600,
+                410
+              ],
+              [
+                600,
+                230
+              ],
+              [
+                748,
+                230
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                430
+              ],
+              [
+                704,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                896,
+                430
+              ],
+              [
+                1084,
+                430
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1130,
+                472
+              ],
+              [
+                1130,
+                612
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                158,
+                630
+              ],
+              [
+                300,
+                630
+              ],
+              [
+                300,
+                450
+              ],
+              [
+                393,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                487,
+                450
+              ],
+              [
+                620,
+                450
+              ],
+              [
+                620,
+                640
+              ],
+              [
+                1042,
+                640
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                168,
+                430
+              ],
+              [
+                393,
+                430
+              ]
+            ],
+            "count": 1,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                404,
+                180
+              ],
+              [
+                240,
+                180
+              ],
+              [
+                240,
+                650
+              ],
+              [
+                160,
+                650
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [],
+      "chapter": "Recap"
+    }
+  ]
+}

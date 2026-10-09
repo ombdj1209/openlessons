@@ -1,0 +1,620 @@
+{
+  "engine": "dots",
+  "title": "Kadane's algorithm: maximum subarray",
+  "request": "add more impressive god-level DSA solutions",
+  "createdAt": "2026-10-08",
+  "tags": [
+    "dsa",
+    "arrays",
+    "dynamic-programming",
+    "interview"
+  ],
+  "companies": [
+    "Meta",
+    "Microsoft",
+    "Amazon",
+    "Goldman Sachs",
+    "LinkedIn"
+  ],
+  "difficulty": "Medium",
+  "dots": 1300,
+  "steps": [
+    {
+      "eyebrow": "The problem",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer reads you the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "MAXIMUM SUBARRAY",
+            "size": 104
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LEETCODE 53 · MEDIUM",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Given an integer array *nums*, find the subarray with the largest sum, and return its sum. A subarray is a run of neighbouring elements.",
+        "example": [
+          "Input:  nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]",
+          "Output: 6",
+          "The subarray [4, -1, 2, 1] has the largest sum"
+        ],
+        "constraints": [
+          "1 <= nums.length <= 10^5",
+          "-10^4 <= nums[i] <= 10^4"
+        ],
+        "followUp": "Can you do it in a single pass, in O(n) time?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Pick a stretch of numbers that sit next to each other. *Which stretch adds up to the most?*",
+        "points": [
+          "*You get:* a list of numbers, some of them negative.",
+          "*You return:* the biggest possible sum, like 6.",
+          "*The catch:* walk through the list only once."
+        ]
+      }
+    },
+    {
+      "eyebrow": "The example",
+      "caption": "Here's a list with some negative numbers. Pick a stretch of *neighbouring* numbers. Which stretch adds up to the most?",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.9,
+            "values": [
+              "−2",
+              "1",
+              "−3",
+              "4",
+              "−1",
+              "2",
+              "1",
+              "−5",
+              "4"
+            ],
+            "note": "A stretch means numbers next to each other. You can't skip any in the middle."
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "The answer",
+      "caption": "The best stretch is 4, −1, 2, 1, which adds up to *6*. It keeps the −1, because the numbers around it more than make up for it.",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.9,
+            "values": [
+              "−2",
+              "1",
+              "−3",
+              "4",
+              "−1",
+              "2",
+              "1",
+              "−5",
+              "4"
+            ],
+            "hi": [
+              3,
+              4,
+              5,
+              6
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "4 − 1 + 2 + 1 = 6",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "The key idea",
+      "caption": "Walk the list keeping a *running total*. At each number, ask one question: keep adding to my total, or throw it away and start fresh here?",
+      "dur": 8,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.9,
+            "values": [
+              "−2",
+              "1",
+              "−3",
+              "4",
+              "−1",
+              "2",
+              "1",
+              "−5",
+              "4"
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "KEEP GOING   or   START FRESH?",
+          "at": [
+            800,
+            290
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Solution"
+    },
+    {
+      "eyebrow": "The simple rule",
+      "caption": "If your total has gone *negative*, throw it away. A negative total can only drag the next numbers down.",
+      "dur": 7.5,
+      "labels": [
+        {
+          "text": "new total = the bigger of:  (this number)  or  (total + this number)",
+          "at": [
+            800,
+            290
+          ],
+          "accent": true
+        },
+        {
+          "text": "and always remember the best total seen so far",
+          "at": [
+            800,
+            326
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Walk · at 1",
+      "caption": "The total so far is −2. At 1, keeping it gives −1, starting fresh gives 1. *Start fresh*: the total is now 1.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.9,
+            "values": [
+              "−2",
+              "1",
+              "−3",
+              "4",
+              "−1",
+              "2",
+              "1",
+              "−5",
+              "4"
+            ],
+            "hi": [
+              1
+            ],
+            "dim": [
+              0
+            ],
+            "marks": [
+              {
+                "i": 1,
+                "text": "here"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "total: −2 → start fresh → 1      best so far: 1",
+          "at": [
+            800,
+            290
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "At 4",
+      "caption": "After −3 the total drops to −2 again. At 4, starting fresh beats carrying −2: the total is 4, our *new best*.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.9,
+            "values": [
+              "−2",
+              "1",
+              "−3",
+              "4",
+              "−1",
+              "2",
+              "1",
+              "−5",
+              "4"
+            ],
+            "hi": [
+              3
+            ],
+            "dim": [
+              0,
+              1,
+              2
+            ],
+            "marks": [
+              {
+                "i": 3,
+                "text": "here"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "total: −2 → start fresh → 4      best so far: 4",
+          "at": [
+            800,
+            290
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Keep going",
+      "caption": "Now keeping the total wins every time, even through the −1, because the total stays positive: 3, then 5, then *6*.",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.9,
+            "values": [
+              "−2",
+              "1",
+              "−3",
+              "4",
+              "−1",
+              "2",
+              "1",
+              "−5",
+              "4"
+            ],
+            "hi": [
+              3,
+              4,
+              5,
+              6
+            ],
+            "dim": [
+              0,
+              1,
+              2
+            ],
+            "marks": [
+              {
+                "i": 6,
+                "text": "here"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "total: 4 → 3 → 5 → 6      best so far: 6",
+          "at": [
+            800,
+            290
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "To the end",
+      "caption": "−5 drops the total to 1, then 4 lifts it to 5. Neither beats 6, so the answer is *6*.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              440
+            ],
+            "scale": 0.9,
+            "values": [
+              "−2",
+              "1",
+              "−3",
+              "4",
+              "−1",
+              "2",
+              "1",
+              "−5",
+              "4"
+            ],
+            "hi": [
+              3,
+              4,
+              5,
+              6
+            ],
+            "dim": [
+              0,
+              1,
+              2,
+              7,
+              8
+            ],
+            "marks": [
+              {
+                "i": 8,
+                "text": "here"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "total: 6 → 1 → 5      best so far stays 6 ✓",
+          "at": [
+            800,
+            290
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Your total is −3 and the next number is 2. What's the new total?",
+        "options": [
+          "−1",
+          "2",
+          "5"
+        ],
+        "answer": 1,
+        "explain": "Start fresh at 2, because 2 beats −3 + 2 = −1. A negative total is *dead weight*."
+      }
+    },
+    {
+      "eyebrow": "The code",
+      "caption": "Here is the whole solution. Each line matches a step we just walked through.",
+      "dur": 9,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              800,
+              410
+            ],
+            "w": 860,
+            "h": 270
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "def max_subarray(nums):",
+          "at": [
+            410,
+            330
+          ],
+          "code": true
+        },
+        {
+          "text": "    total = best = nums[0]",
+          "at": [
+            410,
+            366
+          ],
+          "code": true
+        },
+        {
+          "text": "    for x in nums[1:]:",
+          "at": [
+            410,
+            402
+          ],
+          "code": true
+        },
+        {
+          "text": "        total = max(x, total + x)    # start fresh, or keep going",
+          "at": [
+            410,
+            438
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "        best = max(best, total)      # remember the best so far",
+          "at": [
+            410,
+            474
+          ],
+          "code": true
+        },
+        {
+          "text": "    return best",
+          "at": [
+            410,
+            510
+          ],
+          "code": true
+        }
+      ],
+      "chapter": "Code"
+    },
+    {
+      "eyebrow": "If the rules change",
+      "chapter": "Other ways",
+      "caption": "The running total wins for one pass over a fixed list. Change the question and another tool fits:",
+      "dur": 10,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Segment tree",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Prefix sums",
+            "id": "alt1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Divide and conquer",
+            "id": "alt2"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF NUMBERS CHANGE OFTEN",
+          "at": [
+            300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "O(log n) per update and query",
+          "at": [
+            300,
+            548
+          ]
+        },
+        {
+          "text": "IF THE STRETCH MUST BE ≥ k LONG",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "prefix[i] − smallest earlier prefix",
+          "at": [
+            800,
+            548
+          ]
+        },
+        {
+          "text": "IF HALVES RUN IN PARALLEL",
+          "at": [
+            1300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "O(n log n) · splits across machines",
+          "at": [
+            1300,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "caption": "The big idea: carry a running total and *drop it the moment it turns negative*. This is known as Kadane's algorithm.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      },
+      "chapter": "Recap"
+    }
+  ]
+}

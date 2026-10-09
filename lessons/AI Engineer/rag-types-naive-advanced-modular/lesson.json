@@ -1,0 +1,3542 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-09",
+  "request": "add an AI Engineer folder with RAG in detail: how it works, types of RAG and use cases",
+  "companies": [],
+  "dots": 2400,
+  "spacing": 8,
+  "difficulty": "Medium",
+  "title": "Types of RAG: naive, advanced, modular",
+  "tags": [
+    "ai-engineering",
+    "rag",
+    "llm",
+    "query-rewriting",
+    "hyde",
+    "modular-rag",
+    "interview"
+  ],
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "chapter": "Question",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer sets the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "TYPES OF RAG · 1",
+            "size": 120
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "AI ENGINEERING · MEDIUM",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "There are many “types” of RAG. For a given product, which would you choose, and why? Walk through the types that make *finding* the right chunks better.",
+        "example": [
+          "Help-center FAQ bot",
+          "Customer-support chat with follow-up questions",
+          "Internal assistant over docs, databases and the web"
+        ],
+        "constraints": [
+          "Keep each answer under a few seconds",
+          "Don’t pay for fancy parts you don’t need"
+        ],
+        "followUp": "How would you decide when to move up to a more complex type?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Requirements",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Think of the “types” as *fixes*, not brands. Each type exists because the simple version fails in one particular way.",
+        "points": [
+          "*You get:* a list of RAG names that sound alike.",
+          "*You do:* learn the failure each one fixes, and its best use.",
+          "*The catch:* names vary between papers and tools, so learn the idea."
+        ]
+      }
+    },
+    {
+      "eyebrow": "Naive RAG",
+      "caption": "Naive RAG: embed the question, grab the nearest chunks, hand them to the AI. It is fast, cheap and simple, and plenty for a clean FAQ bot.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "space",
+            "at": [
+              800,
+              450
+            ],
+            "w": 340,
+            "h": 250,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_qv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vl"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "USE CASE: HELP-CENTER FAQ BOT",
+          "at": [
+            800,
+            150
+          ],
+          "accent": true
+        },
+        {
+          "text": "“What is the refund window?”",
+          "at": [
+            330,
+            400
+          ]
+        }
+      ],
+      "chapter": "Naive RAG"
+    },
+    {
+      "eyebrow": "Where naive struggles",
+      "caption": "But people don’t ask clean questions. In a chat, “And what about premium?” means nothing alone, so search lands in empty space and returns random chunks.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "space",
+            "at": [
+              800,
+              450
+            ],
+            "w": 340,
+            "h": 250,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                55,
+                52
+              ]
+            ],
+            "bad": [
+              15,
+              12,
+              8
+            ]
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_qv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vl"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "count": 4,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“And what about premium?”",
+          "at": [
+            330,
+            400
+          ],
+          "fail": true
+        },
+        {
+          "text": "RANDOM CHUNKS → WRONG ANSWER",
+          "at": [
+            1180,
+            400
+          ],
+          "fail": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Query rewriting",
+      "caption": "Fix: a small AI step first rewrites the question using the chat history: “What is the refund window for the premium plan?” Then it searches.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              380,
+              450
+            ],
+            "w": 150,
+            "h": 90,
+            "text": "REWRITE",
+            "label": "QUERY REWRITER",
+            "note": "A small AI call that turns a chatty question into a clean search query.",
+            "id": "rewriter",
+            "accent": true
+          },
+          {
+            "shape": "space",
+            "at": [
+              800,
+              450
+            ],
+            "w": 340,
+            "h": 250,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                300,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yr"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                460,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vl"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                300,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                460,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“and premium?”",
+          "at": [
+            230,
+            400
+          ]
+        },
+        {
+          "text": "“premium refund window?”",
+          "at": [
+            520,
+            400
+          ],
+          "accent": true
+        },
+        {
+          "text": "USE CASE: SUPPORT CHAT WITH FOLLOW-UPS",
+          "at": [
+            800,
+            150
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Better questions"
+    },
+    {
+      "eyebrow": "HyDE",
+      "caption": "HyDE: when a question is worded nothing like the documents, the AI writes a *fake answer* first and we search with that. It reads like real docs, so it lands beside them.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              380,
+              250
+            ],
+            "scale": 0.4,
+            "label": "AI WRITES A FAKE ANSWER",
+            "note": "The invented answer may contain errors; only its *wording and meaning* are used for the search.",
+            "id": "hyde",
+            "accent": true
+          },
+          {
+            "shape": "space",
+            "at": [
+              800,
+              450
+            ],
+            "w": 340,
+            "h": 250,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                50,
+                44
+              ],
+              [
+                74,
+                74
+              ]
+            ],
+            "hi": [
+              15,
+              16,
+              17
+            ]
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                430
+              ],
+              [
+                150,
+                250
+              ],
+              [
+                330,
+                250
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yh"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                430,
+                250
+              ],
+              [
+                800,
+                250
+              ],
+              [
+                800,
+                321
+              ]
+            ],
+            "arrow": true,
+            "id": "p_hv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1000,
+                518
+              ],
+              [
+                915,
+                512
+              ]
+            ],
+            "arrow": true,
+            "id": "p_lead"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                430
+              ],
+              [
+                150,
+                250
+              ],
+              [
+                330,
+                250
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                430,
+                250
+              ],
+              [
+                800,
+                250
+              ],
+              [
+                800,
+                321
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.4
+          },
+          {
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“my app freezes when I tap pay”",
+          "at": [
+            330,
+            400
+          ]
+        },
+        {
+          "text": "QUESTION",
+          "at": [
+            800,
+            402.5
+          ]
+        },
+        {
+          "text": "FAKE ANSWER",
+          "at": [
+            1085,
+            522
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Multi-query",
+      "caption": "Multi-query: for a broad question, have the AI reword it several ways, search with each, and merge the results. Each wording reaches a different corner of the data.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              380,
+              450
+            ],
+            "w": 150,
+            "h": 90,
+            "text": "REWRITE",
+            "label": "QUERY REWRITER",
+            "note": "A small AI call that turns a chatty question into a clean search query.",
+            "id": "rewriter",
+            "accent": true
+          },
+          {
+            "shape": "space",
+            "at": [
+              800,
+              450
+            ],
+            "w": 340,
+            "h": 250,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                72,
+                74
+              ],
+              [
+                32,
+                30
+              ],
+              [
+                26,
+                76
+              ]
+            ],
+            "hi": [
+              15,
+              16,
+              2,
+              4,
+              10,
+              11
+            ]
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                300,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yr"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                460,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vl"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                300,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                460,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "count": 5,
+            "speed": 0.4,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“Tell me about the premium plan”",
+          "at": [
+            330,
+            400
+          ]
+        },
+        {
+          "text": "3 REWORDINGS → 3 SEARCHES → ONE MERGED LIST",
+          "at": [
+            800,
+            325
+          ],
+          "accent": true
+        },
+        {
+          "text": "USE CASE: BROAD RESEARCH QUESTIONS",
+          "at": [
+            800,
+            150
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Advanced RAG",
+      "caption": "Advanced RAG is the same pipeline with fixes at three points: *before* the search, *during* it, and *after*. Each fix targets one failure.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              380,
+              450
+            ],
+            "w": 150,
+            "h": 90,
+            "text": "REWRITE",
+            "label": "QUERY REWRITER",
+            "note": "A small AI call that turns a chatty question into a clean search query.",
+            "id": "rewriter"
+          },
+          {
+            "shape": "space",
+            "at": [
+              800,
+              450
+            ],
+            "w": 340,
+            "h": 250,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "shape": "table",
+            "at": [
+              800,
+              240
+            ],
+            "scale": 0.45,
+            "rows": 4,
+            "cols": 3,
+            "label": "KEYWORD INDEX",
+            "id": "kw"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1100,
+              450
+            ],
+            "w": 140,
+            "h": 100,
+            "text": "RERANK",
+            "label": "RERANKER",
+            "id": "rerank"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                300,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yr"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                460,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1025,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vr"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                866,
+                240
+              ],
+              [
+                1100,
+                240
+              ],
+              [
+                1100,
+                396
+              ]
+            ],
+            "arrow": true,
+            "id": "p_kwr"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                300,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                460,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1025,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                866,
+                240
+              ],
+              [
+                1100,
+                240
+              ],
+              [
+                1100,
+                396
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1175,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "① BEFORE: REWRITE",
+          "at": [
+            380,
+            380
+          ],
+          "accent": true
+        },
+        {
+          "text": "② DURING: HYBRID SEARCH",
+          "at": [
+            800,
+            160
+          ],
+          "accent": true
+        },
+        {
+          "text": "③ AFTER: RERANK",
+          "at": [
+            1100,
+            585
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Advanced RAG"
+    },
+    {
+      "eyebrow": "Best for Advanced RAG",
+      "caption": "Reach for it when wrong answers cost something: enterprise search, legal or financial assistants. You pay in extra parts, more latency, and more to monitor.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              380,
+              450
+            ],
+            "w": 150,
+            "h": 90,
+            "text": "REWRITE",
+            "label": "QUERY REWRITER",
+            "note": "A small AI call that turns a chatty question into a clean search query.",
+            "id": "rewriter"
+          },
+          {
+            "shape": "space",
+            "at": [
+              800,
+              450
+            ],
+            "w": 340,
+            "h": 250,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "shape": "table",
+            "at": [
+              800,
+              240
+            ],
+            "scale": 0.45,
+            "rows": 4,
+            "cols": 3,
+            "label": "KEYWORD INDEX",
+            "id": "kw"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1100,
+              450
+            ],
+            "w": 140,
+            "h": 100,
+            "text": "RERANK",
+            "label": "RERANKER",
+            "id": "rerank"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                300,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yr"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                460,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                975,
+                450
+              ],
+              [
+                1025,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vr"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1175,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                866,
+                240
+              ],
+              [
+                1100,
+                240
+              ],
+              [
+                1100,
+                396
+              ]
+            ],
+            "arrow": true,
+            "id": "p_kwr"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                460,
+                450
+              ],
+              [
+                625,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1175,
+                450
+              ],
+              [
+                1420,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "BEST FOR: ENTERPRISE SEARCH, LEGAL, FINANCE",
+          "at": [
+            800,
+            130
+          ],
+          "accent": true
+        },
+        {
+          "text": "COST: MORE PARTS · MORE LATENCY",
+          "at": [
+            800,
+            160
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Modular RAG",
+      "caption": "Modular RAG builds the system from swappable blocks: router, retrievers, reranker, generator. Swap one block without rebuilding the rest.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              500,
+              450
+            ],
+            "w": 120,
+            "h": 160,
+            "text": "ROUTER",
+            "label": "ROUTER",
+            "note": "Decides which source can answer this question.",
+            "id": "router",
+            "accent": true
+          },
+          {
+            "shape": "space",
+            "at": [
+              1000,
+              240
+            ],
+            "w": 220,
+            "h": 140,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "DOCUMENTS",
+            "id": "docs2"
+          },
+          {
+            "shape": "database",
+            "at": [
+              1000,
+              450
+            ],
+            "scale": 0.45,
+            "label": "SQL DATABASE",
+            "note": "Live numbers: counts, totals, statuses.",
+            "id": "sql"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              1000,
+              650
+            ],
+            "scale": 0.45,
+            "label": "WEB SEARCH",
+            "id": "web"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                435,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yRouter"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                420
+              ],
+              [
+                700,
+                420
+              ],
+              [
+                700,
+                240
+              ],
+              [
+                884,
+                240
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rDocs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                450
+              ],
+              [
+                940,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rSql"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                480
+              ],
+              [
+                700,
+                480
+              ],
+              [
+                700,
+                650
+              ],
+              [
+                956,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rWeb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1115,
+                240
+              ],
+              [
+                1300,
+                240
+              ],
+              [
+                1300,
+                420
+              ],
+              [
+                1425,
+                420
+              ]
+            ],
+            "arrow": true,
+            "id": "p_docsL"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1055,
+                450
+              ],
+              [
+                1425,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sqlL"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1045,
+                650
+              ],
+              [
+                1300,
+                650
+              ],
+              [
+                1300,
+                480
+              ],
+              [
+                1425,
+                480
+              ]
+            ],
+            "arrow": true,
+            "id": "p_webL"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                435,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "USE CASE: INTERNAL COMPANY ASSISTANT",
+          "at": [
+            800,
+            150
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Modular RAG"
+    },
+    {
+      "eyebrow": "Question 1 · live numbers",
+      "caption": "“How many tickets are open?” is a *live number*, not a paragraph. The router sends it to the SQL database, and no vector search is needed.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              500,
+              450
+            ],
+            "w": 120,
+            "h": 160,
+            "text": "ROUTER",
+            "label": "ROUTER",
+            "note": "Decides which source can answer this question.",
+            "id": "router"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1000,
+              240
+            ],
+            "w": 220,
+            "h": 140,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "DOCUMENTS",
+            "id": "docs2"
+          },
+          {
+            "shape": "database",
+            "at": [
+              1000,
+              450
+            ],
+            "scale": 0.45,
+            "label": "SQL DATABASE",
+            "note": "Live numbers: counts, totals, statuses.",
+            "id": "sql",
+            "accent": true
+          },
+          {
+            "shape": "globe",
+            "at": [
+              1000,
+              650
+            ],
+            "scale": 0.45,
+            "label": "WEB SEARCH",
+            "id": "web"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                435,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yRouter"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                420
+              ],
+              [
+                700,
+                420
+              ],
+              [
+                700,
+                240
+              ],
+              [
+                884,
+                240
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rDocs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                450
+              ],
+              [
+                940,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rSql"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                480
+              ],
+              [
+                700,
+                480
+              ],
+              [
+                700,
+                650
+              ],
+              [
+                956,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rWeb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1115,
+                240
+              ],
+              [
+                1300,
+                240
+              ],
+              [
+                1300,
+                420
+              ],
+              [
+                1425,
+                420
+              ]
+            ],
+            "arrow": true,
+            "id": "p_docsL"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1055,
+                450
+              ],
+              [
+                1425,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sqlL"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1045,
+                650
+              ],
+              [
+                1300,
+                650
+              ],
+              [
+                1300,
+                480
+              ],
+              [
+                1425,
+                480
+              ]
+            ],
+            "arrow": true,
+            "id": "p_webL"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                435,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                565,
+                450
+              ],
+              [
+                940,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1055,
+                450
+              ],
+              [
+                1425,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“How many tickets are open?”",
+          "at": [
+            330,
+            400
+          ]
+        }
+      ],
+      "focus": [
+        "you",
+        "router",
+        "sql",
+        "llm",
+        "p_yRouter",
+        "p_rSql",
+        "p_sqlL"
+      ]
+    },
+    {
+      "eyebrow": "Question 2 · policy",
+      "caption": "“What is our travel policy?” lives in documents. The router sends it to the document search instead. Same system, different path.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              500,
+              450
+            ],
+            "w": 120,
+            "h": 160,
+            "text": "ROUTER",
+            "label": "ROUTER",
+            "note": "Decides which source can answer this question.",
+            "id": "router"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1000,
+              240
+            ],
+            "w": 220,
+            "h": 140,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "DOCUMENTS",
+            "id": "docs2",
+            "accent": true,
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "shape": "database",
+            "at": [
+              1000,
+              450
+            ],
+            "scale": 0.45,
+            "label": "SQL DATABASE",
+            "note": "Live numbers: counts, totals, statuses.",
+            "id": "sql"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              1000,
+              650
+            ],
+            "scale": 0.45,
+            "label": "WEB SEARCH",
+            "id": "web"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                435,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yRouter"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                420
+              ],
+              [
+                700,
+                420
+              ],
+              [
+                700,
+                240
+              ],
+              [
+                884,
+                240
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rDocs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                450
+              ],
+              [
+                940,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rSql"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                480
+              ],
+              [
+                700,
+                480
+              ],
+              [
+                700,
+                650
+              ],
+              [
+                956,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rWeb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1115,
+                240
+              ],
+              [
+                1300,
+                240
+              ],
+              [
+                1300,
+                420
+              ],
+              [
+                1425,
+                420
+              ]
+            ],
+            "arrow": true,
+            "id": "p_docsL"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1055,
+                450
+              ],
+              [
+                1425,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sqlL"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1045,
+                650
+              ],
+              [
+                1300,
+                650
+              ],
+              [
+                1300,
+                480
+              ],
+              [
+                1425,
+                480
+              ]
+            ],
+            "arrow": true,
+            "id": "p_webL"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                435,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                565,
+                420
+              ],
+              [
+                700,
+                420
+              ],
+              [
+                700,
+                240
+              ],
+              [
+                884,
+                240
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1115,
+                240
+              ],
+              [
+                1300,
+                240
+              ],
+              [
+                1300,
+                420
+              ],
+              [
+                1425,
+                420
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“What is our travel policy?”",
+          "at": [
+            330,
+            400
+          ]
+        }
+      ],
+      "focus": [
+        "you",
+        "router",
+        "docs2",
+        "llm",
+        "p_yRouter",
+        "p_rDocs",
+        "p_docsL"
+      ]
+    },
+    {
+      "eyebrow": "Question 3 · fresh news",
+      "caption": "“What did our competitor announce today?” is newer than any document. The router sends it to web search.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              500,
+              450
+            ],
+            "w": 120,
+            "h": 160,
+            "text": "ROUTER",
+            "label": "ROUTER",
+            "note": "Decides which source can answer this question.",
+            "id": "router"
+          },
+          {
+            "shape": "space",
+            "at": [
+              1000,
+              240
+            ],
+            "w": 220,
+            "h": 140,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "DOCUMENTS",
+            "id": "docs2"
+          },
+          {
+            "shape": "database",
+            "at": [
+              1000,
+              450
+            ],
+            "scale": 0.45,
+            "label": "SQL DATABASE",
+            "note": "Live numbers: counts, totals, statuses.",
+            "id": "sql"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              1000,
+              650
+            ],
+            "scale": 0.45,
+            "label": "WEB SEARCH",
+            "id": "web",
+            "accent": true
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                435,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yRouter"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                420
+              ],
+              [
+                700,
+                420
+              ],
+              [
+                700,
+                240
+              ],
+              [
+                884,
+                240
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rDocs"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                450
+              ],
+              [
+                940,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rSql"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                565,
+                480
+              ],
+              [
+                700,
+                480
+              ],
+              [
+                700,
+                650
+              ],
+              [
+                956,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_rWeb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1115,
+                240
+              ],
+              [
+                1300,
+                240
+              ],
+              [
+                1300,
+                420
+              ],
+              [
+                1425,
+                420
+              ]
+            ],
+            "arrow": true,
+            "id": "p_docsL"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1055,
+                450
+              ],
+              [
+                1425,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sqlL"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1045,
+                650
+              ],
+              [
+                1300,
+                650
+              ],
+              [
+                1300,
+                480
+              ],
+              [
+                1425,
+                480
+              ]
+            ],
+            "arrow": true,
+            "id": "p_webL"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                435,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                565,
+                480
+              ],
+              [
+                700,
+                480
+              ],
+              [
+                700,
+                650
+              ],
+              [
+                956,
+                650
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1045,
+                650
+              ],
+              [
+                1300,
+                650
+              ],
+              [
+                1300,
+                480
+              ],
+              [
+                1425,
+                480
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“What did our competitor announce today?”",
+          "at": [
+            330,
+            400
+          ]
+        }
+      ],
+      "focus": [
+        "you",
+        "router",
+        "web",
+        "llm",
+        "p_yRouter",
+        "p_rWeb",
+        "p_webL"
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "In a chat, the user types “And what about the premium plan?” and search returns junk. Which fix targets this?",
+        "options": [
+          "Rewrite the question using the chat history",
+          "Use a bigger vector database",
+          "Add more documents"
+        ],
+        "answer": 0,
+        "explain": "The question is meaningless on its own. *Query rewriting* turns it into a standalone search query before retrieval."
+      }
+    },
+    {
+      "eyebrow": "Which one do I need?",
+      "chapter": "Choosing",
+      "caption": "Don’t build the fanciest one. Start simple, then move up only when a specific failure forces you to:",
+      "dur": 11,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Naive RAG",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Rewrite or HyDE",
+            "id": "alt1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Advanced or modular",
+            "id": "alt2"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF QUESTIONS ARE SIMPLE & CLEAN",
+          "at": [
+            300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "cheap · fast · easy to build",
+          "at": [
+            300,
+            548
+          ]
+        },
+        {
+          "text": "IF QUESTIONS ARE VAGUE OR CHATTY",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "one extra AI call per question",
+          "at": [
+            800,
+            548
+          ]
+        },
+        {
+          "text": "IF WRONG ANSWERS COST MONEY",
+          "at": [
+            1300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "more parts · more latency",
+          "at": [
+            1300,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "chapter": "Recap",
+      "caption": "The big idea: each RAG type is *a fix for one failure*: rewrite for vague questions, HyDE for odd wording, rerank for noise, a router for mixed sources.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      }
+    }
+  ]
+}

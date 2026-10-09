@@ -1,0 +1,1160 @@
+{
+  "engine": "dots",
+  "title": "Trapping Rain Water with two pointers",
+  "request": "add more impressive god-level DSA solutions",
+  "createdAt": "2026-10-08",
+  "tags": [
+    "dsa",
+    "arrays",
+    "two-pointers",
+    "interview"
+  ],
+  "companies": [
+    "Microsoft",
+    "Amazon",
+    "Google",
+    "Goldman Sachs",
+    "Bloomberg"
+  ],
+  "difficulty": "Hard",
+  "dots": 1300,
+  "steps": [
+    {
+      "eyebrow": "The problem",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer reads you the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "TRAPPING RAIN WATER",
+            "size": 96
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LEETCODE 42 · HARD",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Given *n* non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.",
+        "example": [
+          "Input:  height = [0,1,0,2,1,0,1,3,2,1,2,1]",
+          "Output: 6"
+        ],
+        "constraints": [
+          "1 <= n <= 2 * 10^4",
+          "0 <= height[i] <= 10^5"
+        ],
+        "followUp": "Can you do it in one pass, using only O(1) extra space?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "Picture the numbers as walls of different heights. After it rains, *how much water gets stuck between the walls?*",
+        "points": [
+          "*You get:* a list of wall heights.",
+          "*You return:* one number, the total water trapped.",
+          "*The catch:* do it in one walk, without making extra lists."
+        ]
+      }
+    },
+    {
+      "eyebrow": "The picture",
+      "caption": "Each number is the height of a wall. When it rains, water collects in the dips between walls. How much collects?",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              458,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              610,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              686,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              838,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              914,
+              495
+            ],
+            "w": 64,
+            "h": 210,
+            "note": "The tallest wall, 3 high."
+          },
+          {
+            "shape": "box",
+            "at": [
+              990,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              1066,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              1142,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              1218,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                340,
+                604
+              ],
+              [
+                1260,
+                604
+              ]
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "WALL HEIGHTS",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "0",
+          "at": [
+            382,
+            636
+          ]
+        },
+        {
+          "text": "1",
+          "at": [
+            458,
+            636
+          ]
+        },
+        {
+          "text": "0",
+          "at": [
+            534,
+            636
+          ]
+        },
+        {
+          "text": "2",
+          "at": [
+            610,
+            636
+          ]
+        },
+        {
+          "text": "1",
+          "at": [
+            686,
+            636
+          ]
+        },
+        {
+          "text": "0",
+          "at": [
+            762,
+            636
+          ]
+        },
+        {
+          "text": "1",
+          "at": [
+            838,
+            636
+          ]
+        },
+        {
+          "text": "3",
+          "at": [
+            914,
+            636
+          ]
+        },
+        {
+          "text": "2",
+          "at": [
+            990,
+            636
+          ]
+        },
+        {
+          "text": "1",
+          "at": [
+            1066,
+            636
+          ]
+        },
+        {
+          "text": "2",
+          "at": [
+            1142,
+            636
+          ]
+        },
+        {
+          "text": "1",
+          "at": [
+            1218,
+            636
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "The answer",
+      "caption": "*6 squares* of water get trapped. Water stays wherever there's a taller wall on both sides to hold it in, like a bowl.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              458,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              610,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              686,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              838,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              914,
+              495
+            ],
+            "w": 64,
+            "h": 210
+          },
+          {
+            "shape": "box",
+            "at": [
+              990,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              1066,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              1142,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              1218,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              534,
+              565
+            ],
+            "w": 60,
+            "h": 62,
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              686,
+              495
+            ],
+            "w": 60,
+            "h": 62,
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              762,
+              530
+            ],
+            "w": 60,
+            "h": 132,
+            "accent": true,
+            "id": "w5",
+            "note": "Tallest wall on the left is 2, on the right 3, so water rises to 2 here."
+          },
+          {
+            "shape": "box",
+            "at": [
+              838,
+              495
+            ],
+            "w": 60,
+            "h": 62,
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              1066,
+              495
+            ],
+            "w": 60,
+            "h": 62,
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                340,
+                604
+              ],
+              [
+                1260,
+                604
+              ]
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "ORANGE = WATER · 6 SQUARES",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "One spot at a time",
+      "caption": "Look at one spot. Its tallest wall on the left is 2, on the right is 3. Water can only rise to the *shorter* of the two: 2.",
+      "dur": 8,
+      "focus": [
+        "w5"
+      ],
+      "labels": [
+        {
+          "text": "WATER HERE = SHORTER OF (TALLEST LEFT, TALLEST RIGHT)",
+          "at": [
+            800,
+            290
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Two fingers",
+      "caption": "Put one finger on each end. Each finger remembers the tallest wall it has passed so far.",
+      "dur": 7.5,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              458,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              610,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              686,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              838,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              914,
+              495
+            ],
+            "w": 64,
+            "h": 210
+          },
+          {
+            "shape": "box",
+            "at": [
+              990,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              1066,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              1142,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              1218,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                340,
+                604
+              ],
+              [
+                1260,
+                604
+              ]
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LEFT →",
+          "at": [
+            382,
+            650
+          ],
+          "accent": true
+        },
+        {
+          "text": "← RIGHT",
+          "at": [
+            1218,
+            650
+          ],
+          "accent": true
+        },
+        {
+          "text": "tallest on the left so far: 0",
+          "at": [
+            340,
+            250
+          ],
+          "code": true
+        },
+        {
+          "text": "tallest on the right so far: 0",
+          "at": [
+            900,
+            250
+          ],
+          "code": true
+        }
+      ],
+      "chapter": "Solution"
+    },
+    {
+      "eyebrow": "The trick",
+      "caption": "Always move the finger on the *lower* side. Its water is already decided, because the other side is guaranteed to have a taller wall.",
+      "dur": 8.5,
+      "labels": [
+        {
+          "text": "LEFT →",
+          "at": [
+            382,
+            650
+          ],
+          "accent": true
+        },
+        {
+          "text": "← RIGHT",
+          "at": [
+            1218,
+            650
+          ],
+          "accent": true
+        },
+        {
+          "text": "lower side moves  ·  add its water  ·  step inward",
+          "at": [
+            340,
+            250
+          ],
+          "code": true,
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Step by step",
+      "caption": "The lower side keeps moving inward, adding its water. A few moves in, the fingers are here and we've collected 2 squares.",
+      "dur": 8,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              458,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              610,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              686,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              838,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              914,
+              495
+            ],
+            "w": 64,
+            "h": 210
+          },
+          {
+            "shape": "box",
+            "at": [
+              990,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              1066,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              1142,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              1218,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              534,
+              565
+            ],
+            "w": 60,
+            "h": 62,
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              1066,
+              495
+            ],
+            "w": 60,
+            "h": 62,
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                340,
+                604
+              ],
+              [
+                1260,
+                604
+              ]
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LEFT",
+          "at": [
+            610,
+            650
+          ],
+          "accent": true
+        },
+        {
+          "text": "RIGHT",
+          "at": [
+            990,
+            650
+          ],
+          "accent": true
+        },
+        {
+          "text": "water collected so far: 2",
+          "at": [
+            340,
+            250
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Tallest on the left so far is 2, on the right 3. Which finger moves?",
+        "options": [
+          "The left one",
+          "The right one",
+          "Both"
+        ],
+        "answer": 0,
+        "explain": "The left side is lower, so its water is already decided. Move the *left finger*."
+      }
+    },
+    {
+      "eyebrow": "Done",
+      "caption": "Keep going until the fingers meet at the tallest wall. Every spot was handled exactly once: *6 squares* of water.",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              458,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              610,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              686,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              838,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              914,
+              495
+            ],
+            "w": 64,
+            "h": 210,
+            "label": "FINGERS MEET"
+          },
+          {
+            "shape": "box",
+            "at": [
+              990,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              1066,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              1142,
+              530
+            ],
+            "w": 64,
+            "h": 140
+          },
+          {
+            "shape": "box",
+            "at": [
+              1218,
+              565
+            ],
+            "w": 64,
+            "h": 70
+          },
+          {
+            "shape": "box",
+            "at": [
+              534,
+              565
+            ],
+            "w": 60,
+            "h": 62,
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              686,
+              495
+            ],
+            "w": 60,
+            "h": 62,
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              762,
+              530
+            ],
+            "w": 60,
+            "h": 132,
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              838,
+              495
+            ],
+            "w": 60,
+            "h": 62,
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              1066,
+              495
+            ],
+            "w": 60,
+            "h": 62,
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                340,
+                604
+              ],
+              [
+                1260,
+                604
+              ]
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "TOTAL WATER = 6",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "The code",
+      "caption": "Here is the whole solution. The comments match the steps we just walked through.",
+      "dur": 9.5,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              800,
+              384
+            ],
+            "w": 940,
+            "h": 450
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "def trap(height):",
+          "at": [
+            360,
+            200
+          ],
+          "code": true
+        },
+        {
+          "text": "    left, right = 0, len(height) - 1",
+          "at": [
+            360,
+            234
+          ],
+          "code": true
+        },
+        {
+          "text": "    best_left = best_right = water = 0",
+          "at": [
+            360,
+            268
+          ],
+          "code": true
+        },
+        {
+          "text": "    while left < right:",
+          "at": [
+            360,
+            302
+          ],
+          "code": true
+        },
+        {
+          "text": "        if height[left] < height[right]:     # left side is lower",
+          "at": [
+            360,
+            336
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "            best_left = max(best_left, height[left])",
+          "at": [
+            360,
+            370
+          ],
+          "code": true
+        },
+        {
+          "text": "            water += best_left - height[left]",
+          "at": [
+            360,
+            404
+          ],
+          "code": true
+        },
+        {
+          "text": "            left += 1",
+          "at": [
+            360,
+            438
+          ],
+          "code": true
+        },
+        {
+          "text": "        else:                                # right side is lower",
+          "at": [
+            360,
+            472
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "            best_right = max(best_right, height[right])",
+          "at": [
+            360,
+            506
+          ],
+          "code": true
+        },
+        {
+          "text": "            water += best_right - height[right]",
+          "at": [
+            360,
+            540
+          ],
+          "code": true
+        },
+        {
+          "text": "            right -= 1",
+          "at": [
+            360,
+            574
+          ],
+          "code": true
+        }
+      ],
+      "chapter": "Code"
+    },
+    {
+      "eyebrow": "If the rules change",
+      "chapter": "Other ways",
+      "caption": "Two fingers win when extra memory is off the table. Change the rules and these fit better:",
+      "dur": 10,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              500,
+              420
+            ],
+            "w": 480,
+            "h": 170,
+            "text": "Two helper lists",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1100,
+              420
+            ],
+            "w": 480,
+            "h": 170,
+            "text": "Monotonic stack",
+            "id": "alt1"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF MEMORY IS FINE",
+          "at": [
+            500,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "left-max and right-max · easiest to prove",
+          "at": [
+            500,
+            548
+          ]
+        },
+        {
+          "text": "IF WALLS ARRIVE ONE BY ONE",
+          "at": [
+            1100,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "fills water layer by layer · no look-ahead",
+          "at": [
+            1100,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "caption": "The big idea: when each spot depends on both sides, *walk inward from both ends* and always move the weaker side.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      },
+      "chapter": "Recap"
+    }
+  ]
+}

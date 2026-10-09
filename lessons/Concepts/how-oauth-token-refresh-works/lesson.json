@@ -1,0 +1,727 @@
+{
+  "engine": "dots",
+  "title": "How OAuth token refresh works",
+  "request": "How does OAuth token refresh work?",
+  "createdAt": "2026-10-08",
+  "tags": [
+    "auth",
+    "web",
+    "oauth"
+  ],
+  "difficulty": "Medium",
+  "dots": 1000,
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "caption": "Your app keeps you signed in for a month, yet never stores your password. How is that safe?",
+      "dur": 7,
+      "panel": false,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              380
+            ],
+            "text": "HOW DO YOU STAY\nSIGNED IN FOR A MONTH?",
+            "size": 96
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "THE QUESTION",
+          "at": [
+            800,
+            200
+          ],
+          "accent": true
+        },
+        {
+          "text": "WITHOUT THE APP EVER STORING YOUR PASSWORD",
+          "at": [
+            800,
+            600
+          ]
+        }
+      ],
+      "chapter": "Question"
+    },
+    {
+      "eyebrow": "01 · The players",
+      "caption": "Three players: your app, the API it calls, and an Auth service that hands out tokens.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              320,
+              430
+            ],
+            "scale": 1.1,
+            "label": "YOUR APP",
+            "note": "Runs on your device. It never stores your password, only tokens."
+          },
+          {
+            "shape": "lock",
+            "at": [
+              800,
+              300
+            ],
+            "scale": 1.1,
+            "label": "AUTH SERVICE",
+            "note": "The only part that can create tokens. It signs each one with a private key."
+          },
+          {
+            "shape": "server",
+            "at": [
+              1280,
+              430
+            ],
+            "scale": 0.8,
+            "label": "API",
+            "note": "Holds your data. It trusts a token only if Auth's signature on it is valid."
+          }
+        ]
+      },
+      "chapter": "Two tokens"
+    },
+    {
+      "eyebrow": "02 · Two tokens",
+      "caption": "After you log in once, the app holds two tokens: a short-lived *access token* and a long-lived *refresh token*.",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              320,
+              430
+            ],
+            "scale": 1.1,
+            "label": "YOUR APP"
+          },
+          {
+            "shape": "box",
+            "at": [
+              960,
+              300
+            ],
+            "w": 420,
+            "h": 100,
+            "label": "ACCESS TOKEN · LIVES 1 HOUR",
+            "note": "Sent with every API call. Short-lived on purpose: if it leaks, it stops working soon."
+          },
+          {
+            "shape": "box",
+            "at": [
+              960,
+              540
+            ],
+            "w": 420,
+            "h": 100,
+            "accent": true,
+            "label": "REFRESH TOKEN · LIVES 30 DAYS",
+            "note": "Only ever sent to Auth, never to the API. Auth can revoke it, for example when you log out."
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                430,
+                400
+              ],
+              [
+                600,
+                400
+              ],
+              [
+                600,
+                300
+              ],
+              [
+                740,
+                300
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                430,
+                460
+              ],
+              [
+                600,
+                460
+              ],
+              [
+                600,
+                540
+              ],
+              [
+                740,
+                540
+              ]
+            ],
+            "arrow": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "eyJhbGciOi… · exp 10:00",
+          "at": [
+            790,
+            306
+          ],
+          "code": true
+        },
+        {
+          "text": "rt_9f2c41… · exp 7 Nov",
+          "at": [
+            790,
+            546
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Two tokens, two jobs.",
+      "check": {
+        "question": "Which token travels with every API call?",
+        "options": [
+          "The access token",
+          "The refresh token"
+        ],
+        "answer": 0,
+        "explain": "The *access token* goes everywhere, which is exactly why it only lives for an hour. The refresh token only ever goes to Auth."
+      }
+    },
+    {
+      "eyebrow": "03 · Every call",
+      "caption": "Every API call carries the access token. The API checks its signature and expiry before doing anything else.",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              320,
+              430
+            ],
+            "scale": 1.1,
+            "label": "YOUR APP"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1280,
+              430
+            ],
+            "scale": 0.8,
+            "label": "API"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                420,
+                430
+              ],
+              [
+                1180,
+                430
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                420,
+                430
+              ],
+              [
+                1180,
+                430
+              ]
+            ],
+            "count": 6,
+            "speed": 0.45
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "GET /orders  ·  Authorization: Bearer eyJhbGciOi…",
+          "at": [
+            470,
+            400
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "04 · Expired",
+      "caption": "An hour later the token expires, and the API refuses the call with 401 Unauthorized.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              320,
+              430
+            ],
+            "scale": 1.1,
+            "label": "YOUR APP"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1280,
+              430
+            ],
+            "scale": 0.8,
+            "accent": true,
+            "label": "API",
+            "note": "The signature is fine, but the expiry time is in the past, so the request is rejected."
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                420,
+                400
+              ],
+              [
+                1180,
+                400
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1180,
+                470
+              ],
+              [
+                420,
+                470
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                420,
+                400
+              ],
+              [
+                1180,
+                400
+              ]
+            ],
+            "count": 3,
+            "speed": 0.45,
+            "accent": false
+          },
+          {
+            "path": [
+              [
+                1180,
+                470
+              ],
+              [
+                420,
+                470
+              ]
+            ],
+            "count": 4,
+            "speed": 0.55
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "← 401 UNAUTHORIZED · TOKEN EXPIRED",
+          "at": [
+            800,
+            520
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "The refresh"
+    },
+    {
+      "eyebrow": "05 · Inside the check",
+      "caption": "Two checks run on every token: is the signature genuine, and is it still in date? Here the second fails.",
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "lock",
+            "at": [
+              520,
+              400
+            ],
+            "scale": 1.7,
+            "label": "TOKEN CHECK",
+            "note": "Checking needs only Auth's public key, so the API can verify tokens without calling Auth each time."
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "1. signature   ✓ signed by Auth",
+          "at": [
+            800,
+            360
+          ],
+          "code": true
+        },
+        {
+          "text": "2. expiry      ✕ 10:00 is in the past",
+          "at": [
+            800,
+            420
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "→ reject with 401",
+          "at": [
+            800,
+            480
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "06 · The refresh",
+      "caption": "So the app quietly sends its refresh token to Auth, which answers with a brand-new access token.",
+      "dur": 7.5,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              320,
+              440
+            ],
+            "scale": 1.1,
+            "label": "YOUR APP"
+          },
+          {
+            "shape": "lock",
+            "at": [
+              1260,
+              430
+            ],
+            "scale": 1.1,
+            "label": "AUTH · /TOKEN",
+            "note": "Auth looks the refresh token up, checks it hasn't been revoked, and often issues a new refresh token too (rotation)."
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                420,
+                400
+              ],
+              [
+                1170,
+                400
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1170,
+                480
+              ],
+              [
+                420,
+                480
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                420,
+                400
+              ],
+              [
+                1170,
+                400
+              ]
+            ],
+            "count": 4,
+            "speed": 0.45
+          },
+          {
+            "path": [
+              [
+                1170,
+                480
+              ],
+              [
+                420,
+                480
+              ]
+            ],
+            "count": 4,
+            "speed": 0.45,
+            "accent": false,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "POST /token · grant_type=refresh_token",
+          "at": [
+            470,
+            370
+          ],
+          "code": true
+        },
+        {
+          "text": "← 200 · { access_token, expires_in: 3600 }",
+          "at": [
+            470,
+            525
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "07 · Fresh token",
+      "caption": "The new access token is good for another hour. No password, no login screen.",
+      "dur": 6,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              320,
+              430
+            ],
+            "scale": 1.1,
+            "label": "YOUR APP"
+          },
+          {
+            "shape": "box",
+            "at": [
+              960,
+              430
+            ],
+            "w": 420,
+            "h": 110,
+            "accent": true,
+            "label": "ACCESS TOKEN · NEW",
+            "note": "Same shape as before, new expiry. The old one is simply never used again."
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                430,
+                430
+              ],
+              [
+                740,
+                430
+              ]
+            ],
+            "arrow": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "eyJhbGciOi… · exp 11:00 ✓",
+          "at": [
+            790,
+            436
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "08 · Retry",
+      "caption": "The app retries the original request. It succeeds, and you never noticed anything happened.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "phone",
+            "at": [
+              320,
+              430
+            ],
+            "scale": 1.1,
+            "label": "YOUR APP"
+          },
+          {
+            "shape": "server",
+            "at": [
+              1280,
+              430
+            ],
+            "scale": 0.8,
+            "label": "API"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                420,
+                400
+              ],
+              [
+                1180,
+                400
+              ]
+            ],
+            "arrow": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1180,
+                470
+              ],
+              [
+                420,
+                470
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                420,
+                400
+              ],
+              [
+                1180,
+                400
+              ]
+            ],
+            "count": 4,
+            "speed": 0.5
+          },
+          {
+            "path": [
+              [
+                1180,
+                470
+              ],
+              [
+                420,
+                470
+              ]
+            ],
+            "count": 4,
+            "speed": 0.5,
+            "accent": false,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "← 200 OK · your orders",
+          "at": [
+            800,
+            520
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "09 · Why two tokens",
+      "caption": "A leaked access token dies within the hour. The refresh token stays private and can be revoked at any time.",
+      "dur": 7.5,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              500,
+              380
+            ],
+            "text": "1h",
+            "size": 200,
+            "label": "ACCESS · SHORT, SENT EVERYWHERE",
+            "note": "Exposed on every request, so it must expire fast."
+          },
+          {
+            "shape": "text",
+            "at": [
+              1100,
+              380
+            ],
+            "text": "30d",
+            "size": 200,
+            "accent": true,
+            "label": "REFRESH · LONG, SENT ONLY TO AUTH",
+            "note": "Rarely sent, stored securely, and revocable."
+          }
+        ]
+      },
+      "chapter": "Why"
+    },
+    {
+      "eyebrow": "Recap",
+      "caption": "Short-lived keys for every call, one long-lived key to renew them. That is token refresh.",
+      "dur": 7,
+      "form": {
+        "type": "sphere"
+      },
+      "chapter": "Recap"
+    }
+  ]
+}

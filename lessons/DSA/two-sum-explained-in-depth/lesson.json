@@ -1,0 +1,1107 @@
+{
+  "engine": "dots",
+  "title": "Two Sum, explained in depth",
+  "request": "search the top best DSA question and explain that question's answer with this, very detailed explanation",
+  "createdAt": "2026-10-08",
+  "tags": [
+    "dsa",
+    "arrays",
+    "hash-map",
+    "interview"
+  ],
+  "companies": [
+    "Amazon",
+    "Google",
+    "Adobe",
+    "Goldman Sachs"
+  ],
+  "difficulty": "Easy",
+  "dots": 1300,
+  "steps": [
+    {
+      "eyebrow": "The problem",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer reads you the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "TWO SUM",
+            "size": 130
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "LEETCODE 1 · EASY",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Given an array of integers *nums* and an integer *target*, return the indices of the two numbers that add up to target. Each input has exactly one solution, and you may not use the same element twice.",
+        "example": [
+          "Input:  nums = [2, 7, 11, 15], target = 9",
+          "Output: [0, 1]",
+          "Because nums[0] + nums[1] = 2 + 7 = 9"
+        ],
+        "constraints": [
+          "2 <= nums.length <= 10^4",
+          "-10^9 <= nums[i], target <= 10^9",
+          "Only one valid answer exists"
+        ],
+        "followUp": "Can you do it in less than O(n²) time?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Problem",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "You get a list of numbers and a target. Find the *two numbers that add up to the target*, and say where they are in the list.",
+        "points": [
+          "*You get:* a list of numbers, and one target number.",
+          "*You return:* the two positions, like [0, 1].",
+          "*The catch:* checking every pair is too slow. Find something faster."
+        ]
+      }
+    },
+    {
+      "eyebrow": "The example",
+      "caption": "Let's use a slightly longer list, so there's more to walk through. Two of these numbers add up to *9*. Can you spot them?",
+      "dur": 7,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              430
+            ],
+            "values": [
+              3,
+              8,
+              11,
+              2,
+              7,
+              15
+            ],
+            "note": "Each box holds one number. The small grey digit under it is its position, starting from 0."
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "TARGET = 9",
+          "at": [
+            800,
+            290
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "The answer",
+      "caption": "It's *2 and 7*. We don't return the numbers themselves, we return where they sit: positions 3 and 4.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              430
+            ],
+            "values": [
+              3,
+              8,
+              11,
+              2,
+              7,
+              15
+            ],
+            "hi": [
+              3,
+              4
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "2 + 7 = 9   →   ANSWER: [3, 4]",
+          "at": [
+            800,
+            290
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "What the follow-up means",
+      "caption": "O(n²) means checking every pair. The follow-up wants better: ideally *O(n)*, which simply means looking at each number once.",
+      "dur": 7.5,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              360
+            ],
+            "text": "O(n)",
+            "size": 220,
+            "accent": true,
+            "label": "n = HOW MANY NUMBERS · ONE LOOK EACH"
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "The key idea",
+      "caption": "When you stand on a number, you already know its partner. Standing on 7, the partner *must* be 9 − 7 = 2.",
+      "dur": 7.5,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              800,
+              430
+            ],
+            "values": [
+              3,
+              8,
+              11,
+              2,
+              7,
+              15
+            ],
+            "hi": [
+              4
+            ],
+            "marks": [
+              {
+                "i": 4,
+                "text": "you are here"
+              }
+            ]
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "PARTNER = TARGET − THIS NUMBER = 9 − 7 = 2",
+          "at": [
+            800,
+            290
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Solution"
+    },
+    {
+      "eyebrow": "The notebook",
+      "caption": "So as we walk, we write each number and its position in a *notebook*. Asking “have I seen 2?” is then instant. Programmers call this a hash map.",
+      "dur": 8,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              560,
+              440
+            ],
+            "scale": 0.8,
+            "values": [
+              3,
+              8,
+              11,
+              2,
+              7,
+              15
+            ]
+          },
+          {
+            "shape": "map",
+            "at": [
+              1250,
+              420
+            ],
+            "slots": 5,
+            "head": [
+              "NUMBER",
+              "POSITION"
+            ],
+            "label": "NOTEBOOK · HASH MAP",
+            "note": "A hash map finds an entry straight away, whether it holds 5 numbers or 5 million."
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "Walk · position 0",
+      "caption": "We're on 3. Its partner would be 6. Is 6 in the notebook? No, it's empty. So write down 3 and step forward.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              560,
+              440
+            ],
+            "scale": 0.8,
+            "values": [
+              3,
+              8,
+              11,
+              2,
+              7,
+              15
+            ],
+            "hi": [
+              0
+            ],
+            "marks": [
+              {
+                "i": 0,
+                "text": "here"
+              }
+            ]
+          },
+          {
+            "shape": "map",
+            "at": [
+              1250,
+              420
+            ],
+            "slots": 5,
+            "head": [
+              "NUMBER",
+              "POSITION"
+            ],
+            "entries": [
+              [
+                3,
+                0
+              ]
+            ],
+            "hi": [
+              0
+            ],
+            "label": "NOTEBOOK · HASH MAP"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                364,
+                396
+              ],
+              [
+                364,
+                214
+              ],
+              [
+                1080,
+                214
+              ],
+              [
+                1080,
+                314
+              ],
+              [
+                1125,
+                314
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                364,
+                396
+              ],
+              [
+                364,
+                214
+              ],
+              [
+                1080,
+                214
+              ],
+              [
+                1080,
+                314
+              ],
+              [
+                1125,
+                314
+              ]
+            ],
+            "count": 2,
+            "speed": 0.45
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "on 3 → partner 6? not seen → write 3",
+          "at": [
+            330,
+            180
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Position 1",
+      "caption": "We're on 8. Partner: 1. Not in the notebook. Write down 8.",
+      "dur": 5.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              560,
+              440
+            ],
+            "scale": 0.8,
+            "values": [
+              3,
+              8,
+              11,
+              2,
+              7,
+              15
+            ],
+            "hi": [
+              1
+            ],
+            "dim": [
+              0
+            ],
+            "marks": [
+              {
+                "i": 1,
+                "text": "here"
+              }
+            ]
+          },
+          {
+            "shape": "map",
+            "at": [
+              1250,
+              420
+            ],
+            "slots": 5,
+            "head": [
+              "NUMBER",
+              "POSITION"
+            ],
+            "entries": [
+              [
+                3,
+                0
+              ],
+              [
+                8,
+                1
+              ]
+            ],
+            "hi": [
+              1
+            ],
+            "label": "NOTEBOOK · HASH MAP"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                443,
+                396
+              ],
+              [
+                443,
+                214
+              ],
+              [
+                1080,
+                214
+              ],
+              [
+                1080,
+                376
+              ],
+              [
+                1125,
+                376
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                443,
+                396
+              ],
+              [
+                443,
+                214
+              ],
+              [
+                1080,
+                214
+              ],
+              [
+                1080,
+                376
+              ],
+              [
+                1125,
+                376
+              ]
+            ],
+            "count": 2,
+            "speed": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "on 8 → partner 1? not seen → write 8",
+          "at": [
+            330,
+            180
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Position 2",
+      "caption": "We're on 11. Partner: −2. Not there. Write down 11.",
+      "dur": 5.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              560,
+              440
+            ],
+            "scale": 0.8,
+            "values": [
+              3,
+              8,
+              11,
+              2,
+              7,
+              15
+            ],
+            "hi": [
+              2
+            ],
+            "dim": [
+              0,
+              1
+            ],
+            "marks": [
+              {
+                "i": 2,
+                "text": "here"
+              }
+            ]
+          },
+          {
+            "shape": "map",
+            "at": [
+              1250,
+              420
+            ],
+            "slots": 5,
+            "head": [
+              "NUMBER",
+              "POSITION"
+            ],
+            "entries": [
+              [
+                3,
+                0
+              ],
+              [
+                8,
+                1
+              ],
+              [
+                11,
+                2
+              ]
+            ],
+            "hi": [
+              2
+            ],
+            "label": "NOTEBOOK · HASH MAP"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                521,
+                396
+              ],
+              [
+                521,
+                214
+              ],
+              [
+                1080,
+                214
+              ],
+              [
+                1080,
+                438
+              ],
+              [
+                1125,
+                438
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                521,
+                396
+              ],
+              [
+                521,
+                214
+              ],
+              [
+                1080,
+                214
+              ],
+              [
+                1080,
+                438
+              ],
+              [
+                1125,
+                438
+              ]
+            ],
+            "count": 2,
+            "speed": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "on 11 → partner −2? not seen → write 11",
+          "at": [
+            330,
+            180
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Position 3",
+      "caption": "We're on 2. Partner: 7. We haven't reached 7 yet, so it isn't in the notebook. Write down 2.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              560,
+              440
+            ],
+            "scale": 0.8,
+            "values": [
+              3,
+              8,
+              11,
+              2,
+              7,
+              15
+            ],
+            "hi": [
+              3
+            ],
+            "dim": [
+              0,
+              1,
+              2
+            ],
+            "marks": [
+              {
+                "i": 3,
+                "text": "here"
+              }
+            ]
+          },
+          {
+            "shape": "map",
+            "at": [
+              1250,
+              420
+            ],
+            "slots": 5,
+            "head": [
+              "NUMBER",
+              "POSITION"
+            ],
+            "entries": [
+              [
+                3,
+                0
+              ],
+              [
+                8,
+                1
+              ],
+              [
+                11,
+                2
+              ],
+              [
+                2,
+                3
+              ]
+            ],
+            "hi": [
+              3
+            ],
+            "label": "NOTEBOOK · HASH MAP"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                600,
+                396
+              ],
+              [
+                600,
+                214
+              ],
+              [
+                1080,
+                214
+              ],
+              [
+                1080,
+                500
+              ],
+              [
+                1125,
+                500
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                600,
+                396
+              ],
+              [
+                600,
+                214
+              ],
+              [
+                1080,
+                214
+              ],
+              [
+                1080,
+                500
+              ],
+              [
+                1125,
+                500
+              ]
+            ],
+            "count": 2,
+            "speed": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "on 2 → partner 7? not seen yet → write 2",
+          "at": [
+            330,
+            180
+          ],
+          "code": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Position 4 · found it",
+      "caption": "We're on 7. Partner: 2. The notebook says 2 is at position 3. *Found it!* The answer is positions 3 and 4.",
+      "dur": 8,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "array",
+            "at": [
+              560,
+              440
+            ],
+            "scale": 0.8,
+            "values": [
+              3,
+              8,
+              11,
+              2,
+              7,
+              15
+            ],
+            "hi": [
+              3,
+              4
+            ],
+            "dim": [
+              0,
+              1,
+              2
+            ],
+            "marks": [
+              {
+                "i": 4,
+                "text": "here"
+              }
+            ]
+          },
+          {
+            "shape": "map",
+            "at": [
+              1250,
+              420
+            ],
+            "slots": 5,
+            "head": [
+              "NUMBER",
+              "POSITION"
+            ],
+            "entries": [
+              [
+                3,
+                0
+              ],
+              [
+                8,
+                1
+              ],
+              [
+                11,
+                2
+              ],
+              [
+                2,
+                3
+              ]
+            ],
+            "hi": [
+              3
+            ],
+            "label": "NOTEBOOK · HASH MAP"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1125,
+                500
+              ],
+              [
+                1000,
+                500
+              ],
+              [
+                1000,
+                620
+              ],
+              [
+                599,
+                620
+              ],
+              [
+                599,
+                560
+              ]
+            ],
+            "arrow": true
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                1125,
+                500
+              ],
+              [
+                1000,
+                500
+              ],
+              [
+                1000,
+                620
+              ],
+              [
+                599,
+                620
+              ],
+              [
+                599,
+                560
+              ]
+            ],
+            "count": 3,
+            "speed": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "on 7 → partner 2? YES, at position 3 → answer [3, 4]",
+          "at": [
+            330,
+            180
+          ],
+          "code": true,
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Standing on 8 with a target of 9, which partner do we look up?",
+        "options": [
+          "1",
+          "8",
+          "17"
+        ],
+        "answer": 0,
+        "explain": "9 − 8 = 1. We always look up *target minus the number we're standing on*."
+      }
+    },
+    {
+      "eyebrow": "One small detail",
+      "caption": "Always look up the partner *before* writing the number down. Otherwise, with a target of 6, the number 3 could pair with itself.",
+      "dur": 8,
+      "labels": [
+        {
+          "text": "1. LOOK UP THE PARTNER    2. THEN WRITE THE NUMBER",
+          "at": [
+            800,
+            180
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "The code",
+      "caption": "Here is the whole solution. Each line matches a step we just walked through.",
+      "dur": 9,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 820,
+            "h": 320
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "def two_sum(nums, target):",
+          "at": [
+            430,
+            316
+          ],
+          "code": true
+        },
+        {
+          "text": "    notebook = {}                  # number -> position",
+          "at": [
+            430,
+            352
+          ],
+          "code": true
+        },
+        {
+          "text": "    for i, x in enumerate(nums):   # walk once",
+          "at": [
+            430,
+            388
+          ],
+          "code": true
+        },
+        {
+          "text": "        partner = target - x",
+          "at": [
+            430,
+            424
+          ],
+          "code": true
+        },
+        {
+          "text": "        if partner in notebook:    # seen it before?",
+          "at": [
+            430,
+            460
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "            return [notebook[partner], i]",
+          "at": [
+            430,
+            496
+          ],
+          "code": true,
+          "accent": true
+        },
+        {
+          "text": "        notebook[x] = i            # write it down",
+          "at": [
+            430,
+            532
+          ],
+          "code": true
+        }
+      ],
+      "chapter": "Code"
+    },
+    {
+      "eyebrow": "If the rules change",
+      "chapter": "Other ways",
+      "caption": "The notebook wins here. Change one rule, though, and a different method is the better pick:",
+      "dur": 10,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              500,
+              420
+            ],
+            "w": 480,
+            "h": 170,
+            "text": "Sort, then squeeze",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1100,
+              420
+            ],
+            "w": 480,
+            "h": 170,
+            "text": "Check every pair",
+            "id": "alt1"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF THE LIST IS ALREADY SORTED",
+          "at": [
+            500,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "two pointers · O(1) memory",
+          "at": [
+            500,
+            548
+          ]
+        },
+        {
+          "text": "IF MEMORY IS TINY AND n IS SMALL",
+          "at": [
+            1100,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "O(n²) time · zero extra memory",
+          "at": [
+            1100,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "caption": "The big idea: *remember what you've already seen*, so you never have to go back and search. It solves dozens of problems.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      },
+      "chapter": "Recap"
+    }
+  ]
+}

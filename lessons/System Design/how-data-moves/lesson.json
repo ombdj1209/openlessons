@@ -1,0 +1,489 @@
+{
+  "engine": "dots",
+  "title": "How data moves",
+  "request": "show me how data moves through a system, with dots",
+  "createdAt": "2026-10-08",
+  "tags": [
+    "system-design",
+    "databases",
+    "primer"
+  ],
+  "difficulty": "Easy",
+  "dots": 960,
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "caption": "You tap Buy. In under a second, data crosses three machines and comes back. What actually happens?",
+      "dur": 7,
+      "panel": false,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              380
+            ],
+            "text": "WHAT HAPPENS WHEN\nYOU TAP “BUY”?",
+            "size": 100
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "THE QUESTION",
+          "at": [
+            800,
+            200
+          ],
+          "accent": true
+        },
+        {
+          "text": "IN UNDER A SECOND, DATA CROSSES THREE MACHINES AND BACK",
+          "at": [
+            800,
+            600
+          ]
+        }
+      ],
+      "chapter": "Question"
+    },
+    {
+      "eyebrow": "Three parts",
+      "caption": "Most systems split into three: the client you hold, the server that thinks, the database that remembers.",
+      "form": {
+        "type": "spheres",
+        "r": 92,
+        "items": [
+          {
+            "at": [
+              400,
+              400
+            ],
+            "label": "CLIENT",
+            "note": "The app or browser in someone's hand. It shows things and sends requests."
+          },
+          {
+            "at": [
+              800,
+              400
+            ],
+            "label": "SERVER",
+            "note": "Runs your code: checks who you are, applies the rules, decides what happens."
+          },
+          {
+            "at": [
+              1200,
+              400
+            ],
+            "label": "DATABASE",
+            "note": "Remembers everything, safely, even when servers restart."
+          }
+        ]
+      },
+      "chapter": "The parts"
+    },
+    {
+      "eyebrow": "One job each",
+      "caption": "Each part has one job. Keep them separate, and each can grow on its own.",
+      "dur": 6.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              400,
+              420
+            ],
+            "label": "CLIENT",
+            "note": "Clients are untrusted: anything they send is checked by the server."
+          },
+          {
+            "shape": "server",
+            "at": [
+              800,
+              420
+            ],
+            "label": "SERVER",
+            "note": "Servers are interchangeable copies, so you can run as many as traffic needs."
+          },
+          {
+            "shape": "database",
+            "at": [
+              1200,
+              420
+            ],
+            "label": "DATABASE",
+            "note": "The one place that holds the truth. Everything else can be rebuilt from it."
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Quick one before we send a request.",
+      "check": {
+        "question": "Which part still has your data after everything restarts?",
+        "options": [
+          "Client",
+          "Server",
+          "Database"
+        ],
+        "answer": 2,
+        "explain": "The *database*. Servers are interchangeable copies that forget everything when they restart."
+      }
+    },
+    {
+      "eyebrow": "A request",
+      "caption": "A tap sends a request to the server, which asks the database, then answers back.",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "laptop",
+            "at": [
+              400,
+              420
+            ],
+            "label": "CLIENT"
+          },
+          {
+            "shape": "server",
+            "at": [
+              800,
+              420
+            ],
+            "label": "SERVER",
+            "note": "A typical request spends most of its time waiting on the database."
+          },
+          {
+            "shape": "database",
+            "at": [
+              1200,
+              420
+            ],
+            "label": "DATABASE"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                566,
+                392
+              ],
+              [
+                676,
+                392
+              ]
+            ],
+            "count": 5,
+            "speed": 0.55
+          },
+          {
+            "path": [
+              [
+                924,
+                392
+              ],
+              [
+                1074,
+                392
+              ]
+            ],
+            "count": 5,
+            "speed": 0.5,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                1074,
+                452
+              ],
+              [
+                924,
+                452
+              ]
+            ],
+            "count": 4,
+            "speed": 0.5,
+            "accent": false,
+            "phase": 0.25
+          },
+          {
+            "path": [
+              [
+                676,
+                452
+              ],
+              [
+                566,
+                452
+              ]
+            ],
+            "count": 4,
+            "speed": 0.55,
+            "accent": false,
+            "phase": 0.75
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "REQUEST →",
+          "at": [
+            621,
+            368
+          ],
+          "accent": true
+        },
+        {
+          "text": "← RESPONSE",
+          "at": [
+            999,
+            486
+          ]
+        }
+      ],
+      "chapter": "A request"
+    },
+    {
+      "eyebrow": "Zoom in",
+      "caption": "Look inside the database. Under the icon is something very ordinary.",
+      "dur": 6,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "database",
+            "at": [
+              800,
+              420
+            ],
+            "scale": 1.9,
+            "label": "DATABASE",
+            "note": "Postgres, MySQL, SQLite: different engines, the same basic idea underneath."
+          }
+        ]
+      },
+      "chapter": "Inside the database"
+    },
+    {
+      "eyebrow": "Tables",
+      "caption": "Rows of records, columns of fields. Finding one row could mean scanning millions.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "table",
+            "at": [
+              800,
+              420
+            ],
+            "rows": 8,
+            "cols": 5,
+            "lit": 4,
+            "label": "TABLE · USERS",
+            "note": "Each row is one user; each column one field: id, name, email, plan, created."
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "← THE ROW WE WANT",
+          "at": [
+            1200,
+            445
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Indexes",
+      "caption": "An index keeps keys in a sorted tree. Three hops find any row instead of millions.",
+      "dur": 7.5,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "tree",
+            "at": [
+              800,
+              430
+            ],
+            "hot": true,
+            "note": "A B-tree. Each node splits the key range, so each hop discards most of the data."
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "ROOT",
+          "at": [
+            800,
+            206
+          ]
+        },
+        {
+          "text": "3 HOPS",
+          "at": [
+            1000,
+            568
+          ],
+          "accent": true
+        },
+        {
+          "text": "ROWS ON DISK",
+          "at": [
+            800,
+            658
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Replicas",
+      "caption": "Copies called replicas share the reading load, and one takes over if the primary fails.",
+      "dur": 7.5,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "database",
+            "at": [
+              560,
+              450
+            ],
+            "scale": 1.05,
+            "label": "PRIMARY · WRITES",
+            "note": "Every write goes here first, and is recorded in a log the replicas follow."
+          },
+          {
+            "shape": "database",
+            "at": [
+              1140,
+              280
+            ],
+            "scale": 0.62,
+            "label": "REPLICA · READS",
+            "note": "A read-only copy, a few milliseconds behind the primary."
+          },
+          {
+            "shape": "database",
+            "at": [
+              1140,
+              600
+            ],
+            "scale": 0.62,
+            "label": "REPLICA · READS"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                700,
+                410
+              ],
+              [
+                880,
+                410
+              ],
+              [
+                880,
+                280
+              ],
+              [
+                1050,
+                280
+              ]
+            ]
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                700,
+                490
+              ],
+              [
+                880,
+                490
+              ],
+              [
+                880,
+                600
+              ],
+              [
+                1050,
+                600
+              ]
+            ]
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                700,
+                410
+              ],
+              [
+                880,
+                410
+              ],
+              [
+                880,
+                280
+              ],
+              [
+                1050,
+                280
+              ]
+            ],
+            "count": 6,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                700,
+                490
+              ],
+              [
+                880,
+                490
+              ],
+              [
+                880,
+                600
+              ],
+              [
+                1050,
+                600
+              ]
+            ],
+            "count": 6,
+            "speed": 0.4,
+            "phase": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "eyebrow": "That’s it",
+      "caption": "Same dots, different shapes. That is system design.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      },
+      "chapter": "Recap"
+    }
+  ]
+}

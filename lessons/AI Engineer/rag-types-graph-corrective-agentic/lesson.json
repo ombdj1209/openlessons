@@ -1,0 +1,5382 @@
+{
+  "engine": "dots",
+  "createdAt": "2026-10-09",
+  "request": "add an AI Engineer folder with RAG in detail: how it works, types of RAG and use cases",
+  "companies": [],
+  "dots": 2400,
+  "spacing": 8,
+  "difficulty": "Medium",
+  "title": "Types of RAG: corrective, agentic, graph and more",
+  "tags": [
+    "ai-engineering",
+    "rag",
+    "llm",
+    "corrective-rag",
+    "self-rag",
+    "agentic-rag",
+    "graph-rag",
+    "multimodal",
+    "interview"
+  ],
+  "steps": [
+    {
+      "eyebrow": "The question",
+      "chapter": "Question",
+      "panel": false,
+      "dur": 12,
+      "caption": "The interviewer sets the problem.",
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "text",
+            "at": [
+              800,
+              168
+            ],
+            "text": "TYPES OF RAG · 2",
+            "size": 120
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "AI ENGINEERING · HARD",
+          "at": [
+            800,
+            262
+          ],
+          "accent": true
+        }
+      ],
+      "problem": {
+        "statement": "Better search isn’t always enough. Some answers need the system to *check its own work*, take *several steps*, or understand how documents *connect*. Which RAG types handle that?",
+        "example": [
+          "A legal assistant where a wrong answer is costly",
+          "“Compare our churn with the industry and explain why”",
+          "“What are the main themes across 10,000 support tickets?”"
+        ],
+        "constraints": [
+          "Each extra check costs time and money",
+          "Wrong answers must be rare, and explainable"
+        ],
+        "followUp": "How do you stop a smart RAG system from looping forever or costing too much?"
+      }
+    },
+    {
+      "eyebrow": "In plain English",
+      "chapter": "Requirements",
+      "panel": false,
+      "dur": 9,
+      "caption": "What the interviewer is really asking.",
+      "plain": {
+        "asking": "These types add *thinking around the search*: checking results, deciding when to search, planning steps, or reading across documents.",
+        "points": [
+          "*You get:* harder questions than one search can answer.",
+          "*You do:* match each type to the failure it prevents.",
+          "*The catch:* more thinking means more cost and more delay."
+        ]
+      }
+    },
+    {
+      "eyebrow": "Search can be wrong",
+      "caption": "Plain RAG trusts whatever search returns. Ask about something your documents barely cover, and the AI still gets weak chunks and builds an answer from them.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "space",
+            "at": [
+              520,
+              450
+            ],
+            "w": 260,
+            "h": 190,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                55,
+                52
+              ]
+            ],
+            "bad": [
+              15,
+              12,
+              8
+            ]
+          },
+          {
+            "shape": "box",
+            "at": [
+              860,
+              450
+            ],
+            "w": 140,
+            "h": 100,
+            "text": "GRADE",
+            "label": "GRADER",
+            "note": "A small model that scores how well each chunk answers the question.",
+            "id": "grader"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                385,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                655,
+                450
+              ],
+              [
+                785,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                935,
+                450
+              ],
+              [
+                1415,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_gl"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                385,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                655,
+                450
+              ],
+              [
+                785,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                935,
+                450
+              ],
+              [
+                1415,
+                450
+              ]
+            ],
+            "count": 4,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "WEAK CHUNKS → CONFIDENT WRONG ANSWER ✕",
+          "at": [
+            1180,
+            400
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Corrective RAG"
+    },
+    {
+      "eyebrow": "Corrective RAG",
+      "caption": "Corrective RAG (CRAG) adds a *grader*: a small model that scores each retrieved chunk. Good chunks pass through. Weak ones are dropped.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "space",
+            "at": [
+              520,
+              450
+            ],
+            "w": 260,
+            "h": 190,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                30,
+                28
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "shape": "box",
+            "at": [
+              860,
+              450
+            ],
+            "w": 140,
+            "h": 100,
+            "text": "GRADE",
+            "label": "GRADER",
+            "note": "A small model that scores how well each chunk answers the question.",
+            "id": "grader",
+            "accent": true
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                385,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                655,
+                450
+              ],
+              [
+                785,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                935,
+                450
+              ],
+              [
+                1415,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_gl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                860,
+                502
+              ],
+              [
+                860,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_drop"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                385,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                655,
+                450
+              ],
+              [
+                785,
+                450
+              ]
+            ],
+            "count": 4,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                935,
+                450
+              ],
+              [
+                1415,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                860,
+                502
+              ],
+              [
+                860,
+                590
+              ]
+            ],
+            "count": 3,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "KEEP",
+          "at": [
+            1180,
+            425
+          ],
+          "accent": true
+        },
+        {
+          "text": "DROPPED",
+          "at": [
+            860,
+            625
+          ],
+          "fail": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Three verdicts",
+      "caption": "The paper’s grader gives one of three verdicts: *correct* (keep the chunks), *incorrect* (throw them out and search the web instead), or *unsure* (do both).",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "space",
+            "at": [
+              520,
+              450
+            ],
+            "w": 260,
+            "h": 190,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                55,
+                52
+              ]
+            ],
+            "dim": [
+              15,
+              12,
+              8
+            ]
+          },
+          {
+            "shape": "box",
+            "at": [
+              860,
+              450
+            ],
+            "w": 140,
+            "h": 100,
+            "text": "GRADE",
+            "label": "GRADER",
+            "note": "A small model that scores how well each chunk answers the question.",
+            "id": "grader",
+            "accent": true
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                385,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                655,
+                450
+              ],
+              [
+                785,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vg"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                935,
+                450
+              ],
+              [
+                1415,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_gl"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              860,
+              200
+            ],
+            "scale": 0.45,
+            "label": "WEB SEARCH",
+            "id": "web",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                860,
+                398
+              ],
+              [
+                860,
+                245
+              ]
+            ],
+            "arrow": true,
+            "id": "p_gw"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                905,
+                200
+              ],
+              [
+                1300,
+                200
+              ],
+              [
+                1300,
+                420
+              ],
+              [
+                1425,
+                420
+              ]
+            ],
+            "arrow": true,
+            "id": "p_wl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                860,
+                502
+              ],
+              [
+                860,
+                590
+              ]
+            ],
+            "arrow": true,
+            "id": "p_drop"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                655,
+                450
+              ],
+              [
+                785,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                860,
+                398
+              ],
+              [
+                860,
+                245
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                905,
+                200
+              ],
+              [
+                1300,
+                200
+              ],
+              [
+                1300,
+                420
+              ],
+              [
+                1425,
+                420
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                860,
+                502
+              ],
+              [
+                860,
+                590
+              ]
+            ],
+            "count": 3,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "CORRECT → KEEP",
+          "at": [
+            1130,
+            418
+          ]
+        },
+        {
+          "text": "INCORRECT → WEB SEARCH",
+          "at": [
+            1060,
+            318
+          ],
+          "accent": true
+        },
+        {
+          "text": "UNSURE → BOTH",
+          "at": [
+            1130,
+            485
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Best for Corrective RAG",
+      "caption": "Use it where a wrong answer is costly: legal or policy research, anything beyond your index. The price is an extra model call and a slower answer.",
+      "dur": 10,
+      "labels": [
+        {
+          "text": "BEST FOR: LEGAL & POLICY RESEARCH",
+          "at": [
+            800,
+            130
+          ],
+          "accent": true
+        },
+        {
+          "text": "COST: EXTRA MODEL CALLS · SLOWER",
+          "at": [
+            800,
+            160
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Retrieval returns only weak chunks for a question your documents don’t cover. What does Corrective RAG do?",
+        "options": [
+          "Grades the chunks and falls back to a web search",
+          "Answers from the weak chunks anyway",
+          "Re-embeds the whole database"
+        ],
+        "answer": 0,
+        "explain": "The grader notices the chunks are weak, so instead of trusting them it *drops them and searches elsewhere*. That is the “corrective” part."
+      }
+    },
+    {
+      "eyebrow": "Does it need to look up at all?",
+      "caption": "“What is 12 × 12?” needs no documents. Self-RAG teaches the model to *decide for itself* when to retrieve, so it skips pointless searches.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              640,
+              450
+            ],
+            "w": 190,
+            "h": 100,
+            "text": "RETRIEVE?",
+            "label": "THE MODEL DECIDES",
+            "note": "In Self-RAG the model itself learns to emit a “retrieve” token when it needs outside facts.",
+            "id": "ask",
+            "accent": true
+          },
+          {
+            "shape": "space",
+            "at": [
+              1000,
+              300
+            ],
+            "w": 250,
+            "h": 160,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "svdb"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                540,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yBox"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                640,
+                400
+              ],
+              [
+                640,
+                300
+              ],
+              [
+                875,
+                300
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sYes"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1125,
+                300
+              ],
+              [
+                1300,
+                300
+              ],
+              [
+                1300,
+                420
+              ],
+              [
+                1425,
+                420
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sVl"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                740,
+                450
+              ],
+              [
+                1415,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_sNo"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                540,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                740,
+                450
+              ],
+              [
+                1415,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                640,
+                400
+              ],
+              [
+                640,
+                300
+              ],
+              [
+                875,
+                300
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1125,
+                300
+              ],
+              [
+                1300,
+                300
+              ],
+              [
+                1300,
+                420
+              ],
+              [
+                1425,
+                420
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“What is 12 × 12?”  →  NO LOOKUP",
+          "at": [
+            330,
+            400
+          ]
+        },
+        {
+          "text": "“What did our Q3 report say about churn?”  →  LOOK IT UP",
+          "at": [
+            1000,
+            125
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Self-RAG"
+    },
+    {
+      "eyebrow": "Reflect on its own work",
+      "caption": "It then critiques itself with special tokens: *Look up? Passage relevant? My claim supported? Answer useful?* Weak sentences get redone.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              200,
+              450
+            ],
+            "w": 260,
+            "h": 110,
+            "text": "RETRIEVE?",
+            "id": "t1",
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              560,
+              450
+            ],
+            "w": 260,
+            "h": 110,
+            "text": "RELEVANT?",
+            "id": "t2",
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              920,
+              450
+            ],
+            "w": 260,
+            "h": 110,
+            "text": "SUPPORTED?",
+            "id": "t3",
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              1280,
+              450
+            ],
+            "w": 260,
+            "h": 110,
+            "text": "USEFUL?",
+            "id": "t4",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                330,
+                450
+              ],
+              [
+                430,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                450
+              ],
+              [
+                790,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1050,
+                450
+              ],
+              [
+                1150,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_r3"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                330,
+                450
+              ],
+              [
+                430,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                690,
+                450
+              ],
+              [
+                790,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                1050,
+                450
+              ],
+              [
+                1150,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.6
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "DO I NEED TO LOOK THIS UP?",
+          "at": [
+            200,
+            535
+          ]
+        },
+        {
+          "text": "IS THIS PASSAGE RELEVANT?",
+          "at": [
+            560,
+            535
+          ]
+        },
+        {
+          "text": "IS MY CLAIM SUPPORTED?",
+          "at": [
+            920,
+            535
+          ]
+        },
+        {
+          "text": "IS THE ANSWER USEFUL?",
+          "at": [
+            1280,
+            535
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Best for Self-RAG",
+      "caption": "It suits assistants where most questions don’t need documents and citations matter. Catch: the original design trains the model itself, so it is harder to adopt.",
+      "dur": 10,
+      "labels": [
+        {
+          "text": "BEST FOR: MIXED CHAT + CITED ANSWERS",
+          "at": [
+            800,
+            130
+          ],
+          "accent": true
+        },
+        {
+          "text": "COST: NEEDS A SPECIALLY TRAINED MODEL",
+          "at": [
+            800,
+            160
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "One search isn’t enough",
+      "caption": "“Compare our churn with the industry, and explain why.” That is three questions in one: our number, theirs, and the reasons. A single search can’t answer it.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "space",
+            "at": [
+              520,
+              450
+            ],
+            "w": 260,
+            "h": 190,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                50,
+                50
+              ]
+            ],
+            "bad": [
+              12,
+              15,
+              8
+            ]
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                385,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                655,
+                450
+              ],
+              [
+                785,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vg"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                385,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                655,
+                450
+              ],
+              [
+                785,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "ONE SEARCH → ONE PIECE OF THE ANSWER ✕",
+          "at": [
+            1150,
+            400
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Agentic RAG"
+    },
+    {
+      "eyebrow": "Agentic RAG · plan",
+      "caption": "Agentic RAG lets the AI act as an *agent*. It plans: (1) our churn, (2) the industry’s churn, (3) the reasons. Then it picks a tool for each.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              600,
+              450
+            ],
+            "scale": 0.55,
+            "label": "AGENT · PLANS AND DECIDES",
+            "note": "An LLM in a loop: pick a tool, read the result, decide whether it knows enough.",
+            "id": "agent",
+            "accent": true
+          },
+          {
+            "shape": "database",
+            "at": [
+              1100,
+              220
+            ],
+            "scale": 0.4,
+            "label": "SQL",
+            "id": "sql"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              1100,
+              450
+            ],
+            "scale": 0.4,
+            "label": "WEB",
+            "id": "wb"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              1100,
+              660
+            ],
+            "scale": 0.45,
+            "label": "DOCUMENTS",
+            "id": "dc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                510,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ya"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                420
+              ],
+              [
+                800,
+                420
+              ],
+              [
+                800,
+                220
+              ],
+              [
+                1040,
+                220
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aSql"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                450
+              ],
+              [
+                1040,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aWeb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                480
+              ],
+              [
+                800,
+                480
+              ],
+              [
+                800,
+                660
+              ],
+              [
+                1040,
+                660
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aDoc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                560,
+                490
+              ],
+              [
+                560,
+                590
+              ],
+              [
+                110,
+                590
+              ],
+              [
+                110,
+                490
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aY"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                510,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "1 OUR CHURN?   2 INDUSTRY?   3 WHY?",
+          "at": [
+            600,
+            300
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Step 1 · our numbers",
+      "caption": "First it asks the SQL database: “churn last quarter?” The answer, 4.1%, goes back to the agent, which reads it and decides what to do next.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              600,
+              450
+            ],
+            "scale": 0.55,
+            "label": "AGENT · PLANS AND DECIDES",
+            "note": "An LLM in a loop: pick a tool, read the result, decide whether it knows enough.",
+            "id": "agent"
+          },
+          {
+            "shape": "database",
+            "at": [
+              1100,
+              220
+            ],
+            "scale": 0.4,
+            "label": "SQL",
+            "id": "sql",
+            "accent": true
+          },
+          {
+            "shape": "globe",
+            "at": [
+              1100,
+              450
+            ],
+            "scale": 0.4,
+            "label": "WEB",
+            "id": "wb"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              1100,
+              660
+            ],
+            "scale": 0.45,
+            "label": "DOCUMENTS",
+            "id": "dc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                510,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ya"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                420
+              ],
+              [
+                800,
+                420
+              ],
+              [
+                800,
+                220
+              ],
+              [
+                1040,
+                220
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aSql"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                450
+              ],
+              [
+                1040,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aWeb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                480
+              ],
+              [
+                800,
+                480
+              ],
+              [
+                800,
+                660
+              ],
+              [
+                1040,
+                660
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aDoc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                560,
+                490
+              ],
+              [
+                560,
+                590
+              ],
+              [
+                110,
+                590
+              ],
+              [
+                110,
+                490
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aY"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                690,
+                420
+              ],
+              [
+                800,
+                420
+              ],
+              [
+                800,
+                220
+              ],
+              [
+                1040,
+                220
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1040,
+                220
+              ],
+              [
+                800,
+                220
+              ],
+              [
+                800,
+                420
+              ],
+              [
+                690,
+                420
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.5
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“4.1% LAST QUARTER”",
+          "at": [
+            1100,
+            150
+          ],
+          "accent": true
+        }
+      ],
+      "focus": [
+        "you",
+        "agent",
+        "sql",
+        "p_ya",
+        "p_aSql"
+      ]
+    },
+    {
+      "eyebrow": "Step 2 · the industry",
+      "caption": "Next it searches the web for the industry average, then the documents for customer complaints. Each result decides the next move.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              600,
+              450
+            ],
+            "scale": 0.55,
+            "label": "AGENT · PLANS AND DECIDES",
+            "note": "An LLM in a loop: pick a tool, read the result, decide whether it knows enough.",
+            "id": "agent"
+          },
+          {
+            "shape": "database",
+            "at": [
+              1100,
+              220
+            ],
+            "scale": 0.4,
+            "label": "SQL",
+            "id": "sql"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              1100,
+              450
+            ],
+            "scale": 0.4,
+            "label": "WEB",
+            "id": "wb",
+            "accent": true
+          },
+          {
+            "shape": "doc",
+            "at": [
+              1100,
+              660
+            ],
+            "scale": 0.45,
+            "label": "DOCUMENTS",
+            "id": "dc",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                510,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ya"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                420
+              ],
+              [
+                800,
+                420
+              ],
+              [
+                800,
+                220
+              ],
+              [
+                1040,
+                220
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aSql"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                450
+              ],
+              [
+                1040,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aWeb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                480
+              ],
+              [
+                800,
+                480
+              ],
+              [
+                800,
+                660
+              ],
+              [
+                1040,
+                660
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aDoc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                560,
+                490
+              ],
+              [
+                560,
+                590
+              ],
+              [
+                110,
+                590
+              ],
+              [
+                110,
+                490
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aY"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                690,
+                450
+              ],
+              [
+                1040,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1040,
+                450
+              ],
+              [
+                690,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.5
+          },
+          {
+            "path": [
+              [
+                690,
+                480
+              ],
+              [
+                800,
+                480
+              ],
+              [
+                800,
+                660
+              ],
+              [
+                1040,
+                660
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                1040,
+                660
+              ],
+              [
+                800,
+                660
+              ],
+              [
+                800,
+                480
+              ],
+              [
+                690,
+                480
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "accent": false,
+            "phase": 0.8
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“INDUSTRY: 3.2%”",
+          "at": [
+            1100,
+            510
+          ],
+          "accent": true
+        }
+      ],
+      "focus": [
+        "you",
+        "agent",
+        "wb",
+        "dc",
+        "p_ya",
+        "p_aWeb",
+        "p_aDoc"
+      ]
+    },
+    {
+      "eyebrow": "Stop when it knows enough",
+      "caption": "With all three pieces, the agent writes the comparison and the likely causes. A *step limit* stops it looping, since every extra loop costs time and money.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "server",
+            "at": [
+              600,
+              450
+            ],
+            "scale": 0.55,
+            "label": "AGENT · PLANS AND DECIDES",
+            "note": "An LLM in a loop: pick a tool, read the result, decide whether it knows enough.",
+            "id": "agent",
+            "accent": true
+          },
+          {
+            "shape": "database",
+            "at": [
+              1100,
+              220
+            ],
+            "scale": 0.4,
+            "label": "SQL",
+            "id": "sql"
+          },
+          {
+            "shape": "globe",
+            "at": [
+              1100,
+              450
+            ],
+            "scale": 0.4,
+            "label": "WEB",
+            "id": "wb"
+          },
+          {
+            "shape": "doc",
+            "at": [
+              1100,
+              660
+            ],
+            "scale": 0.45,
+            "label": "DOCUMENTS",
+            "id": "dc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                510,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ya"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                420
+              ],
+              [
+                800,
+                420
+              ],
+              [
+                800,
+                220
+              ],
+              [
+                1040,
+                220
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aSql"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                450
+              ],
+              [
+                1040,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aWeb"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                690,
+                480
+              ],
+              [
+                800,
+                480
+              ],
+              [
+                800,
+                660
+              ],
+              [
+                1040,
+                660
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aDoc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                560,
+                490
+              ],
+              [
+                560,
+                590
+              ],
+              [
+                110,
+                590
+              ],
+              [
+                110,
+                490
+              ]
+            ],
+            "arrow": true,
+            "id": "p_aY"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                560,
+                490
+              ],
+              [
+                560,
+                590
+              ],
+              [
+                110,
+                590
+              ],
+              [
+                110,
+                490
+              ]
+            ],
+            "count": 3,
+            "speed": 0.3
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“Churn is 0.9 pts above industry; top complaint: billing.”",
+          "at": [
+            800,
+            635
+          ],
+          "accent": true
+        },
+        {
+          "text": "MAX 6 STEPS",
+          "at": [
+            600,
+            380
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Best for Agentic RAG",
+      "caption": "It suits research and due-diligence questions that need several sources. The cost is real: slower, pricier, and harder to debug than one search.",
+      "dur": 10,
+      "labels": [
+        {
+          "text": "BEST FOR: MULTI-STEP RESEARCH",
+          "at": [
+            800,
+            130
+          ],
+          "accent": true
+        },
+        {
+          "text": "COST: SLOWER · PRICIER · HARDER TO DEBUG",
+          "at": [
+            800,
+            160
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Why cap an agent at a maximum number of steps?",
+        "options": [
+          "To stop endless loops and runaway cost",
+          "Because models forget after 3 steps",
+          "To make answers shorter"
+        ],
+        "answer": 0,
+        "explain": "An agent decides for itself when it is done. Without a limit, a confused one can loop forever, so the cap is a *safety net* for time and money."
+      }
+    },
+    {
+      "eyebrow": "Questions about the whole pile",
+      "caption": "“What are the main themes across 10,000 support tickets?” Vector search returns the 5 most similar chunks, which tells you nothing about the *whole* pile.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "space",
+            "at": [
+              520,
+              450
+            ],
+            "w": 260,
+            "h": 190,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "VECTOR DATABASE",
+            "id": "vdb",
+            "queries": [
+              [
+                50,
+                50
+              ]
+            ],
+            "bad": [
+              12,
+              15,
+              8,
+              3,
+              5
+            ]
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm",
+            "fail": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                385,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                655,
+                450
+              ],
+              [
+                785,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_vg"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                385,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                655,
+                450
+              ],
+              [
+                785,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.55,
+            "fail": true,
+            "drop": true
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "5 CHUNKS ≠ 10,000 TICKETS ✕",
+          "at": [
+            1150,
+            400
+          ],
+          "fail": true
+        }
+      ],
+      "chapter": "Graph RAG"
+    },
+    {
+      "eyebrow": "Step 1 · map who is connected",
+      "caption": "Graph RAG has an AI read everything once and pull out *entities* (people, companies, products) and *relationships*, building a map of what connects to what.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "circle",
+            "at": [
+              520,
+              270
+            ],
+            "r": 30,
+            "text": "Ana",
+            "id": "a1"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              680,
+              230
+            ],
+            "r": 30,
+            "text": "Bo",
+            "id": "a2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              600,
+              410
+            ],
+            "r": 30,
+            "text": "ACME",
+            "id": "a3"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              900,
+              230
+            ],
+            "r": 30,
+            "text": "Zed",
+            "id": "b1"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1050,
+              300
+            ],
+            "r": 30,
+            "text": "Orb",
+            "id": "b2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              960,
+              410
+            ],
+            "r": 30,
+            "text": "Bank",
+            "id": "b3"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              700,
+              570
+            ],
+            "r": 30,
+            "text": "Fox",
+            "id": "c1"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              860,
+              610
+            ],
+            "r": 30,
+            "text": "Gem",
+            "id": "c2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              990,
+              540
+            ],
+            "r": 30,
+            "text": "Pay",
+            "id": "c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                552.9848450049412,
+                261.7537887487647
+              ],
+              [
+                647.0151549950588,
+                238.2462112512353
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a1a2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                666.1912921541827,
+                261.06959265308876
+              ],
+              [
+                613.8087078458173,
+                378.93040734691124
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a2a3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                536.8687239041324,
+                299.52026683223164
+              ],
+              [
+                583.1312760958676,
+                380.47973316776836
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a1a3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                930.810226759839,
+                244.3781058212582
+              ],
+              [
+                1019.189773240161,
+                285.6218941787418
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b1b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1028.4699151312532,
+                326.3145481729129
+              ],
+              [
+                981.5300848687469,
+                383.6854518270871
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b2b3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                910.7517440445724,
+                262.25523213371747
+              ],
+              [
+                949.2482559554276,
+                377.74476786628253
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b1b3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                732.9848450049412,
+                578.2462112512353
+              ],
+              [
+                827.0151549950588,
+                601.7537887487647
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c1c2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                889.9360173973539,
+                593.8806060168095
+              ],
+              [
+                960.0639826026461,
+                556.1193939831905
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c2c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                733.8195209901028,
+                566.5014288630928
+              ],
+              [
+                956.1804790098972,
+                543.4985711369072
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c1c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                634,
+                410
+              ],
+              [
+                926,
+                410
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a3b3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                967.6452232277578,
+                443.12930065361707
+              ],
+              [
+                982.3547767722422,
+                506.87069934638293
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b3c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                618.0199639601082,
+                438.831942336173
+              ],
+              [
+                681.9800360398918,
+                541.168057663827
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a3c1"
+          }
+        ],
+        "flows": []
+      },
+      "labels": [
+        {
+          "text": "NODES = THINGS   LINES = RELATIONSHIPS",
+          "at": [
+            800,
+            150
+          ],
+          "accent": true
+        }
+      ]
+    },
+    {
+      "eyebrow": "Step 2 · find communities",
+      "caption": "An algorithm groups tightly connected nodes into *communities*, and an AI writes a short summary of each. Microsoft’s GraphRAG works this way.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "circle",
+            "at": [
+              520,
+              270
+            ],
+            "r": 30,
+            "text": "Ana",
+            "id": "a1",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              680,
+              230
+            ],
+            "r": 30,
+            "text": "Bo",
+            "id": "a2",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              600,
+              410
+            ],
+            "r": 30,
+            "text": "ACME",
+            "id": "a3",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              900,
+              230
+            ],
+            "r": 30,
+            "text": "Zed",
+            "id": "b1"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1050,
+              300
+            ],
+            "r": 30,
+            "text": "Orb",
+            "id": "b2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              960,
+              410
+            ],
+            "r": 30,
+            "text": "Bank",
+            "id": "b3"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              700,
+              570
+            ],
+            "r": 30,
+            "text": "Fox",
+            "id": "c1"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              860,
+              610
+            ],
+            "r": 30,
+            "text": "Gem",
+            "id": "c2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              990,
+              540
+            ],
+            "r": 30,
+            "text": "Pay",
+            "id": "c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                552.9848450049412,
+                261.7537887487647
+              ],
+              [
+                647.0151549950588,
+                238.2462112512353
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a1a2",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                666.1912921541827,
+                261.06959265308876
+              ],
+              [
+                613.8087078458173,
+                378.93040734691124
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a2a3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                536.8687239041324,
+                299.52026683223164
+              ],
+              [
+                583.1312760958676,
+                380.47973316776836
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a1a3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                930.810226759839,
+                244.3781058212582
+              ],
+              [
+                1019.189773240161,
+                285.6218941787418
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b1b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1028.4699151312532,
+                326.3145481729129
+              ],
+              [
+                981.5300848687469,
+                383.6854518270871
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b2b3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                910.7517440445724,
+                262.25523213371747
+              ],
+              [
+                949.2482559554276,
+                377.74476786628253
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b1b3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                732.9848450049412,
+                578.2462112512353
+              ],
+              [
+                827.0151549950588,
+                601.7537887487647
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c1c2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                889.9360173973539,
+                593.8806060168095
+              ],
+              [
+                960.0639826026461,
+                556.1193939831905
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c2c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                733.8195209901028,
+                566.5014288630928
+              ],
+              [
+                956.1804790098972,
+                543.4985711369072
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c1c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                634,
+                410
+              ],
+              [
+                926,
+                410
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a3b3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                967.6452232277578,
+                443.12930065361707
+              ],
+              [
+                982.3547767722422,
+                506.87069934638293
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b3c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                618.0199639601082,
+                438.831942336173
+              ],
+              [
+                681.9800360398918,
+                541.168057663827
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a3c1"
+          }
+        ],
+        "flows": []
+      },
+      "labels": [
+        {
+          "text": "COMMUNITY 1 · BILLING COMPLAINTS",
+          "at": [
+            600,
+            160
+          ],
+          "accent": true
+        },
+        {
+          "text": "COMMUNITY 2 · FRAUD RINGS",
+          "at": [
+            980,
+            160
+          ]
+        },
+        {
+          "text": "COMMUNITY 3 · SHIPPING DELAYS",
+          "at": [
+            850,
+            680
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Step 3 · answer from summaries",
+      "caption": "To answer “what are the main themes?”, the AI reads the *community summaries* instead of raw chunks. They already cover the whole pile.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "circle",
+            "at": [
+              520,
+              270
+            ],
+            "r": 30,
+            "text": "Ana",
+            "id": "a1",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              680,
+              230
+            ],
+            "r": 30,
+            "text": "Bo",
+            "id": "a2",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              600,
+              410
+            ],
+            "r": 30,
+            "text": "ACME",
+            "id": "a3",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              900,
+              230
+            ],
+            "r": 30,
+            "text": "Zed",
+            "id": "b1",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1050,
+              300
+            ],
+            "r": 30,
+            "text": "Orb",
+            "id": "b2",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              960,
+              410
+            ],
+            "r": 30,
+            "text": "Bank",
+            "id": "b3",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              700,
+              570
+            ],
+            "r": 30,
+            "text": "Fox",
+            "id": "c1",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              860,
+              610
+            ],
+            "r": 30,
+            "text": "Gem",
+            "id": "c2",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              990,
+              540
+            ],
+            "r": 30,
+            "text": "Pay",
+            "id": "c3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                552.9848450049412,
+                261.7537887487647
+              ],
+              [
+                647.0151549950588,
+                238.2462112512353
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a1a2",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                666.1912921541827,
+                261.06959265308876
+              ],
+              [
+                613.8087078458173,
+                378.93040734691124
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a2a3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                536.8687239041324,
+                299.52026683223164
+              ],
+              [
+                583.1312760958676,
+                380.47973316776836
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a1a3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                930.810226759839,
+                244.3781058212582
+              ],
+              [
+                1019.189773240161,
+                285.6218941787418
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b1b2",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1028.4699151312532,
+                326.3145481729129
+              ],
+              [
+                981.5300848687469,
+                383.6854518270871
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b2b3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                910.7517440445724,
+                262.25523213371747
+              ],
+              [
+                949.2482559554276,
+                377.74476786628253
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b1b3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                732.9848450049412,
+                578.2462112512353
+              ],
+              [
+                827.0151549950588,
+                601.7537887487647
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c1c2",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                889.9360173973539,
+                593.8806060168095
+              ],
+              [
+                960.0639826026461,
+                556.1193939831905
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c2c3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                733.8195209901028,
+                566.5014288630928
+              ],
+              [
+                956.1804790098972,
+                543.4985711369072
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c1c3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                634,
+                410
+              ],
+              [
+                926,
+                410
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a3b3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                967.6452232277578,
+                443.12930065361707
+              ],
+              [
+                982.3547767722422,
+                506.87069934638293
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b3c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                618.0199639601082,
+                438.831942336173
+              ],
+              [
+                681.9800360398918,
+                541.168057663827
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a3c1"
+          },
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          }
+        ],
+        "flows": []
+      },
+      "labels": [
+        {
+          "text": "SUMMARY 1",
+          "at": [
+            600,
+            160
+          ],
+          "accent": true
+        },
+        {
+          "text": "SUMMARY 2",
+          "at": [
+            980,
+            160
+          ],
+          "accent": true
+        },
+        {
+          "text": "SUMMARY 3",
+          "at": [
+            850,
+            680
+          ],
+          "accent": true
+        },
+        {
+          "text": "→ COMBINE THE SUMMARIES → THEMES",
+          "at": [
+            800,
+            125
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Also: follow the links",
+      "caption": "Graph RAG also answers “how is Ana connected to Bank?” by following links, which similarity search can’t do. Great for fraud rings and investigations.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "circle",
+            "at": [
+              520,
+              270
+            ],
+            "r": 30,
+            "text": "Ana",
+            "id": "a1",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              680,
+              230
+            ],
+            "r": 30,
+            "text": "Bo",
+            "id": "a2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              600,
+              410
+            ],
+            "r": 30,
+            "text": "ACME",
+            "id": "a3",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              900,
+              230
+            ],
+            "r": 30,
+            "text": "Zed",
+            "id": "b1"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              1050,
+              300
+            ],
+            "r": 30,
+            "text": "Orb",
+            "id": "b2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              960,
+              410
+            ],
+            "r": 30,
+            "text": "Bank",
+            "id": "b3",
+            "accent": true
+          },
+          {
+            "shape": "circle",
+            "at": [
+              700,
+              570
+            ],
+            "r": 30,
+            "text": "Fox",
+            "id": "c1"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              860,
+              610
+            ],
+            "r": 30,
+            "text": "Gem",
+            "id": "c2"
+          },
+          {
+            "shape": "circle",
+            "at": [
+              990,
+              540
+            ],
+            "r": 30,
+            "text": "Pay",
+            "id": "c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                552.9848450049412,
+                261.7537887487647
+              ],
+              [
+                647.0151549950588,
+                238.2462112512353
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a1a2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                666.1912921541827,
+                261.06959265308876
+              ],
+              [
+                613.8087078458173,
+                378.93040734691124
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a2a3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                536.8687239041324,
+                299.52026683223164
+              ],
+              [
+                583.1312760958676,
+                380.47973316776836
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a1a3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                930.810226759839,
+                244.3781058212582
+              ],
+              [
+                1019.189773240161,
+                285.6218941787418
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b1b2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1028.4699151312532,
+                326.3145481729129
+              ],
+              [
+                981.5300848687469,
+                383.6854518270871
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b2b3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                910.7517440445724,
+                262.25523213371747
+              ],
+              [
+                949.2482559554276,
+                377.74476786628253
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b1b3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                732.9848450049412,
+                578.2462112512353
+              ],
+              [
+                827.0151549950588,
+                601.7537887487647
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c1c2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                889.9360173973539,
+                593.8806060168095
+              ],
+              [
+                960.0639826026461,
+                556.1193939831905
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c2c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                733.8195209901028,
+                566.5014288630928
+              ],
+              [
+                956.1804790098972,
+                543.4985711369072
+              ]
+            ],
+            "arrow": false,
+            "id": "e_c1c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                634,
+                410
+              ],
+              [
+                926,
+                410
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a3b3",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                967.6452232277578,
+                443.12930065361707
+              ],
+              [
+                982.3547767722422,
+                506.87069934638293
+              ]
+            ],
+            "arrow": false,
+            "id": "e_b3c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                618.0199639601082,
+                438.831942336173
+              ],
+              [
+                681.9800360398918,
+                541.168057663827
+              ]
+            ],
+            "arrow": false,
+            "id": "e_a3c1"
+          }
+        ],
+        "flows": []
+      },
+      "labels": [
+        {
+          "text": "ANA → ACME → BANK",
+          "at": [
+            780,
+            340
+          ],
+          "accent": true
+        },
+        {
+          "text": "USE CASE: FRAUD, INVESTIGATIONS, RESEARCH LITERATURE",
+          "at": [
+            800,
+            150
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Best for Graph RAG",
+      "caption": "It shines on questions about the whole collection or about connections. The cost: heavy indexing (many AI calls) and a rebuild whenever the data changes much.",
+      "dur": 10,
+      "labels": [
+        {
+          "text": "BEST FOR: WHOLE-COLLECTION & CONNECTION QUESTIONS",
+          "at": [
+            800,
+            100
+          ],
+          "accent": true
+        },
+        {
+          "text": "COST: HEAVY INDEXING · REBUILD ON CHANGE",
+          "at": [
+            800,
+            130
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Quick check",
+      "caption": "Your turn.",
+      "check": {
+        "question": "Which question suits Graph RAG best?",
+        "options": [
+          "What are the main themes across all 10,000 tickets?",
+          "What is the refund window?",
+          "What is 12 × 12?"
+        ],
+        "answer": 0,
+        "explain": "A question about the *whole collection* can’t be answered from a few similar chunks. Graph RAG’s community summaries already cover everything."
+      }
+    },
+    {
+      "eyebrow": "Not all knowledge is text",
+      "caption": "A manual’s answer may be inside a chart, a diagram or a photo. Multimodal RAG indexes images and tables too, on the same map as text.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "doc",
+            "at": [
+              170,
+              250
+            ],
+            "scale": 0.55,
+            "label": "MANUAL PAGE",
+            "id": "mdoc"
+          },
+          {
+            "shape": "bars",
+            "at": [
+              170,
+              450
+            ],
+            "values": [
+              3,
+              5,
+              4,
+              7
+            ],
+            "h": 120,
+            "scale": 0.7,
+            "label": "CHART",
+            "id": "mchart"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              170,
+              650
+            ],
+            "scale": 0.4,
+            "label": "PHOTO",
+            "id": "mphoto"
+          },
+          {
+            "shape": "server",
+            "at": [
+              560,
+              450
+            ],
+            "scale": 0.4,
+            "label": "EMBEDDING MODEL · TEXT + IMAGES",
+            "id": "emb"
+          },
+          {
+            "shape": "space",
+            "at": [
+              910,
+              450
+            ],
+            "w": 260,
+            "h": 190,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "ONE SHARED MAP",
+            "id": "mvdb",
+            "queries": [
+              [
+                40,
+                40
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1450,
+              450
+            ],
+            "scale": 0.6,
+            "label": "VISION MODEL",
+            "id": "mllm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                240,
+                250
+              ],
+              [
+                480,
+                250
+              ],
+              [
+                480,
+                410
+              ],
+              [
+                515,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_m1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                240,
+                450
+              ],
+              [
+                515,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_m2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                220,
+                650
+              ],
+              [
+                480,
+                650
+              ],
+              [
+                480,
+                480
+              ],
+              [
+                515,
+                465
+              ]
+            ],
+            "arrow": true,
+            "id": "p_m3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                610,
+                450
+              ],
+              [
+                770,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1050,
+                450
+              ],
+              [
+                1330,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ml"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                240,
+                250
+              ],
+              [
+                480,
+                250
+              ],
+              [
+                480,
+                410
+              ],
+              [
+                515,
+                430
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                240,
+                450
+              ],
+              [
+                515,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.3
+          },
+          {
+            "path": [
+              [
+                220,
+                650
+              ],
+              [
+                480,
+                650
+              ],
+              [
+                480,
+                480
+              ],
+              [
+                515,
+                465
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4,
+            "phase": 0.6
+          },
+          {
+            "path": [
+              [
+                610,
+                450
+              ],
+              [
+                770,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1050,
+                450
+              ],
+              [
+                1330,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "USE CASE: EQUIPMENT MANUALS, MEDICAL REPORTS, SLIDE DECKS",
+          "at": [
+            800,
+            150
+          ],
+          "accent": true
+        }
+      ],
+      "chapter": "Multimodal RAG"
+    },
+    {
+      "eyebrow": "Two ways to index an image",
+      "caption": "Either embed the *image itself* with a multimodal model, or have an AI *describe it in words* and embed that. The retrieved image then goes to a vision-capable AI.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "doc",
+            "at": [
+              170,
+              250
+            ],
+            "scale": 0.55,
+            "label": "MANUAL PAGE",
+            "id": "mdoc"
+          },
+          {
+            "shape": "bars",
+            "at": [
+              170,
+              450
+            ],
+            "values": [
+              3,
+              5,
+              4,
+              7
+            ],
+            "h": 120,
+            "scale": 0.7,
+            "label": "CHART",
+            "id": "mchart"
+          },
+          {
+            "shape": "phone",
+            "at": [
+              170,
+              650
+            ],
+            "scale": 0.4,
+            "label": "PHOTO",
+            "id": "mphoto"
+          },
+          {
+            "shape": "server",
+            "at": [
+              560,
+              450
+            ],
+            "scale": 0.4,
+            "label": "EMBEDDING MODEL · TEXT + IMAGES",
+            "id": "emb",
+            "accent": true
+          },
+          {
+            "shape": "space",
+            "at": [
+              910,
+              450
+            ],
+            "w": 260,
+            "h": 190,
+            "pts": [
+              [
+                14,
+                24
+              ],
+              [
+                30,
+                14
+              ],
+              [
+                36,
+                38
+              ],
+              [
+                16,
+                44
+              ],
+              [
+                42,
+                24
+              ],
+              [
+                62,
+                16
+              ],
+              [
+                78,
+                26
+              ],
+              [
+                86,
+                10
+              ],
+              [
+                70,
+                38
+              ],
+              [
+                90,
+                34
+              ],
+              [
+                14,
+                66
+              ],
+              [
+                30,
+                84
+              ],
+              [
+                42,
+                64
+              ],
+              [
+                20,
+                92
+              ],
+              [
+                8,
+                80
+              ],
+              [
+                64,
+                66
+              ],
+              [
+                80,
+                86
+              ],
+              [
+                90,
+                62
+              ],
+              [
+                58,
+                86
+              ],
+              [
+                92,
+                80
+              ]
+            ],
+            "label": "ONE SHARED MAP",
+            "id": "mvdb",
+            "queries": [
+              [
+                40,
+                40
+              ]
+            ],
+            "hi": [
+              1,
+              2,
+              4
+            ]
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1450,
+              450
+            ],
+            "scale": 0.6,
+            "label": "VISION MODEL",
+            "id": "mllm",
+            "accent": true
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                240,
+                250
+              ],
+              [
+                480,
+                250
+              ],
+              [
+                480,
+                410
+              ],
+              [
+                515,
+                430
+              ]
+            ],
+            "arrow": true,
+            "id": "p_m1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                240,
+                450
+              ],
+              [
+                515,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_m2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                220,
+                650
+              ],
+              [
+                480,
+                650
+              ],
+              [
+                480,
+                480
+              ],
+              [
+                515,
+                465
+              ]
+            ],
+            "arrow": true,
+            "id": "p_m3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                610,
+                450
+              ],
+              [
+                770,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_mv"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1050,
+                450
+              ],
+              [
+                1330,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_ml"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                610,
+                450
+              ],
+              [
+                770,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1050,
+                450
+              ],
+              [
+                1330,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“THE PUMP DIAGRAM ON PAGE 12”",
+          "at": [
+            800,
+            340
+          ]
+        },
+        {
+          "text": "COST: BIGGER INDEX · NEEDS A VISION MODEL",
+          "at": [
+            800,
+            640
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Every question isn’t equal",
+      "caption": "“Hi!” needs no search. “What is the refund window?” needs one. “Compare plans and costs” needs several. Adaptive RAG gauges the difficulty and picks the effort.",
+      "dur": 10,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "user",
+            "at": [
+              110,
+              450
+            ],
+            "scale": 0.5,
+            "label": "YOU",
+            "id": "you"
+          },
+          {
+            "shape": "box",
+            "at": [
+              460,
+              450
+            ],
+            "w": 150,
+            "h": 110,
+            "text": "CLASSIFY",
+            "label": "DIFFICULTY CHECK",
+            "note": "A small model that judges how hard the question is.",
+            "id": "cls",
+            "accent": true
+          },
+          {
+            "shape": "box",
+            "at": [
+              900,
+              250
+            ],
+            "w": 260,
+            "h": 90,
+            "text": "ANSWER DIRECTLY",
+            "id": "l1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              900,
+              450
+            ],
+            "w": 260,
+            "h": 90,
+            "text": "ONE SEARCH",
+            "id": "l2"
+          },
+          {
+            "shape": "box",
+            "at": [
+              900,
+              650
+            ],
+            "w": 260,
+            "h": 90,
+            "text": "AGENT LOOP",
+            "id": "l3"
+          },
+          {
+            "shape": "cloud",
+            "at": [
+              1480,
+              450
+            ],
+            "scale": 0.6,
+            "label": "AI MODEL (LLM)",
+            "id": "llm"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                385,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_yc"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                535,
+                420
+              ],
+              [
+                660,
+                420
+              ],
+              [
+                660,
+                250
+              ],
+              [
+                770,
+                250
+              ]
+            ],
+            "arrow": true,
+            "id": "p_c1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                535,
+                450
+              ],
+              [
+                770,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_c2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                535,
+                480
+              ],
+              [
+                660,
+                480
+              ],
+              [
+                660,
+                650
+              ],
+              [
+                770,
+                650
+              ]
+            ],
+            "arrow": true,
+            "id": "p_c3"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1030,
+                250
+              ],
+              [
+                1300,
+                250
+              ],
+              [
+                1300,
+                420
+              ],
+              [
+                1425,
+                420
+              ]
+            ],
+            "arrow": true,
+            "id": "p_l1"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1030,
+                450
+              ],
+              [
+                1425,
+                450
+              ]
+            ],
+            "arrow": true,
+            "id": "p_l2"
+          },
+          {
+            "shape": "pipe",
+            "path": [
+              [
+                1030,
+                650
+              ],
+              [
+                1300,
+                650
+              ],
+              [
+                1300,
+                480
+              ],
+              [
+                1425,
+                480
+              ]
+            ],
+            "arrow": true,
+            "id": "p_l3"
+          }
+        ],
+        "flows": [
+          {
+            "path": [
+              [
+                150,
+                450
+              ],
+              [
+                385,
+                450
+              ]
+            ],
+            "count": 2,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                535,
+                420
+              ],
+              [
+                660,
+                420
+              ],
+              [
+                660,
+                250
+              ],
+              [
+                770,
+                250
+              ]
+            ],
+            "count": 1,
+            "speed": 0.3
+          },
+          {
+            "path": [
+              [
+                535,
+                450
+              ],
+              [
+                770,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                535,
+                480
+              ],
+              [
+                660,
+                480
+              ],
+              [
+                660,
+                650
+              ],
+              [
+                770,
+                650
+              ]
+            ],
+            "count": 6,
+            "speed": 0.55
+          },
+          {
+            "path": [
+              [
+                1030,
+                250
+              ],
+              [
+                1300,
+                250
+              ],
+              [
+                1300,
+                420
+              ],
+              [
+                1425,
+                420
+              ]
+            ],
+            "count": 1,
+            "speed": 0.3
+          },
+          {
+            "path": [
+              [
+                1030,
+                450
+              ],
+              [
+                1425,
+                450
+              ]
+            ],
+            "count": 3,
+            "speed": 0.4
+          },
+          {
+            "path": [
+              [
+                1030,
+                650
+              ],
+              [
+                1300,
+                650
+              ],
+              [
+                1300,
+                480
+              ],
+              [
+                1425,
+                480
+              ]
+            ],
+            "count": 6,
+            "speed": 0.55
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "“hi!” · CHEAP",
+          "at": [
+            900,
+            308
+          ]
+        },
+        {
+          "text": "“refund window?” · MEDIUM",
+          "at": [
+            900,
+            508
+          ]
+        },
+        {
+          "text": "“compare plans and costs” · COSTLY",
+          "at": [
+            900,
+            708
+          ]
+        }
+      ],
+      "chapter": "Adaptive RAG"
+    },
+    {
+      "eyebrow": "Best for Adaptive RAG",
+      "caption": "It suits support bots that get every kind of question: easy ones stay cheap and fast. Catch: if the difficulty check misjudges, a hard question gets too little effort.",
+      "dur": 10,
+      "labels": [
+        {
+          "text": "BEST FOR: SUPPORT BOTS WITH MIXED QUESTIONS",
+          "at": [
+            800,
+            130
+          ],
+          "accent": true
+        },
+        {
+          "text": "COST: A MISJUDGED QUESTION GETS TOO LITTLE",
+          "at": [
+            800,
+            160
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Which one do I need? (1/2)",
+      "chapter": "Choosing",
+      "caption": "Match the symptom to the type. Don’t add thinking you don’t need:",
+      "dur": 11,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Corrective or Self-RAG",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Agentic RAG",
+            "id": "alt1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Graph RAG",
+            "id": "alt2"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF WRONG ANSWERS ARE COSTLY",
+          "at": [
+            300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "extra checks · slower answers",
+          "at": [
+            300,
+            548
+          ]
+        },
+        {
+          "text": "IF ANSWERS NEED SEVERAL STEPS",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "many calls · harder to debug",
+          "at": [
+            800,
+            548
+          ]
+        },
+        {
+          "text": "IF QUESTIONS SPAN THE WHOLE PILE",
+          "at": [
+            1300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "heavy indexing · rebuild on change",
+          "at": [
+            1300,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Which one do I need? (2/2)",
+      "chapter": "Choosing",
+      "caption": "And for the rest:",
+      "dur": 11,
+      "via": true,
+      "form": {
+        "type": "shapes",
+        "items": [
+          {
+            "shape": "box",
+            "at": [
+              300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Multimodal RAG",
+            "id": "alt0"
+          },
+          {
+            "shape": "box",
+            "at": [
+              800,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Adaptive RAG",
+            "id": "alt1"
+          },
+          {
+            "shape": "box",
+            "at": [
+              1300,
+              420
+            ],
+            "w": 400,
+            "h": 170,
+            "text": "Naive or advanced",
+            "id": "alt2"
+          }
+        ]
+      },
+      "labels": [
+        {
+          "text": "IF ANSWERS HIDE IN IMAGES",
+          "at": [
+            300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "bigger index · vision model",
+          "at": [
+            300,
+            548
+          ]
+        },
+        {
+          "text": "IF QUESTIONS VARY IN DIFFICULTY",
+          "at": [
+            800,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "cheap easy paths · routing risk",
+          "at": [
+            800,
+            548
+          ]
+        },
+        {
+          "text": "IF NONE OF THE ABOVE HURTS",
+          "at": [
+            1300,
+            300
+          ],
+          "accent": true
+        },
+        {
+          "text": "start here · add fixes later",
+          "at": [
+            1300,
+            548
+          ]
+        }
+      ]
+    },
+    {
+      "eyebrow": "Takeaway",
+      "chapter": "Recap",
+      "caption": "The big idea: *start with simple RAG and add only the type that fixes the failure you actually see.* More thinking always costs time and money.",
+      "dur": 8,
+      "form": {
+        "type": "sphere"
+      }
+    }
+  ]
+}
