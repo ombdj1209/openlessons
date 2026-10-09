@@ -15,7 +15,7 @@ First public release as **OpenLessons**, under the Apache License 2.0.
 * **Concepts:** new lesson *How DNS finds a website* (referral chain, caching, TTL, safe migrations)
 * **AI Engineer** shelf with four RAG lessons:
   * *How RAG works, step by step*: chunks, embeddings, the vector map, nearest neighbours, prompts and citations
-  * *When RAG breaks, and how to fix it*: contextual retrieval, hybrid keyword and vector search, reranking, grounded refusals, re-indexing, permission filters, and evaluation with Anthropic's published retrieval numbers
+  * *When RAG breaks, and how to fix it*: contextual retrieval, hybrid keyword and vector search, reranking, grounded refusals, keeping the index fresh, permission filters, and evaluation with Anthropic's published retrieval numbers
   * *Types of RAG: naive, advanced, modular*: query rewriting, HyDE, multi query, advanced RAG, routers
   * *Types of RAG: corrective, agentic, graph and more*: CRAG, Self RAG, agentic RAG, Graph RAG, multimodal and adaptive RAG
 * Shapes `doc` (a document page) and `space` (an embedding map with search points, hits, wrong hits and a search radius)
