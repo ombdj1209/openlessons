@@ -43,6 +43,12 @@ describe('lesson schema', () => {
   it('reports broken JSON instead of throwing', () => {
     expect(validate({ slug: 'x', category: 'y', json: '{ nope' }).issues[0].message).toMatch(/invalid JSON/);
   });
+  it('accepts the example lesson in the README, so the docs stay honest', () => {
+    const readme = readFileSync(join(__dirname, '..', 'README.md'), 'utf8');
+    const json = readme.match(/```json\n([\s\S]*?)\n```/)?.[1];
+    expect(json).toBeDefined();
+    expect(validate({ slug: 'hello-dots', category: 'Example', json: json! }).issues).toEqual([]);
+  });
   it('ships an up to date lesson.schema.json (run npm run schema)', () => {
     const file = JSON.parse(readFileSync(join(__dirname, '..', 'lesson.schema.json'), 'utf8'));
     const fresh = JSON.parse(JSON.stringify(z.toJSONSchema(Lesson, { io: 'input' })));

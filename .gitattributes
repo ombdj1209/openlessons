@@ -1,0 +1,6 @@
+# Same line endings on every OS, so diffs only show real changes.
+* text=auto eol=lf
+*.png binary
+*.gif binary
+*.webp binary
+*.mp4 binary

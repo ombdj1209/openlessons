@@ -1,0 +1,5 @@
+{
+  "json.schemas": [
+    { "fileMatch": ["lessons/*/*/lesson.json"], "url": "./lesson.schema.json" }
+  ]
+}

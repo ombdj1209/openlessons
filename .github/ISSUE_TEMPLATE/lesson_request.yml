@@ -1,0 +1,35 @@
+name: Lesson request
+description: Ask for a new lesson, or offer to write one
+title: "Lesson: "
+labels: ["lesson"]
+body:
+  - type: input
+    id: question
+    attributes:
+      label: The question the lesson answers
+      placeholder: How does consistent hashing spread keys across servers?
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options: [DSA, System Design, AI Engineer, Concepts, Something new]
+    validations:
+      required: true
+  - type: textarea
+    id: outline
+    attributes:
+      label: What should a learner see?
+      description: The moment it clicks. What breaks, what fixes it, which picture explains it best.
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: Papers, docs or posts the lesson should be faithful to.
+  - type: checkboxes
+    id: write
+    attributes:
+      label: Writing it yourself?
+      options:
+        - label: I would like to write this lesson (see CONTRIBUTING.md)

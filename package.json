@@ -5,10 +5,7 @@
   "private": true,
   "type": "module",
   "license": "Apache-2.0",
-  "author": "ombdj1209 <p-bharadwaj@jmc-ltd.co.jp>",
-  "contributors": [
-    "ombdj1209 <omprakashbdj1209@gmail.com>"
-  ],
+  "author": "ombdj1209 <omprakashbdj1209@gmail.com>",
   "homepage": "https://ombdj1209.github.io/openlessons/",
   "repository": {
     "type": "git",

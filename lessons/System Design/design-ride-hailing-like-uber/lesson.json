@@ -1,6 +1,6 @@
 {
   "$schema": "../../../lesson.schema.json",
-  "title": "Design a ride-hailing app like Uber",
+  "title": "Design a ride hailing app like Uber",
   "question": "How would you design a ride hailing app like Uber?",
   "createdAt": "2026-10-08",
   "tags": [
