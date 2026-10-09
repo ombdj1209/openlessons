@@ -222,7 +222,8 @@ Every lesson credits its writers in its `authors` field, and the library shows t
 <table>
   <tr>
     <td align="center">
-      <a href="https://github.com/ombdj1209"><img src="https://github.com/ombdj1209.png" width="96" alt="ombdj1209"><br><b>@ombdj1209</b></a><br>
+      <a href="https://github.com/ombdj1209"><img src="https://github.com/ombdj1209.png" width="96" alt="Om Prakash Bharadwaj"><br><b>Om Prakash Bharadwaj</b></a><br>
+      <a href="https://github.com/ombdj1209">@ombdj1209</a><br>
       Creator and maintainer<br>
       <a href="mailto:omprakashbdj1209@gmail.com">omprakashbdj1209@gmail.com</a>
     </td>
@@ -241,4 +242,4 @@ Your face goes here after your first merged pull request.
 
 OpenLessons is licensed under the [Apache License 2.0](LICENSE). The lessons are part of the project and use the same license. See [NOTICE](NOTICE).
 
-Copyright 2026 ombdj1209.
+Copyright 2026 Om Prakash Bharadwaj.
