@@ -14,7 +14,7 @@ Watch the idea move, see exactly where it breaks, then test yourself.
 
 <br>
 
-<a href="https://github.com/ombdj1209/openlessons/blob/main/docs/media/demo.mp4"><img src="docs/media/demo-poster.png" alt="Play the demo: a URL shortener grows from one server, breaks under load, then gains a load balancer, a cache and shards" width="860"></a>
+<a href="https://ombdj1209.github.io/openlessons/demo.html"><img src="docs/media/demo-poster.png" alt="Play the demo: a URL shortener grows from one server, breaks under load, then gains a load balancer, a cache and shards" width="860"></a>
 <br><sub>Click to play the demo (1 minute 21 seconds, no sound)</sub>
 
 </div>
