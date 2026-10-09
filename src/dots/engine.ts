@@ -641,33 +641,34 @@ export class DotEngine {
   }
 
   /**
-   * Panel geometry in canvas pixels. Type is sized to the screen (never under 16 CSS px),
-   * and the height is fixed for the whole lesson — sized for its longest caption — so the
-   * stage above never jumps between steps.
+   * Panel geometry in canvas pixels: always exactly two caption lines tall, so it stays slim
+   * and the stage above never jumps. Quick checks add a row for their answers on that step only.
+   * Type is sized to the screen (never under 16 CSS px).
    */
   private panelLayout(g: G, w: number, h: number, dpr: number): PanelLayout {
-    const key = `${w}x${h}x${dpr}`;
+    const chk = this.current.check;
+    const key = `${w}x${h}x${dpr}x${chk ? this.step : -1}`;
     if (this.panelCache?.key === key) return this.panelCache.L;
     const u = Math.max(16 * dpr, Math.min(w / DW * CAP, h / DH * CAP));
     const padX = Math.max(u * 1.1, w * .06);
     const textW = Math.min(w - padX * 2, u * 42);
-    let maxLines = 1, optRows = 0;
-    for (const s of this.steps) {
-      if (!s.panel) continue;
-      const texts = s.check ? [`${s.caption} ${s.check.question}`, `*Correct.* ${s.check.explain}`, `*Not quite.* ${s.check.explain}`] : [s.caption];
-      for (const t of texts) maxLines = Math.max(maxLines, this.layout(g, words(t), textW, u).length);
-      if (s.check) optRows = Math.max(optRows, this.pillRows(g, s.check.options, u, textW).rows.length);
-    }
     const LHpx = u * LH / CAP;
-    const eyebrowY = u * 1.45;                                 // baselines, from the panel top
-    const capY = eyebrowY + u * 1.45;
-    const capEnd = capY + (maxLines - 1) * LHpx + u * .4;
-    const optY = capEnd + u * .6;
+    const capY = u * 1.15;                                     // first caption baseline, from the panel top
+    const capEnd = capY + LHpx + u * .3;                       // two lines
+    const optRows = chk ? this.pillRows(g, chk.options, u, textW).rows.length : 0;
+    const optY = capEnd + u * .4;
     const optH = optRows ? optRows * (u * 1.25) + (optRows - 1) * u * .35 : 0;
-    const height = (optRows ? optY + optH : capEnd) + u * 1.1;
-    const L: PanelLayout = { u, padX, textW, top: h - height, height, eyebrowY, capY, maxLines, LH: LHpx, optY };
+    const height = (optRows ? optY + optH : capEnd) + u * .55;
+    const L: PanelLayout = { u, padX, textW, top: h - height, height, capY, maxLines: 2, LH: LHpx, optY };
     this.panelCache = { key, L };
     return L;
+  }
+
+  /** Lines for a caption, with the type shrunk just enough (at most to 72%) to fit two lines. */
+  private fitCaption(g: G, text: string, L: PanelLayout) {
+    let size = L.u, lines = this.layout(g, words(text), L.textW, size);
+    while (lines.length > L.maxLines && size > L.u * .72) { size *= .94; lines = this.layout(g, words(text), L.textW, size); }
+    return { size, lines, lh: L.LH * size / L.u };
   }
 
   /**
@@ -704,12 +705,9 @@ export class DotEngine {
     g.beginPath(); g.moveTo(inset + rad, top + u * .5); g.lineTo(w - inset - rad, top + u * .5); g.stroke();
     g.restore();
 
-    // The step's topic, small, above the caption.
     // The caption runs on its own clock, started once when the step begins. stepT0 restarts
     // when a `via` step's new shapes start building; using it here made captions type twice.
     const tc = this.clock - this.captionT0;
-    const eyebrow = (s.check && !this.answers.has(this.step) ? 'Quick check' : s.eyebrow ?? '').toUpperCase();
-    this.text(g, eyebrow, w / 2, top + L.eyebrowY, `600 ${u * .42}px ${FONT.mono}`, clamp(tc / .4), 'center', INK_ACCENT, `${u * .14}px`);
 
     // Caption: the previous one fades; the new one arrives word by word at reading pace.
     const outA = 1 - clamp((this.clock - this.prev.t) / .3);
@@ -717,27 +715,27 @@ export class DotEngine {
     // The same caption carried into the next step stays fully written instead of re-typing.
     const same = !ans && this.prev.caption === this.captionText();
     const tw = same ? 1e4 : tc - (ans ? ans.t - this.captionT0 : 0);
-    const lines = this.layout(g, words(this.captionText()), L.textW, u);
-    const y0 = top + L.capY + (L.maxLines - lines.length) * L.LH / 2;
+    const { size: cs, lines, lh } = this.fitCaption(g, this.captionText(), L);
+    const y0 = top + L.capY + Math.max(0, L.maxLines - lines.length) * lh / 2;
     if (outA > 0 && this.prev.caption && !same) {
-      const pl = this.layout(g, words(this.prev.caption), L.textW, u);
-      const py0 = top + L.capY + (L.maxLines - pl.length) * L.LH / 2;
-      pl.forEach((ln, li) => ln.words.forEach((wd) => this.text(g, wd.w, w / 2 - ln.width / 2 + wd.x, py0 + li * L.LH - (1 - outA) * u * .2,
-        `${wd.em ? 600 : 400} ${u}px ${FONT.caption}`, outA * .45, 'left', '#17171b')));
+      const { size: ps, lines: pl, lh: plh } = this.fitCaption(g, this.prev.caption, L);
+      const py0 = top + L.capY + Math.max(0, L.maxLines - pl.length) * plh / 2;
+      pl.forEach((ln, li) => ln.words.forEach((wd) => this.text(g, wd.w, w / 2 - ln.width / 2 + wd.x, py0 + li * plh - (1 - outA) * u * .2,
+        `${wd.em ? 600 : 400} ${ps}px ${FONT.caption}`, outA * .45, 'left', '#17171b')));
     }
     let k = 0;
     lines.forEach((ln, li) => ln.words.forEach((wd) => {
       const appear = .35 + k * WORD, wa = clamp((tw - appear) / .25);
       k++;
       if (wa <= 0) return;
-      const x = w / 2 - ln.width / 2 + wd.x, y = y0 + li * L.LH;
+      const x = w / 2 - ln.width / 2 + wd.x, y = y0 + li * lh;
       // Reading cursor: a soft highlight that sits on the word just arrived, then lets go.
       const fresh = clamp(1 - (tw - appear) / .6);
       if (fresh > 0) {
         g.globalAlpha = fresh * .22 * wa; g.fillStyle = ACCENT;
-        g.beginPath(); g.roundRect(x - u * .16, y - u * .86, wd.width + u * .32, u * 1.16, u * .22); g.fill();
+        g.beginPath(); g.roundRect(x - cs * .16, y - cs * .86, wd.width + cs * .32, cs * 1.16, cs * .22); g.fill();
       }
-      this.text(g, wd.w, x, y + (1 - wa) * u * .16, `${wd.em ? 600 : 400} ${u}px ${FONT.caption}`, wa, 'left', wd.em ? INK_ACCENT : '#17171b');
+      this.text(g, wd.w, x, y + (1 - wa) * cs * .16, `${wd.em ? 600 : 400} ${cs}px ${FONT.caption}`, wa, 'left', wd.em ? INK_ACCENT : '#17171b');
     }));
 
     // Quick-check answers, once the question has been read.
@@ -774,5 +772,5 @@ export class DotEngine {
 
 interface PanelLayout {
   u: number; padX: number; textW: number; top: number; height: number;
-  eyebrowY: number; capY: number; maxLines: number; LH: number; optY: number;
+  capY: number; maxLines: number; LH: number; optY: number;
 }

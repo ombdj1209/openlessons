@@ -40,7 +40,7 @@ Lessons are drawn on a 1600 × 900 stage (16:9), scaled to fit any screen. `[0, 
 | Field | Type | Default | Notes |
 |---|---|---|---|
 | `caption` | string | required | At most 170 characters. Wrap key terms in `*asterisks*` to highlight them |
-| `eyebrow` | string | | Small heading above the caption |
+| `eyebrow` | string | | A short name for the step. Not shown in the player; it keeps long lesson files readable |
 | `chapter` | string | | Starts a chapter in the top bar; carries forward until the next one. Use topic names ("A cache"), not repeated labels |
 | `form` | Form | previous step's | What the dots draw. Omit it to keep the picture and change only the words |
 | `labels` | Label[] | `[]` | Extra text on the stage |
