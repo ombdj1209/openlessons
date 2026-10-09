@@ -1,27 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getProgress, saveProgress } from '../store';
 import { DotEngine, loadFonts } from './engine';
-import { exportDots } from './exportDots';
-import type { DotsLesson } from './schema';
+import type { Lesson } from './schema';
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
 /** Chapters from the steps' `chapter` fields (each carries forward until the next). */
-function chaptersOf(lesson: DotsLesson) {
+function chaptersOf(lesson: Lesson) {
   const out: { name: string; start: number }[] = [];
   lesson.steps.forEach((s, i) => { if (s.chapter && s.chapter !== out[out.length - 1]?.name) out.push({ name: s.chapter, start: i }); });
   return out;
 }
 
 /** Full-screen, black, interactive player for dots lessons. */
-export function DotPlayer({ slug, lesson, next }: { slug: string; lesson: DotsLesson; next?: { slug: string; title: string } | null }) {
+export function DotPlayer({ slug, lesson, next }: { slug: string; lesson: Lesson; next?: { slug: string; title: string } | null }) {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const eng = useRef<DotEngine | null>(null);
   const cursor = useRef<[number, number] | null>(null);
   const lastMove = useRef(-1e9);
   const hoverRef = useRef(-1);
   const pinnedRef = useRef(-1);
-  const thinkingRef = useRef(false);
   const seen = useRef(new Set<number>());
   const [step, setStep] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -32,8 +30,6 @@ export function DotPlayer({ slug, lesson, next }: { slug: string; lesson: DotsLe
   const [exporting, setExporting] = useState(false);
   const [overControl, setOverControl] = useState(false);
   const [, tick] = useState(0); // re-render the note card while its item moves
-  const [thinking, setThinking] = useState(false);
-  const [panelTop, setPanelTop] = useState(0);
   const [finished, setFinished] = useState(false);
   const idleTimer = useRef(0);
   const chapters = chaptersOf(lesson);
@@ -87,9 +83,6 @@ export function DotPlayer({ slug, lesson, next }: { slug: string; lesson: DotsLe
         }
         if (!done && e.finished) { done = true; save(true); setFinished(true); }
         if (done && !e.finished) { done = false; setFinished(false); }
-        // The "ready" button sits just above the caption panel during a thinking pause.
-        if (e.thinking !== thinkingRef.current) { thinkingRef.current = e.thinking; setThinking(e.thinking); }
-        if (e.thinking && cv) setPanelTop((e.panelTopPx / cv.height) * cv.getBoundingClientRect().height);
         if (pinnedRef.current >= 0 || hoverRef.current >= 0) tick((n) => (n + 1) % 1000);
         raf = requestAnimationFrame(loop);
       };
@@ -228,13 +221,6 @@ export function DotPlayer({ slug, lesson, next }: { slug: string; lesson: DotsLe
         </div>
       </div>
 
-
-      {thinking && !finished && (
-        <button className="dot-ready" style={{ bottom: `calc(100% - ${panelTop}px + 20px)` }} onClick={() => go(step + 1)}>
-          I've thought about it · show me the ways →
-        </button>
-      )}
-
       {finished && (
         <div className="dot-end" role="dialog" aria-label="Lesson complete">
           <div className="dot-end-card">
@@ -255,7 +241,7 @@ export function DotPlayer({ slug, lesson, next }: { slug: string; lesson: DotsLe
   );
 }
 
-function DotExport({ lesson, slug, onClose }: { lesson: DotsLesson; slug: string; onClose(): void }) {
+function DotExport({ lesson, slug, onClose }: { lesson: Lesson; slug: string; onClose(): void }) {
   const [height, setHeight] = useState<720 | 1080>(1080);
   const [fps, setFps] = useState<30 | 60>(30);
   const [progress, setProgress] = useState<number | null>(null);
@@ -268,6 +254,8 @@ function DotExport({ lesson, slug, onClose }: { lesson: DotsLesson; slug: string
     abort.current = new AbortController();
     setError(null); setProgress(0);
     try {
+      // The encoder is large and only needed here, so it loads on first export.
+      const { exportDots } = await import('./exportDots');
       const blob = await exportDots(lesson, { height, fps, onProgress: setProgress, signal: abort.current.signal });
       const u = URL.createObjectURL(blob);
       setUrl(u);

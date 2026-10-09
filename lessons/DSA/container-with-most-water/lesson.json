@@ -1,8 +1,8 @@
 {
-  "engine": "dots",
-  "createdAt": "2026-10-08",
-  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "$schema": "../../../lesson.schema.json",
   "title": "Container with most water",
+  "question": "How do you find the two walls that hold the most water?",
+  "createdAt": "2026-10-08",
   "tags": [
     "dsa",
     "arrays",
@@ -14,6 +14,9 @@
     "Google",
     "Amazon",
     "Microsoft"
+  ],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Medium",
   "dots": 1300,

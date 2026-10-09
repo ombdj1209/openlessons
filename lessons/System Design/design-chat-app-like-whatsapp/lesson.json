@@ -1,11 +1,8 @@
 {
-  "engine": "dots",
-  "createdAt": "2026-10-08",
-  "request": "add the latest DSA and system design questions from open-source repos as lessons",
-  "companies": [],
-  "dots": 2400,
-  "spacing": 8,
+  "$schema": "../../../lesson.schema.json",
   "title": "Design a chat app like WhatsApp",
+  "question": "How would you design a chat app like WhatsApp?",
+  "createdAt": "2026-10-08",
   "tags": [
     "system-design",
     "interview",
@@ -13,6 +10,12 @@
     "messaging",
     "real-time"
   ],
+  "companies": [],
+  "authors": [
+    "ombdj1209"
+  ],
+  "dots": 2400,
+  "spacing": 8,
   "difficulty": "Medium",
   "steps": [
     {

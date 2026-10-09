@@ -1,7 +1,7 @@
 {
-  "engine": "dots",
+  "$schema": "../../../lesson.schema.json",
   "title": "Floyd's cycle detection: tortoise and hare",
-  "request": "add more impressive god-level DSA solutions",
+  "question": "How do you detect a cycle in a linked list without extra memory?",
   "createdAt": "2026-10-08",
   "tags": [
     "dsa",
@@ -15,6 +15,9 @@
     "Microsoft",
     "Goldman Sachs",
     "Nvidia"
+  ],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Easy",
   "dots": 1300,

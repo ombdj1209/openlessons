@@ -1,12 +1,16 @@
 {
-  "engine": "dots",
+  "$schema": "../../../lesson.schema.json",
   "title": "How OAuth token refresh works",
-  "request": "How does OAuth token refresh work?",
+  "question": "How does OAuth token refresh keep you signed in without your password?",
   "createdAt": "2026-10-08",
   "tags": [
     "auth",
     "web",
     "oauth"
+  ],
+  "companies": [],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Medium",
   "dots": 1000,

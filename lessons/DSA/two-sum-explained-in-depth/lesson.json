@@ -1,7 +1,7 @@
 {
-  "engine": "dots",
+  "$schema": "../../../lesson.schema.json",
   "title": "Two Sum, explained in depth",
-  "request": "search the top best DSA question and explain that question's answer with this, very detailed explanation",
+  "question": "How do you find two numbers that add up to a target?",
   "createdAt": "2026-10-08",
   "tags": [
     "dsa",
@@ -14,6 +14,9 @@
     "Google",
     "Adobe",
     "Goldman Sachs"
+  ],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Easy",
   "dots": 1300,

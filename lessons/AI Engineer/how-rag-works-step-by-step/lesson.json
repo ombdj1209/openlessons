@@ -1,12 +1,8 @@
 {
-  "engine": "dots",
-  "createdAt": "2026-10-09",
-  "request": "add an AI Engineer folder with RAG in detail: how it works, types of RAG and use cases",
-  "companies": [],
-  "dots": 2400,
-  "spacing": 8,
-  "difficulty": "Medium",
+  "$schema": "../../../lesson.schema.json",
   "title": "How RAG works, step by step",
+  "question": "How does retrieval augmented generation (RAG) work?",
+  "createdAt": "2026-10-09",
   "tags": [
     "ai-engineering",
     "rag",
@@ -15,6 +11,13 @@
     "vector-database",
     "interview"
   ],
+  "companies": [],
+  "authors": [
+    "ombdj1209"
+  ],
+  "dots": 2400,
+  "spacing": 8,
+  "difficulty": "Medium",
   "steps": [
     {
       "eyebrow": "The question",

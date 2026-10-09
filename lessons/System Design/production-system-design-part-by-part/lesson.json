@@ -1,13 +1,17 @@
 {
-  "engine": "dots",
+  "$schema": "../../../lesson.schema.json",
   "title": "Production system design, part by part",
-  "request": "best production system design explain each part properly in detail",
+  "question": "What does a production backend for 10 million users look like?",
   "createdAt": "2026-10-08",
   "tags": [
     "system-design",
     "backend",
     "scaling",
     "interview"
+  ],
+  "companies": [],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Medium",
   "dots": 1100,

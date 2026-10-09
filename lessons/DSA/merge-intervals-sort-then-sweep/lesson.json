@@ -1,8 +1,8 @@
 {
-  "engine": "dots",
-  "createdAt": "2026-10-08",
-  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "$schema": "../../../lesson.schema.json",
   "title": "Merge intervals: sort, then sweep",
+  "question": "How do you merge overlapping intervals?",
+  "createdAt": "2026-10-08",
   "tags": [
     "dsa",
     "arrays",
@@ -13,6 +13,9 @@
   "companies": [
     "Amazon",
     "Microsoft"
+  ],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Medium",
   "dots": 1300,

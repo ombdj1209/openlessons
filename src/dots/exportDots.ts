@@ -1,6 +1,6 @@
 import { BufferTarget, CanvasSource, Mp4OutputFormat, Output, QUALITY_HIGH, canEncodeVideo } from 'mediabunny';
 import { DotEngine, loadFonts } from './engine';
-import type { DotsLesson } from './schema';
+import type { Lesson } from './schema';
 
 export interface DotsExportOptions {
   height: 720 | 1080;
@@ -13,7 +13,7 @@ export interface DotsExportOptions {
  * Plays the lesson from the start in its own engine with a fixed time step and records
  * every frame, so the video is the same each time and never depends on the live player.
  */
-export async function exportDots(lesson: DotsLesson, o: DotsExportOptions): Promise<Blob> {
+export async function exportDots(lesson: Lesson, o: DotsExportOptions): Promise<Blob> {
   const h = o.height, w = Math.round((h * 16) / 9);
   if (!(await canEncodeVideo('avc', { width: w, height: h }))) throw new Error('This browser cannot encode H.264 video.');
   await loadFonts();

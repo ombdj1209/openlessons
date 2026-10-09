@@ -1,7 +1,7 @@
 {
-  "engine": "dots",
+  "$schema": "../../../lesson.schema.json",
   "title": "Kadane's algorithm: maximum subarray",
-  "request": "add more impressive god-level DSA solutions",
+  "question": "How do you find the subarray with the largest sum in one pass?",
   "createdAt": "2026-10-08",
   "tags": [
     "dsa",
@@ -15,6 +15,9 @@
     "Amazon",
     "Goldman Sachs",
     "LinkedIn"
+  ],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Medium",
   "dots": 1300,

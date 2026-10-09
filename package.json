@@ -1,18 +1,46 @@
 {
-  "name": "lesson-player",
-  "private": true,
+  "name": "openlessons",
   "version": "0.1.0",
+  "description": "Open source, animated lessons for DSA, system design and AI engineering, drawn with thousands of moving dots.",
+  "private": true,
   "type": "module",
+  "license": "Apache-2.0",
+  "author": "ombdj1209 <p-bharadwaj@jmc-ltd.co.jp>",
+  "contributors": [
+    "ombdj1209 <omprakashbdj1209@gmail.com>"
+  ],
+  "homepage": "https://ombdj1209.github.io/openlessons/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ombdj1209/openlessons.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ombdj1209/openlessons/issues"
+  },
+  "keywords": [
+    "education",
+    "interview-prep",
+    "dsa",
+    "system-design",
+    "rag",
+    "animation",
+    "canvas",
+    "learning"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check-lessons": "tsx scripts/check-lessons.ts"
+    "check-lessons": "tsx scripts/check-lessons.ts",
+    "schema": "tsx scripts/build-schema.ts",
+    "verify": "npm run typecheck && npm run check-lessons && npm test && npm run build"
   },
   "dependencies": {
-    "elkjs": "^0.12.0",
-    "gsap": "^3.15.0",
     "idb": "^8.0.4",
     "mediabunny": "^1.61.3",
     "react": "^19.3.0",
@@ -24,7 +52,6 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
-    "jsdom": "^29.1.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.3",

@@ -1,12 +1,16 @@
 {
-  "engine": "dots",
+  "$schema": "../../../lesson.schema.json",
   "title": "How data moves",
-  "request": "show me how data moves through a system, with dots",
+  "question": "What actually happens when you tap Buy in an app?",
   "createdAt": "2026-10-08",
   "tags": [
     "system-design",
     "databases",
     "primer"
+  ],
+  "companies": [],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Easy",
   "dots": 960,

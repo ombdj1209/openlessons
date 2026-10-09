@@ -1,7 +1,7 @@
 {
-  "engine": "dots",
+  "$schema": "../../../lesson.schema.json",
   "title": "Binary search: halving the problem",
-  "request": "add more impressive god-level DSA solutions",
+  "question": "How does binary search find a number in a sorted list so fast?",
   "createdAt": "2026-10-08",
   "tags": [
     "dsa",
@@ -14,6 +14,9 @@
     "Google",
     "Meta",
     "Microsoft"
+  ],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Easy",
   "dots": 1300,

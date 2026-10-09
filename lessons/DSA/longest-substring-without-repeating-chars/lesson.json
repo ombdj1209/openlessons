@@ -1,8 +1,8 @@
 {
-  "engine": "dots",
-  "createdAt": "2026-10-08",
-  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "$schema": "../../../lesson.schema.json",
   "title": "Longest substring without repeating characters",
+  "question": "How do you find the longest substring without repeating characters?",
+  "createdAt": "2026-10-08",
   "tags": [
     "dsa",
     "strings",
@@ -15,6 +15,9 @@
     "Amazon",
     "Meta",
     "Microsoft"
+  ],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Medium",
   "dots": 1300,

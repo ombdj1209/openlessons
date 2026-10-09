@@ -1,12 +1,8 @@
 {
-  "engine": "dots",
-  "createdAt": "2026-10-09",
-  "request": "add an AI Engineer folder with RAG in detail: how it works, types of RAG and use cases",
-  "companies": [],
-  "dots": 2400,
-  "spacing": 8,
-  "difficulty": "Medium",
+  "$schema": "../../../lesson.schema.json",
   "title": "Types of RAG: naive, advanced, modular",
+  "question": "What are naive, advanced and modular RAG, and when do you use each?",
+  "createdAt": "2026-10-09",
   "tags": [
     "ai-engineering",
     "rag",
@@ -16,6 +12,13 @@
     "modular-rag",
     "interview"
   ],
+  "companies": [],
+  "authors": [
+    "ombdj1209"
+  ],
+  "dots": 2400,
+  "spacing": 8,
+  "difficulty": "Medium",
   "steps": [
     {
       "eyebrow": "The question",

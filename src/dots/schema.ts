@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-/** Design space every dots lesson is authored in (16:9). Captions own the band below y = 760. */
+/** Design space every lesson is authored in (16:9). Captions own the band below y = 760. */
 export const DW = 1600, DH = 900;
 
 export const SHAPES = [
@@ -11,7 +11,7 @@ export const SHAPES = [
 
 const XY = z.tuple([z.number(), z.number()]);
 
-export const DotItem = z.object({
+export const DotItem = z.strictObject({
   shape: z.enum(SHAPES),
   at: XY.optional(),
   scale: z.number().positive().max(4).default(1),
@@ -50,7 +50,7 @@ export const DotItem = z.object({
   /** array cells / bars / intervals / grid cells to grey out (ruled out, already processed). */
   dim: z.array(z.number().int().min(0)).optional(),
   /** array: pointer arrows under cells, e.g. { "i": 2, "text": "j" }. */
-  marks: z.array(z.object({ i: z.number().int().min(0), text: z.string() })).optional(),
+  marks: z.array(z.strictObject({ i: z.number().int().min(0), text: z.string() })).optional(),
 }).superRefine((it, ctx) => {
   if (it.shape === 'pipe' ? !it.path : !it.at) {
     ctx.addIssue({ code: 'custom', message: it.shape === 'pipe' ? 'pipe needs a path' : `${it.shape} needs at: [x, y]` });
@@ -65,7 +65,7 @@ export const DotItem = z.object({
 });
 export type DotItem = z.infer<typeof DotItem>;
 
-export const DotFlow = z.object({
+export const DotFlow = z.strictObject({
   path: z.array(XY).min(2),
   count: z.number().int().min(1).max(30).default(5),
   speed: z.number().positive().max(3).default(0.5),
@@ -77,24 +77,24 @@ export const DotFlow = z.object({
   drop: z.boolean().default(false),
 });
 
-const Ball = z.object({ at: XY, label: z.string().optional(), id: z.string().optional(), note: z.string().optional() });
+const Ball = z.strictObject({ at: XY, label: z.string().optional(), id: z.string().optional(), note: z.string().optional() });
 
 export const DotForm = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('sphere'), at: XY.default([800, 410]), r: z.number().positive().max(400).default(150) }),
-  z.object({ type: z.literal('spheres'), items: z.array(Ball).min(1).max(6), r: z.number().positive().max(300).default(90) }),
-  z.object({ type: z.literal('shapes'), items: z.array(DotItem).min(1), flows: z.array(DotFlow).default([]) }),
+  z.strictObject({ type: z.literal('sphere'), at: XY.default([800, 410]), r: z.number().positive().max(400).default(150) }),
+  z.strictObject({ type: z.literal('spheres'), items: z.array(Ball).min(1).max(6), r: z.number().positive().max(300).default(90) }),
+  z.strictObject({ type: z.literal('shapes'), items: z.array(DotItem).min(1), flows: z.array(DotFlow).default([]) }),
 ]);
 export type DotForm = z.infer<typeof DotForm>;
 
 /** Retrieval practice: the lesson waits for an answer, then explains it. */
-export const DotCheck = z.object({
+export const DotCheck = z.strictObject({
   question: z.string().min(1),
   options: z.array(z.string().min(1)).min(2).max(4),
   answer: z.number().int().min(0),
   explain: z.string().min(1),
 }).refine((c) => c.answer < c.options.length, 'answer must index into options');
 
-export const DotStep = z.object({
+export const DotStep = z.strictObject({
   eyebrow: z.string().optional(),
   /** Words wrapped in *asterisks* are key terms and light up. */
   caption: z.string().min(1),
@@ -109,35 +109,37 @@ export const DotStep = z.object({
   /** false keeps the caption panel away, leaving the whole stage to the dots (e.g. the opening question). */
   panel: z.boolean().default(true),
   /** The problem exactly as an interviewer reads it, shown crisp on the stage under the dots. */
-  problem: z.object({
+  problem: z.strictObject({
     statement: z.string().min(1),
     example: z.array(z.string()).default([]),
     constraints: z.array(z.string()).default([]),
     followUp: z.string().optional(),
   }).optional(),
   /** What the interviewer is really asking, in simple English (shown in yellow, after the problem). */
-  plain: z.object({
+  plain: z.strictObject({
     asking: z.string().min(1),
     points: z.array(z.string()).default([]),
   }).optional(),
-  /** A thinking pause: the lesson waits here until the learner moves on. */
-  think: z.boolean().default(false),
   /** Chapter this step starts or belongs to (Problem, Approaches, Solution, Code…); carried forward. */
   chapter: z.string().optional(),
   check: DotCheck.optional(),
   /** Free text. `code: true` sets it left-aligned in monospace, for code and formulas. */
-  labels: z.array(z.object({ text: z.string(), at: XY, accent: z.boolean().optional(), code: z.boolean().optional(), fail: z.boolean().optional() })).default([]),
+  labels: z.array(z.strictObject({ text: z.string(), at: XY, accent: z.boolean().optional(), code: z.boolean().optional(), fail: z.boolean().optional() })).default([]),
 });
 export type DotStep = z.infer<typeof DotStep>;
 
-export const DotsLesson = z.object({
-  engine: z.literal('dots'),
+export const Lesson = z.strictObject({
+  /** Optional pointer to lesson.schema.json, for editor autocomplete. */
+  $schema: z.string().optional(),
   title: z.string().min(1),
-  request: z.string().min(1),
+  /** The question this lesson answers, in a learner's words. Shown in search. */
+  question: z.string().min(1),
   createdAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   tags: z.array(z.string()).default([]),
   /** Companies publicly reported to ask this problem; shown as tags and used by the library filter. */
   companies: z.array(z.string()).default([]),
+  /** GitHub usernames of the people who wrote or improved this lesson. */
+  authors: z.array(z.string().regex(/^[A-Za-z0-9-]+$/, 'GitHub username without @')).default([]),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).optional(),
   dots: z.number().int().min(300).max(2500).default(960),
   /**
@@ -153,4 +155,4 @@ export const DotsLesson = z.object({
     if (s.caption.length > 170) ctx.addIssue({ code: 'custom', path: ['steps', i, 'caption'], message: 'keep captions under 170 characters (about two lines)' });
   });
 });
-export type DotsLesson = z.infer<typeof DotsLesson>;
+export type Lesson = z.infer<typeof Lesson>;

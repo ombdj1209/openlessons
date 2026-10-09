@@ -1,8 +1,8 @@
 {
-  "engine": "dots",
-  "createdAt": "2026-10-08",
-  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "$schema": "../../../lesson.schema.json",
   "title": "Top K frequent elements: bucket sort",
+  "question": "How do you find the k most frequent elements faster than sorting?",
+  "createdAt": "2026-10-08",
   "tags": [
     "dsa",
     "hash-map",
@@ -13,6 +13,9 @@
   "companies": [
     "Amazon",
     "Microsoft"
+  ],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Medium",
   "dots": 1300,

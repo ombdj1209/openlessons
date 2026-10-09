@@ -1,4 +1,4 @@
-import { DH, DW, type DotForm, type DotStep, type DotsLesson } from './schema';
+import { DH, DW, type DotForm, type DotStep, type Lesson } from './schema';
 import { itemPoints, type Ann, type Pt } from './shapes';
 
 export const ACCENT = '#ff7a3d';
@@ -181,7 +181,7 @@ export class DotEngine {
   /** Export mode: answer quick checks by itself after a reading pause. */
   autoAnswer = false;
 
-  constructor(readonly lesson: DotsLesson) {
+  constructor(readonly lesson: Lesson) {
     const n = this.n = lesson.dots;
     const F = () => new Float32Array(n);
     this.x = F(); this.y = F(); this.r = F(); this.a = F(); this.c = F();
@@ -214,8 +214,6 @@ export class DotEngine {
   stepDuration(k: number): number {
     const s = this.steps[k];
     const base = Math.max(s.dur, (s.problem ? problemTime(s.problem) : s.plain ? plainTime(s.plain) : readTime(s.caption)) + 2.2);
-    // A thinking pause waits for the learner; a video can't, so it just holds for a beat.
-    if (s.think) return this.autoAnswer ? base : Infinity;
     if (!s.check) return base;
     const ans = this.answers.get(k);
     if (!ans) return Infinity;
@@ -438,8 +436,6 @@ export class DotEngine {
   }
   /** True when a canvas-pixel point is on the caption panel. */
   onPanel(py: number) { return py >= this.panelTop; }
-  /** Top edge of the caption panel in canvas pixels, for placing HTML above it. */
-  get panelTopPx() { return this.panelTop; }
 
   render(g: G, w: number, h: number, o: { cursor?: [number, number] | null; cursorK?: number; hover?: number; bare?: boolean; dpr?: number } = {}) {
     // The panel claims the bottom of the screen; the diagram fits into what is left above it.
@@ -522,8 +518,6 @@ export class DotEngine {
     g.globalAlpha = 1;
   }
 
-  /** True while a thinking pause is waiting for the learner to move on. */
-  get thinking() { return this.current.think && !this.autoAnswer && this.pending < 0; }
 
   /**
    * The problem as the interviewer reads it: statement (word by word, at reading pace),

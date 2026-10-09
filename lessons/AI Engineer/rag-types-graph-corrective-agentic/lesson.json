@@ -1,12 +1,8 @@
 {
-  "engine": "dots",
-  "createdAt": "2026-10-09",
-  "request": "add an AI Engineer folder with RAG in detail: how it works, types of RAG and use cases",
-  "companies": [],
-  "dots": 2400,
-  "spacing": 8,
-  "difficulty": "Medium",
+  "$schema": "../../../lesson.schema.json",
   "title": "Types of RAG: corrective, agentic, graph and more",
+  "question": "What are corrective, self, agentic, graph, multimodal and adaptive RAG?",
+  "createdAt": "2026-10-09",
   "tags": [
     "ai-engineering",
     "rag",
@@ -18,6 +14,13 @@
     "multimodal",
     "interview"
   ],
+  "companies": [],
+  "authors": [
+    "ombdj1209"
+  ],
+  "dots": 2400,
+  "spacing": 8,
+  "difficulty": "Medium",
   "steps": [
     {
       "eyebrow": "The question",

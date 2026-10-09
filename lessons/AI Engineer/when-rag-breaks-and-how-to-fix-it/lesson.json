@@ -1,12 +1,8 @@
 {
-  "engine": "dots",
-  "createdAt": "2026-10-09",
-  "request": "add an AI Engineer folder with RAG in detail: how it works, types of RAG and use cases",
-  "companies": [],
-  "dots": 2400,
-  "spacing": 8,
-  "difficulty": "Medium",
+  "$schema": "../../../lesson.schema.json",
   "title": "When RAG breaks, and how to fix it",
+  "question": "Why do RAG systems give wrong answers, and how do you fix them?",
+  "createdAt": "2026-10-09",
   "tags": [
     "ai-engineering",
     "rag",
@@ -16,6 +12,13 @@
     "reranking",
     "evaluation"
   ],
+  "companies": [],
+  "authors": [
+    "ombdj1209"
+  ],
+  "dots": 2400,
+  "spacing": 8,
+  "difficulty": "Medium",
   "steps": [
     {
       "eyebrow": "The question",

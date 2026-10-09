@@ -1,8 +1,8 @@
 {
-  "engine": "dots",
-  "createdAt": "2026-10-08",
-  "request": "add the latest DSA and system design questions from open-source repos as lessons",
+  "$schema": "../../../lesson.schema.json",
   "title": "LRU cache: hash map plus linked list",
+  "question": "How do you build an LRU cache with O(1) get and put?",
+  "createdAt": "2026-10-08",
   "tags": [
     "dsa",
     "design",
@@ -12,6 +12,9 @@
   ],
   "companies": [
     "Amazon"
+  ],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Medium",
   "dots": 1300,

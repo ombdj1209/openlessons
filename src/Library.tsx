@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { DotEngine, loadFonts } from './dots/engine';
-import type { DotsLesson } from './dots/schema';
+import type { Lesson } from './dots/schema';
 import { lessonInfo, type LoadedLesson } from './lessons';
 import { allProgress, type Progress } from './store';
 
-/** A still of a dots lesson: its most telling step, drawn by the real engine. */
-function DotThumb({ lesson }: { lesson: DotsLesson }) {
+/** A still of a lesson: its most telling step, drawn by the real engine. */
+function DotThumb({ lesson }: { lesson: Lesson }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const cv = ref.current;
@@ -21,15 +21,7 @@ function DotThumb({ lesson }: { lesson: DotsLesson }) {
   return <canvas ref={ref} className="thumb" width={640} height={360} aria-hidden="true" />;
 }
 
-/** First scene of an SVG lesson as an inline still; ids re-prefixed so cards never collide. */
-function SvgThumb({ l }: { l: LoadedLesson }) {
-  const s = l.scenes[0];
-  if (!s) return <div className="thumb thumb-empty">No playable scenes</div>;
-  const html = s.svg.replaceAll(`${s.id}__`, `t-${l.slug}-${s.id}__`);
-  return <div className="thumb thumb-light" aria-hidden="true" dangerouslySetInnerHTML={{ __html: html }} />;
-}
-
-const ORDER = ['DSA', 'System Design', 'Concepts'];
+const ORDER = ['DSA', 'System Design', 'AI Engineer', 'Concepts'];
 const byOrder = (a: string, b: string) => ((ORDER.indexOf(a) + 1 || 99) - (ORDER.indexOf(b) + 1 || 99)) || a.localeCompare(b);
 
 export function Library({ lessons }: { lessons: LoadedLesson[] }) {
@@ -53,7 +45,7 @@ export function Library({ lessons }: { lessons: LoadedLesson[] }) {
 
   const shown = inFolder
     .filter(({ l, info }) => {
-      const hay = [l.slug, info.title, info.request, ...info.tags, ...info.companies].join(' ').toLowerCase();
+      const hay = [l.slug, info.title, info.question, ...info.tags, ...info.companies].join(' ').toLowerCase();
       return hay.includes(q.trim().toLowerCase()) && (!company || info.companies.includes(company));
     })
     .sort((a, b) => byOrder(a.l.category, b.l.category) || b.info.createdAt.localeCompare(a.info.createdAt) || a.info.title.localeCompare(b.info.title));
@@ -71,7 +63,7 @@ export function Library({ lessons }: { lessons: LoadedLesson[] }) {
   return (
     <div className="lib">
       <aside className="lib-side" aria-label="Folders">
-        <p className="lib-brand">Visual lessons</p>
+        <p className="lib-brand">OpenLessons</p>
         <nav className="folders">
           {['All', ...folders].map((f) => {
             const n = f === 'All' ? rows.length : rows.filter((r) => r.l.category === f).length;
@@ -119,7 +111,7 @@ export function Library({ lessons }: { lessons: LoadedLesson[] }) {
           </div>
         )}
 
-        {lessons.length === 0 && <p className="empty">No lessons yet. Ask Claude Code to “make a lesson on how DNS works” and it will appear here.</p>}
+        {lessons.length === 0 && <p className="empty">No lessons yet. Add one under <code>lessons/&lt;Category&gt;/&lt;slug&gt;/lesson.json</code> and it appears here.</p>}
         {lessons.length > 0 && shown.length === 0 && <p className="empty">No lessons match.</p>}
 
         <ul className="grid">
@@ -129,7 +121,7 @@ export function Library({ lessons }: { lessons: LoadedLesson[] }) {
               <li key={l.slug}>
                 <a className="card" href={`#/lesson/${encodeURIComponent(l.slug)}`}>
                   <div className="thumb-wrap">
-                    {l.dots ? <DotThumb lesson={l.dots} /> : <SvgThumb l={l} />}
+                    {l.lesson ? <DotThumb lesson={l.lesson} /> : <div className="thumb thumb-empty">Needs fixing</div>}
                     <div className="thumb-tags">
                       {folder === 'All' && <span className="pill">{l.category}</span>}
                       {info.difficulty && <span className={`pill diff-${info.difficulty.toLowerCase()}`}>{info.difficulty}</span>}
@@ -144,7 +136,7 @@ export function Library({ lessons }: { lessons: LoadedLesson[] }) {
                         {info.companies.length > 4 && <span className="co more">+{info.companies.length - 4}</span>}
                       </div>
                     )}
-                    <p className="meta">{info.steps} steps · {pct === 100 ? 'Completed' : pct > 0 ? `${pct}% watched` : 'Not started'}</p>
+                    <p className="meta">{info.steps} steps · {pct === 100 ? 'Completed' : pct > 0 ? `${pct}% watched` : 'Not started'}{info.authors.length > 0 && <> · by {info.authors.map((a) => '@' + a).join(', ')}</>}</p>
                   </div>
                 </a>
               </li>

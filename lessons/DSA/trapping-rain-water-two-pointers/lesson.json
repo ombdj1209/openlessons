@@ -1,7 +1,7 @@
 {
-  "engine": "dots",
+  "$schema": "../../../lesson.schema.json",
   "title": "Trapping Rain Water with two pointers",
-  "request": "add more impressive god-level DSA solutions",
+  "question": "How much rain water can an elevation map trap?",
   "createdAt": "2026-10-08",
   "tags": [
     "dsa",
@@ -15,6 +15,9 @@
     "Google",
     "Goldman Sachs",
     "Bloomberg"
+  ],
+  "authors": [
+    "ombdj1209"
   ],
   "difficulty": "Hard",
   "dots": 1300,
