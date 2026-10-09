@@ -14,7 +14,8 @@ Watch the idea move, see exactly where it breaks, then test yourself.
 
 <br>
 
-<img src="docs/media/demo.gif" alt="A URL shortener lesson: one server turns red under 120,000 clicks a second, then a load balancer and more servers appear while everything else stays still" width="860">
+<a href="https://github.com/ombdj1209/openlessons/blob/main/docs/media/demo.mp4"><img src="docs/media/demo-poster.png" alt="Play the demo: a URL shortener grows from one server, breaks under load, then gains a load balancer, a cache and shards" width="860"></a>
+<br><sub>Click to play the demo (1 minute 21 seconds, no sound)</sub>
 
 </div>
 

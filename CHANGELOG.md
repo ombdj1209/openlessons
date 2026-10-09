@@ -4,7 +4,14 @@ All notable changes are recorded here, newest first. The format follows [Keep a 
 
 ## Unreleased
 
-Nothing yet. Add a line here in your pull request.
+### Changed
+
+* The caption panel is always two lines tall and no longer shows the orange step label; long captions shrink slightly to fit
+* The README demo is now a video that plays only when you press play, instead of an autoplaying GIF
+
+### Added
+
+* `bitrate` option for video export, for smaller files
 
 ## 0.1.0 (2026-10-09)
 

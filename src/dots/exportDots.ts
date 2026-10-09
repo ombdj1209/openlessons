@@ -7,6 +7,8 @@ export interface DotsExportOptions {
   fps: 30 | 60;
   onProgress(fraction: number): void;
   signal: AbortSignal;
+  /** Bits per second. Defaults to high quality; set lower for small files (dot art compresses well). */
+  bitrate?: number;
 }
 
 /**
@@ -22,7 +24,7 @@ export async function exportDots(lesson: Lesson, o: DotsExportOptions): Promise<
   const g = canvas.getContext('2d')!;
   const target = new BufferTarget();
   const output = new Output({ format: new Mp4OutputFormat(), target });
-  const source = new CanvasSource(canvas, { codec: 'avc', quality: QUALITY_HIGH });
+  const source = new CanvasSource(canvas, { codec: 'avc', bitrate: o.bitrate ?? QUALITY_HIGH });
   output.addVideoTrack(source, { frameRate: o.fps });
   await output.start();
 
