@@ -241,4 +241,4 @@ Your face goes here after your first merged pull request.
 
 OpenLessons is licensed under the [Apache License 2.0](LICENSE). The lessons are part of the project and use the same license. See [NOTICE](NOTICE).
 
-Copyright 2026 The OpenLessons Authors.
+Copyright 2026 ombdj1209 and the OpenLessons contributors.
